@@ -352,7 +352,6 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
               userName: item.userName,
               amount: item.amount,
             }));
-            console.log(userDiv);
             setUserDivision(userDiv);
             openAmountSetter(false);
           }}
