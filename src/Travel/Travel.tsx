@@ -158,9 +158,9 @@ export const TravelPage = () => {
           ) : (
             <>
               <Dashboard refreshData={refreshData}></Dashboard>
-              <Footer />
             </>
           )}
+          <Footer />
         </div>
       ) : (
         <Login />
