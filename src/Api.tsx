@@ -28,12 +28,12 @@ export const useAxiosSetup = () => {
       }
       return response;
     },
-      (error) => {
-        if (requestQueue.length === 0) {
-          setLoading(false);
-        }
-        return Promise.reject(error);
-      };
+    (error) => {
+      if (requestQueue.length === 0) {
+        setLoading(false);
+      }
+      return Promise.reject(error);
+    }
   );
 };
 
