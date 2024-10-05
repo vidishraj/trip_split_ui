@@ -1,8 +1,36 @@
 import Axios from 'axios';
 import { setupCache } from 'axios-cache-interceptor';
+import { useLoading } from './Contexts/LoadingContext';
 
 const instance = Axios.create();
 const axios = setupCache(instance, { debug: console.log });
+
+export const useAxiosSetup = () => {
+  const { setLoading } = useLoading();
+
+  axios.interceptors.request.use(
+    (config) => {
+      setLoading(true);
+      console.log(config.url);
+      return config;
+    },
+    (error) => {
+      setLoading(false);
+      return Promise.reject(error);
+    }
+  );
+
+  axios.interceptors.response.use(
+    (response) => {
+      setLoading(false);
+      return response;
+    },
+    (error) => {
+      setLoading(false);
+      return Promise.reject(error);
+    }
+  );
+};
 
 let requestQueue: (() => void)[] = [];
 let isRequestPending = false;
