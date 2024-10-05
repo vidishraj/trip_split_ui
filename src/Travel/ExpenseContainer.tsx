@@ -245,7 +245,9 @@ const ExpenseItem = ({ expense }: ExpenseProps) => {
                 }}
               >
                 {getUserName(parseInt(userId))}: ₹{' '}
-                {splitBetween[userId].toFixed(2)}
+                {parseInt(userId) === paidBy
+                  ? (amount - splitBetween[userId]).toFixed(2)
+                  : splitBetween[userId].toFixed(2)}
               </Typography>
             ))}
           </Box>
