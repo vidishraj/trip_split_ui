@@ -12,20 +12,26 @@ import {
   DialogActions,
   Button,
 } from '@mui/material';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, ChangeEvent } from 'react';
 import { useTravel } from '../../Contexts/TravelContext';
 import { CurrencyContext } from '../../Contexts/CurrencyContext';
 import { currencies } from '../Trip';
 import { round } from './ExpenseDialog';
 
+interface User {
+  userId: any;
+  userName: any;
+  isChecked: any;
+  [key: string]: any;
+}
+
 interface AmountSplitDialogProps {
-  amount: any;
-  onSubmit: any;
-  onCancel: any;
+  amount: Record<string, any>;
+  onSubmit: (users: any) => void;
+  onCancel: () => void;
   open: boolean;
-  setUserDiv: any;
   editMode?: boolean;
-  editValues?: [];
+  editValues?: { userId: string; amount: any }[];
 }
 
 export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
@@ -33,154 +39,161 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
   onSubmit,
   onCancel,
   open,
-  editMode,
-  editValues,
+  editMode = false,
+  editValues = [],
 }) => {
   const travelCtx = useTravel();
   const currencyCtx = useContext(CurrencyContext);
   const users = travelCtx.state.users;
-  const [checkedUsers, setCheckedUsers] = useState<any>(
+
+  const [checkedUsers, setCheckedUsers] = useState<User[]>(
     users.map((user) => ({
       ...user,
       isChecked: true,
     }))
   );
-
   const [isEqual, setIsEqual] = useState(true);
-  const [currentTotal, setCurrentTotal] = useState(amount);
+  const [currentTotal, setCurrentTotal] = useState<Record<string, any>>(amount);
   const [selectedCurrency, setSelectedCurrency] = useState('inr');
-  const [rawInputValues, setRawInputValues] = useState<any>({});
+  const [rawInputValues, setRawInputValues] = useState<
+    Record<number, Record<string, string>>
+  >({});
   const [submitStatus, setSubmitStatus] = useState(true);
 
   useEffect(() => {
-    let newObj = checkedUsers;
-    let rawObj: any = {};
-    checkedUsers.forEach((element: any, index: any) => {
-      rawObj[index] = {};
-    });
-    if (!editMode) {
-      newObj.forEach((item: any, index: any) => {
-        Object.keys(amount).forEach((curr) => {
-          rawObj[index][curr] = round(amount[curr] / users.length, 1);
-          newObj[index][curr] = round(amount[curr] / users.length, 1);
-        });
-      });
-    } else {
-      newObj.forEach((item: any, index: any) => {
-        let valAmount = editValues?.filter(
-          (element) => element['userId'] === item['userId']
-        )[0]['amount'];
-        Object.keys(amount).forEach((curr) => {
-          rawObj[index][curr] = valAmount;
-          newObj[index][curr] = valAmount;
-        });
-      });
-    }
-    setRawInputValues({ ...rawObj });
-    setCheckedUsers([...newObj]);
-    calculateTotal(); // eslint-disable-next-line react-hooks/exhaustive-deps
+    initializeValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount]);
 
-  function checkSubmitDiabled(currTotal: any) {
+  const initializeValues = () => {
+    const newCheckedUsers = [...checkedUsers];
+    const newRawInputValues: Record<number, Record<string, string>> = {};
+    let total = initializeTotal(amount);
+
+    newCheckedUsers.forEach((user, index) => {
+      newRawInputValues[index] = {};
+      Object.keys(amount).forEach((curr) => {
+        const value = editMode
+          ? editValues.find((v) => v.userId === user.userId)?.amount || 0
+          : round(amount[curr] / users.length, 1);
+
+        newRawInputValues[index][curr] = value.toString();
+        newCheckedUsers[index][curr] = value;
+        total[curr] += value;
+      });
+    });
+
+    balanceRemainder(newRawInputValues, newCheckedUsers, total);
+
+    setRawInputValues(newRawInputValues);
+    setCheckedUsers(newCheckedUsers);
+    calculateTotal();
+  };
+
+  const initializeTotal = (amount: Record<string, number>) => {
+    return Object.keys(amount).reduce(
+      (acc, curr) => {
+        acc[curr] = 0;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+  };
+
+  const balanceRemainder = (
+    rawObj: Record<number, Record<string, string>>,
+    usersObj: User[],
+    total: Record<string, number>
+  ) => {
+    Object.keys(amount).forEach((curr, index) => {
+      const remainder = round(amount[curr] - total[curr], 1);
+      if (remainder !== 0) {
+        rawObj[0][curr] = (parseFloat(rawObj[0][curr]) + remainder).toString();
+        usersObj[0][curr] += remainder;
+      }
+    });
+  };
+
+  const checkSubmitDisabled = (currTotal: Record<string, string>) => {
     setSubmitStatus(
       !(
         parseFloat(amount[selectedCurrency]) ===
         parseFloat(currTotal[selectedCurrency])
       )
     );
-  }
+  };
 
   const handleEqualToggle = () => {
-    if (!isEqual) {
-      let newObj = checkedUsers;
-      let rawObj: any = rawInputValues;
-      newObj.forEach((item: any, index: any) => {
-        newObj[index]['isChecked'] = true;
-        Object.keys(amount).forEach((curr) => {
-          rawObj[index][curr] = round(amount[curr] / users.length, 1);
-          newObj[index][curr] = round(amount[curr] / users.length, 1);
-        });
-      });
-      setRawInputValues({ ...rawObj });
-      setCheckedUsers([...newObj]);
-    }
-    setIsEqual(!isEqual);
-    calculateTotal();
+    if (!isEqual) initializeValues();
+    setIsEqual((prev) => !prev);
   };
 
   const handleCheckboxChange = (index: number) => {
-    let currChecked = checkedUsers;
-    currChecked[index]['isChecked'] = !currChecked[index]['isChecked'];
-    setCheckedUsers([...currChecked]);
+    const newCheckedUsers = [...checkedUsers];
+    newCheckedUsers[index].isChecked = !newCheckedUsers[index].isChecked;
+    setCheckedUsers(newCheckedUsers);
     calculateTotal();
   };
 
   const calculateTotal = () => {
-    let currTotal: any = {};
-    Object.keys(amount).forEach((curr) => {
-      currTotal[curr] = 0;
-    });
-    checkedUsers.forEach((element: any) => {
-      if (element['isChecked']) {
+    const currTotal: any = initializeTotal(amount);
+    checkedUsers.forEach((user) => {
+      if (user.isChecked) {
         Object.keys(amount).forEach((curr) => {
-          currTotal[curr] += element[curr];
+          currTotal[curr] += user[curr];
         });
       }
     });
-    Object.keys(amount).forEach((curr) => {
+
+    Object.keys(currTotal).forEach((curr) => {
       currTotal[curr] = round(currTotal[curr], 1);
     });
-    checkSubmitDiabled(currTotal);
-    setCurrentTotal((prev: any) => ({ ...prev, ...currTotal }));
+
+    checkSubmitDisabled(currTotal);
+    setCurrentTotal(currTotal);
   };
 
   const handleAmountChange = (index: number, inputValue: string) => {
-    setRawInputValues((prev: any) => ({
-      ...prev,
-      [index]: { ...prev[index], [selectedCurrency]: inputValue },
-    }));
-
     const parsedValue = parseFloat(inputValue);
+
     if (!isNaN(parsedValue)) {
-      let rawObj: any = rawInputValues;
-      let conversionObj = currencyCtx.state.currencies['inr'];
-      let newValueInr = parsedValue / conversionObj[selectedCurrency];
-      let currChecked = checkedUsers;
+      const conversionRate =
+        currencyCtx.state.currencies['inr'][selectedCurrency];
+      const newValueInr = parsedValue / conversionRate;
+
+      const newRawInputValues = { ...rawInputValues };
+      const newCheckedUsers = [...checkedUsers];
+
       Object.keys(amount).forEach((curr) => {
-        rawObj[index][curr] = inputValue.endsWith('.')
-          ? round(newValueInr * conversionObj[curr], 1).toString() + '.'
-          : round(newValueInr * conversionObj[curr], 1);
-        currChecked[index][curr] = round(newValueInr * conversionObj[curr], 1);
+        const convertedValue = round(
+          newValueInr * currencyCtx.state.currencies['inr'][curr],
+          1
+        );
+        newRawInputValues[index][curr] = inputValue.endsWith('.')
+          ? `${convertedValue}.`
+          : convertedValue.toString();
+        newCheckedUsers[index][curr] = convertedValue;
       });
-      setRawInputValues({ ...rawObj });
-      setCheckedUsers([...currChecked]);
+
+      setRawInputValues(newRawInputValues);
+      setCheckedUsers(newCheckedUsers);
     }
     calculateTotal();
   };
 
-  const handleCurrencyChange = (e: any) => {
+  const handleCurrencyChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSelectedCurrency(e.target.value);
     calculateTotal();
   };
 
   const handleSubmit = () => {
-    let item: any = [];
-    checkedUsers.forEach((element: any, index: number) => {
-      if (element.isChecked) {
-        item.push({
-          userId: element.userId,
-          userName: element.userName,
-          amount: element['inr'],
-        });
-      } else {
-        item.push({
-          userId: element.userId,
-          userName: element.userName,
-          amount: 0,
-        });
-      }
-    });
-    onSubmit(item);
+    const submissionData = checkedUsers.map((user) => ({
+      userId: user.userId,
+      userName: user.userName,
+      amount: user.isChecked ? user['inr'] : 0,
+    }));
+
+    onSubmit(submissionData);
   };
 
   return (
@@ -217,7 +230,7 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
           </TextField>
         </Box>
 
-        {checkedUsers.map((user: any, index: any) => (
+        {checkedUsers.map((user, index) => (
           <Box
             key={user.userId}
             display="flex"
@@ -252,21 +265,17 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
               }}
               onBlur={() => {
                 if (!rawInputValues[index][selectedCurrency]) {
-                  setRawInputValues((prev: any) => ({
+                  setRawInputValues((prev) => ({
                     ...prev,
-                    [index]: {
-                      [selectedCurrency]: '0',
-                    },
+                    [index]: { [selectedCurrency]: '0' },
                   }));
                   handleAmountChange(index, '0');
                 }
               }}
               disabled={isEqual || !user.isChecked}
-              slotProps={{
-                htmlInput: {
-                  inputMode: 'decimal',
-                  pattern: '^d*.?d{0,1}$',
-                },
+              inputProps={{
+                inputMode: 'decimal',
+                pattern: '^d*.?d{0,1}$',
               }}
               sx={{ width: '120px' }}
             />
