@@ -5,6 +5,7 @@ import { useLoading } from './Contexts/LoadingContext';
 const instance = Axios.create();
 const axios = setupCache(instance, { debug: console.log });
 
+let requestQueue: (() => void)[] = [];
 export const useAxiosSetup = () => {
   const { setLoading } = useLoading();
 
@@ -22,17 +23,20 @@ export const useAxiosSetup = () => {
 
   axios.interceptors.response.use(
     (response) => {
-      setLoading(false);
+      if (requestQueue.length == 0) {
+        setLoading(false);
+      }
       return response;
     },
     (error) => {
-      setLoading(false);
+      if (requestQueue.length == 0) {
+        setLoading(false);
+      }
       return Promise.reject(error);
     }
   );
 };
 
-let requestQueue: (() => void)[] = [];
 let isRequestPending = false;
 const delayBetweenRequests = 100;
 
