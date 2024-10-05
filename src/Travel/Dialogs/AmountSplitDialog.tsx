@@ -127,6 +127,9 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
         });
       }
     });
+    Object.keys(amount).forEach((curr) => {
+      currTotal[curr] = round(currTotal[curr], 1);
+    });
     checkSubmitDiabled(currTotal);
     setCurrentTotal((prev: any) => ({ ...prev, ...currTotal }));
   };
