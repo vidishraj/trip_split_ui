@@ -23,17 +23,17 @@ export const useAxiosSetup = () => {
 
   axios.interceptors.response.use(
     (response) => {
-      if (requestQueue.length == 0) {
+      if (requestQueue.length === 0) {
         setLoading(false);
       }
       return response;
     },
-    (error) => {
-      if (requestQueue.length == 0) {
-        setLoading(false);
-      }
-      return Promise.reject(error);
-    }
+      (error) => {
+        if (requestQueue.length === 0) {
+          setLoading(false);
+        }
+        return Promise.reject(error);
+      };
   );
 };
 
