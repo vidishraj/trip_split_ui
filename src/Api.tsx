@@ -12,7 +12,6 @@ export const useAxiosSetup = () => {
   axios.interceptors.request.use(
     (config) => {
       setLoading(true);
-      console.log(config.url);
       return config;
     },
     (error) => {
