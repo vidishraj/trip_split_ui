@@ -19,7 +19,7 @@ import { useTheme, useMediaQuery } from '@mui/material';
 import { AxiosResponse } from 'axios';
 import { useTravel } from '../Contexts/TravelContext';
 import { useMessage } from '../Contexts/NotifContext';
-import { insertTrip } from '../Api';
+import { fetchTrips, insertTrip } from '../Api';
 import Lottie from 'lottie-react';
 import animationData from './tripAnimation.json';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -71,13 +71,32 @@ const TripPage = () => {
             message: 'Successfully created trip.',
           });
         }
-        travelCtx.state.refreshData();
+        setOpen(false);
+        fetchTrips(true)
+          .then((response) => {
+            if (Array.isArray(response.data.Message)) {
+              response.data.Message.forEach((item: any) => {
+                item['currencies'] = item['currencies'].toString().split(',');
+              });
+              travelCtx.dispatch({
+                type: 'SET_TRIP',
+                payload: response.data.Message,
+              });
+            }
+          })
+          .catch((error) => {
+            notif.setPayload({
+              type: 'error',
+              message: 'Error fetching trip.',
+            });
+          });
       })
       .catch((error) => {
         notif.setPayload({
           type: 'error',
           message: 'Error creating trip.',
         });
+        setOpen(false);
         console.log(error);
       });
   }
