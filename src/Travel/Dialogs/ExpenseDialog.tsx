@@ -184,7 +184,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
         userDivisionSum += item.amount;
       });
     }
-
+    userDivisionSum = round(userDivisionSum, 1);
     const originalPayload = editMode ? editData : {};
     const isFormComplete =
       date &&
@@ -352,6 +352,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
               userName: item.userName,
               amount: item.amount,
             }));
+            console.log(userDiv);
             setUserDivision(userDiv);
             openAmountSetter(false);
           }}
