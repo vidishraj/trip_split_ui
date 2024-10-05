@@ -346,7 +346,6 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
         <AmountSplitDialog
           amount={currencyAmounts}
           open={amountSetter}
-          setUserDiv={setUserDivision}
           onSubmit={(items: any) => {
             const userDiv: any[] = items.map((item: any) => ({
               userId: item.userId,
