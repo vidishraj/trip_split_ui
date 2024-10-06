@@ -154,8 +154,14 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
   };
 
   const handleAmountChange = (index: number, inputValue: string) => {
+    if (inputValue === '') {
+      let emptyNewObj: any = rawInputValues;
+      Object.keys(amount).forEach((curr) => {
+        emptyNewObj[index][curr] = '';
+      });
+      setRawInputValues(emptyNewObj);
+    }
     const parsedValue = parseFloat(inputValue);
-
     if (!isNaN(parsedValue)) {
       const conversionRate =
         currencyCtx.state.currencies['inr'][selectedCurrency];
@@ -260,6 +266,7 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
               onChange={(e) => {
                 const inputValue = e.target.value;
                 if (!isEqual && inputValue.match(/^\d*\.?\d{0,1}$/)) {
+                  console.log(inputValue);
                   handleAmountChange(index, inputValue);
                 }
               }}
@@ -273,9 +280,11 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
                 }
               }}
               disabled={isEqual || !user.isChecked}
-              inputProps={{
-                inputMode: 'decimal',
-                pattern: '^d*.?d{0,1}$',
+              slotProps={{
+                htmlInput: {
+                  inputMode: 'decimal',
+                  pattern: '^d*.?d{0,1}$',
+                },
               }}
               sx={{ width: '120px' }}
             />
