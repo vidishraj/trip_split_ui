@@ -156,9 +156,12 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
   const handleAmountChange = (index: number, inputValue: string) => {
     if (inputValue === '') {
       let emptyNewObj: any = rawInputValues;
+      const newCheckedUsers = [...checkedUsers];
       Object.keys(amount).forEach((curr) => {
         emptyNewObj[index][curr] = '';
+        newCheckedUsers[index][curr] = 0;
       });
+      setCheckedUsers(newCheckedUsers);
       setRawInputValues(emptyNewObj);
     }
     const parsedValue = parseFloat(inputValue);
