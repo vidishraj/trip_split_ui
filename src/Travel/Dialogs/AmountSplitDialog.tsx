@@ -269,7 +269,6 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
               onChange={(e) => {
                 const inputValue = e.target.value;
                 if (!isEqual && inputValue.match(/^\d*\.?\d{0,1}$/)) {
-                  console.log(inputValue);
                   handleAmountChange(index, inputValue);
                 }
               }}
