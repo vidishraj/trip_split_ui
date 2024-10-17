@@ -41,11 +41,7 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ open, onClose }) => {
     }
     setLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      )
+      await createUserWithEmailAndPassword(auth, email, password)
         .then((response) => {
           const body = {
             userName: userName,

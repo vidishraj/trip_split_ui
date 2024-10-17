@@ -48,6 +48,7 @@ const Dashboard: React.FC<ActionProps> = (props) => {
           });
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [travelCtx.state.chosenTrip]);
   const handleDialogOpen = () => setDialogOpen(true);
   const handleDialogClose = () => setDialogOpen(false);

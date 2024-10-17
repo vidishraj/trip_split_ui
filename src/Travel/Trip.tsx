@@ -115,7 +115,6 @@ const TripPage = () => {
     }
     sendTripRequest(tripIdConnect)
       .then((response) => {
-        console.log(response);
         notif.setPayload({
           type: 'success',
           message: 'Request sent successfully. Ask your friend to add you!',
