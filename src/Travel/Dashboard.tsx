@@ -121,6 +121,19 @@ const Dashboard: React.FC<ActionProps> = (props) => {
       <Box display="flex" justifyContent="center" mb={1}>
         {' '}
         {/* Reduced margin */}
+        <Box
+          sx={{
+            position: 'absolute',
+            zIndex: 8,
+            width: 'fit-content',
+            right: 10,
+            top: 5,
+            marginRight: '10px',
+          }}
+        >
+          {' '}
+          TripId : {travelCtx.state.chosenTrip?.tripIdShared}
+        </Box>
         <Button
           variant="outlined"
           startIcon={<AttachMoney />}
