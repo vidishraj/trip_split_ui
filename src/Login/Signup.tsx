@@ -10,9 +10,10 @@ import {
   CircularProgress,
   Typography,
 } from '@mui/material';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
 import { useUser } from '../Contexts/GlobalContext';
 import { auth } from './FirebaseConfig';
+import { insertUser } from '../Api';
 
 interface SignupDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ interface SignupDialogProps {
 const SignupDialog: React.FC<SignupDialogProps> = ({ open, onClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userName, setUserName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,14 +35,32 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ open, onClose }) => {
       setError('Passwords do not match');
       return;
     }
+    if (userName.length < 5) {
+      setError('UserName must be at least 5 characters long');
+      return;
+    }
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
-      );
-      setUser(userCredential.user);
+      )
+        .then((response) => {
+          const body = {
+            userName: userName,
+            email: email,
+          };
+          insertUser(body)
+            .then(() => setUser(response.user))
+            .catch((error) => {
+              deleteUser(response.user);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log('Error signing up');
+        });
       onClose();
     } catch (error) {
       setError('Error creating account. Please try again.');
@@ -61,6 +81,14 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ open, onClose }) => {
           margin="normal"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+        />
+        <TextField
+          label="User Name"
+          type="text"
+          fullWidth
+          margin="normal"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
         />
         <TextField
           label="Password"
