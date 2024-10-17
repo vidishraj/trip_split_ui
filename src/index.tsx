@@ -16,24 +16,22 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    <Router>
-      <LoadingProvider>
-        <AuthProvider>
-          <CurrencyProvider>
-            <MessageProvider>
-              <NotificationMessage>
-                <TravelProvider>
-                  <UserProvider>
-                    <Loader />
-                    <App />
-                  </UserProvider>
-                </TravelProvider>
-              </NotificationMessage>
-            </MessageProvider>
-          </CurrencyProvider>
-        </AuthProvider>
-      </LoadingProvider>
-    </Router>
-  </React.StrictMode>
+  <Router>
+    <LoadingProvider>
+      <AuthProvider>
+        <CurrencyProvider>
+          <MessageProvider>
+            <NotificationMessage>
+              <TravelProvider>
+                <UserProvider>
+                  <Loader />
+                  <App />
+                </UserProvider>
+              </TravelProvider>
+            </NotificationMessage>
+          </MessageProvider>
+        </CurrencyProvider>
+      </AuthProvider>
+    </LoadingProvider>
+  </Router>
 );
