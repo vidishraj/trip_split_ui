@@ -19,7 +19,7 @@ import { useTheme, useMediaQuery } from '@mui/material';
 import { AxiosResponse } from 'axios';
 import { useTravel } from '../Contexts/TravelContext';
 import { useMessage } from '../Contexts/NotifContext';
-import { fetchTrips, insertTrip } from '../Api';
+import { fetchTrips, insertTrip, sendTripRequest } from '../Api';
 import Lottie from 'lottie-react';
 import animationData from './tripAnimation.json';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -28,6 +28,8 @@ import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import CurrencyPoundIcon from '@mui/icons-material/CurrencyPound';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
+import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
+
 export const currencies = [
   { label: 'US Dollar', abr: 'usd', icon: <AttachMoneyIcon /> },
   { label: 'Indian Rupees', abr: 'inr', icon: <CurrencyRupeeIcon /> },
@@ -40,7 +42,9 @@ export const currencies = [
 const TripPage = () => {
   const [trip, setTrip] = useState('');
   const [open, setOpen] = useState(false);
+  const [openTripConnector, setTripConnector] = useState(false);
   const [tripTitle, setTripTitle] = useState('');
+  const [tripIdConnect, setTripIdConnect] = useState('');
   const notif = useMessage();
   const travelCtx = useTravel();
   const theme = useTheme();
@@ -101,6 +105,31 @@ const TripPage = () => {
       });
   }
 
+  function sendTripConnectRequest() {
+    if (tripIdConnect.length !== 6) {
+      notif.setPayload({
+        type: 'error',
+        message: 'Trip Id should be 6 characters long',
+      });
+      return;
+    }
+    sendTripRequest(tripIdConnect)
+      .then((response) => {
+        console.log(response);
+        notif.setPayload({
+          type: 'success',
+          message: 'Request sent successfully. Ask your friend to add you!',
+        });
+      })
+      .catch((error) => {
+        notif.setPayload({
+          type: 'error',
+          message: 'Error occurred while sending request',
+        });
+      });
+
+    setTripConnector(false);
+  }
   const handleTripChange = (event: any) => {
     setTrip(event.target.value);
   };
@@ -148,8 +177,17 @@ const TripPage = () => {
           width={isMobile ? 300 : 500}
         />
       </Box>
-      <Box padding="16px">
-        <FormControl fullWidth variant="outlined" sx={{ marginBottom: '16px' }}>
+      <Box
+        width="100%"
+        display={'flex'}
+        flexDirection={'column'}
+        justifyContent={'center'}
+        alignItems={'center'}
+      >
+        <FormControl
+          variant="outlined"
+          sx={{ marginBottom: '16px', width: '30%', minWidth: '200px' }}
+        >
           <InputLabel id="trip-select-label">Choose Trip</InputLabel>
           <Select
             labelId="trip-select-label"
@@ -160,21 +198,21 @@ const TripPage = () => {
             sx={{
               backgroundColor: '#fff',
               borderRadius: '12px',
-              padding: isMobile ? '12px' : '16px',
+              padding: isMobile ? '3px' : '5px',
               boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2)',
             }}
           >
             {travelCtx?.state?.trip?.map((item) => {
               return (
                 <MenuItem
-                  key={item.tripId}
+                  key={item.tripIdShared}
                   onClick={() => {
                     travelCtx.dispatch({
                       type: 'SET_CHOSEN_TRIP',
                       payload: item,
                     });
                   }}
-                  value={item.tripId}
+                  value={item.tripIdShared}
                 >
                   {item.tripTitle}
                 </MenuItem>
@@ -182,27 +220,50 @@ const TripPage = () => {
             })}
           </Select>
         </FormControl>
-
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={handleClickOpen}
-          startIcon={<Add />}
-          sx={{
-            padding: isMobile ? '12px' : '16px',
-            fontSize: isMobile ? '14px' : '16px',
-            backgroundColor: '#1976d2',
-            color: '#fff',
-            borderRadius: '12px',
-            boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2)',
-            '&:hover': {
-              backgroundColor: '#1565c0',
-            },
-          }}
+        <Box
+          display="flex"
+          justifyContent={'space-around'}
+          width="50%"
+          minWidth={'300px'}
         >
-          Create Trip
-        </Button>
+          <Button
+            variant="contained"
+            onClick={handleClickOpen}
+            startIcon={<Add />}
+            sx={{
+              padding: isMobile ? '5px' : '16px',
+              fontSize: isMobile ? '12px' : '16px',
+              backgroundColor: '#1976d2',
+              color: '#fff',
+              borderRadius: '12px',
+              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2)',
+              '&:hover': {
+                backgroundColor: '#1565c0',
+              },
+            }}
+          >
+            Create Trip
+          </Button>
 
+          <Button
+            variant="contained"
+            onClick={() => setTripConnector(true)}
+            startIcon={<ConnectWithoutContactIcon />}
+            sx={{
+              padding: isMobile ? '5px' : '16px',
+              fontSize: isMobile ? '12px' : '16px',
+              backgroundColor: '#1976d2',
+              color: '#fff',
+              borderRadius: '12px',
+              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2)',
+              '&:hover': {
+                backgroundColor: '#1565c0',
+              },
+            }}
+          >
+            Connect Trip
+          </Button>
+        </Box>
         <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
           <DialogTitle>Create New Trip</DialogTitle>
           <DialogContent>
@@ -286,6 +347,54 @@ const TripPage = () => {
             </Button>
             <Button
               onClick={handleClose}
+              sx={{ color: theme.palette.grey[700] }}
+            >
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={openTripConnector}
+          onClose={() => setTripConnector(false)}
+          fullWidth
+          maxWidth="sm"
+        >
+          <DialogTitle>Connect Trip</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="trip-title"
+              label="Trip ID"
+              type="text"
+              fullWidth
+              variant="outlined"
+              slotProps={{ htmlInput: { maxLength: 6, minLength: 6 } }}
+              value={tripIdConnect}
+              onChange={(e) => setTripIdConnect(e.target.value)}
+              sx={{
+                marginTop: '16px',
+                backgroundColor: '#fff',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={sendTripConnectRequest}
+              disabled={tripIdConnect.length !== 6}
+              sx={{
+                backgroundColor:
+                  tripIdConnect.length !== 6 ? 'grey' : '#1976d2',
+                color: '#fff',
+                '&:hover': { backgroundColor: '#1565c0' },
+              }}
+            >
+              Send Request
+            </Button>
+            <Button
+              onClick={() => setTripConnector(false)}
               sx={{ color: theme.palette.grey[700] }}
             >
               Cancel
