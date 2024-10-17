@@ -1,46 +1,54 @@
-# Getting Started with Create React App
+# 🧳 trip_split
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**trip_split** is a free alternative to the popular expense-splitting app, SplitWise. Inspired by the limitations of SplitWise, such as ads and the lack of free features, trip_split allows users to easily split expenses with friends. 
 
-## Available Scripts
+Splitwise is a popular app that enables consumers to share the costs of bills among friends. By ensuring that everyone who pays is reimbursed accurately and minimizing the number of transactions, Splitwise simplifies the expense-splitting process.
 
-In the project directory, you can run:
+## 🌐 Live Site
+Check out the live version of the application here: [Trip_Split Live Site](https://trips-split.netlify.app/)  
 
-### `npm start`
+## 💼 Project Flow
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. **Login**: Users can securely log in to their accounts.
+2. **Create a Trip**: Users can create a trip and select up to three different currencies to be used during the trip.
+3. **Add Users**: Invite friends or group members to the trip.
+4. **Add Expenses**: Expenses can be added in any of the three currencies chosen for the trip, which will then be converted into all currencies using **LIVE CURRENCY RATES** (a key feature).
+5. **View Balances**: Users can see their balances, indicating the amounts they owe or are owed.
+6. **Total Expenses**: View the total expenses for the trip and analyze, edit, or delete expenses as needed.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 🛠️ Technologies Used
+- **FrontEnd**: React (for UI)
+- **Auth**: Firebase
+- **Deployment**: Netlify (for hosting the application)
 
-### `npm test`
+## 🛠️ Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 📂 Cloning the Project
 
-### `npm run build`
+- **master** (Frontend): Contains the React-based frontend.
+### Frontend (React) Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Clone the frontend code from the `master` branch:
+   ```bash
+   git clone -b master https://github.com/vidishraj/trip_split_ui.git
+   cd FPL_Analysis
+2. Install dependencies:
+   ```bash
+   npm install
+3. Set your values in .env file <br></br>
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+4. Dont use the Auth Provider if you don't have firebase credentials or change the AuthProvider init values.
+   ```bash
+   interface AuthContextType {
+    currentUser: User | null;
+   }
+   const AuthContext = createContext<AuthContextType>({ currentUser: null });
+    ```
+5. Start the application.
+   ```bash
+     npm start
+   ```
+  
+## 🎯 Future Improvements
+- Improve the overall UI and UX.
+- Improve the re-login flow along with some bugs.
