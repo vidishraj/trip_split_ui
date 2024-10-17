@@ -24,8 +24,8 @@ export const NameListDialog: React.FC<NameListDialogProps> = ({ onClose }) => {
   const { setPayload } = useMessage();
 
   function onDelete(userId: string, deletable: boolean) {
-    if (deletable) {
-      deleteUser(userId.toString())
+    if (deletable && travelCtx.state.chosenTrip?.tripIdShared) {
+      deleteUser(userId.toString(), travelCtx.state.chosenTrip?.tripIdShared)
         .then((response) => {
           if (response.data.Message) {
             setPayload({
@@ -60,7 +60,7 @@ export const NameListDialog: React.FC<NameListDialogProps> = ({ onClose }) => {
           display="flex"
           flexDirection="column"
           alignItems={'center'}
-          padding="16px"
+          // padding="16px"
           bgcolor="#ffffff"
           borderRadius="8px"
         >

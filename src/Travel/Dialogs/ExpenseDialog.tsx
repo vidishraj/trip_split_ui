@@ -115,7 +115,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
 
   const handleSubmit = () => {
     const payload = {
-      tripId: travelCtx?.state?.chosenTrip?.tripId,
+      tripId: travelCtx?.state?.chosenTrip?.tripIdShared,
       date,
       description,
       amount: currencyAmounts[enabledCurrency],

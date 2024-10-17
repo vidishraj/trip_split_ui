@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import animationData from './dashboardAnimation.json';
 import { useTheme, useMediaQuery } from '@mui/material';
 import ExpenseDialog from './Dialogs/ExpenseDialog';
 import { useTravel } from '../Contexts/TravelContext';
 import { NameListDialog } from './Dialogs/UserDialog';
-import { insertUser } from '../Api';
+import { fetchTripRequestsForTrip, insertUser } from '../Api';
 import ExpenseContainer from './ExpenseContainer';
 import { People, AttachMoney, CurrencyExchange } from '@mui/icons-material';
 import UsernameDialog from './Dialogs/AddUserDialog';
@@ -30,6 +30,25 @@ const Dashboard: React.FC<ActionProps> = (props) => {
   const [showBalancesContainer, setShowBalanceContainer] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  useEffect(() => {
+    if (travelCtx.state.chosenTrip?.tripIdShared) {
+      fetchTripRequestsForTrip(travelCtx.state.chosenTrip?.tripIdShared)
+        .then((response) => {
+          if (Array.isArray(response.data.Message)) {
+            travelCtx.dispatch({
+              type: 'SET_TRIP_REQ',
+              payload: response.data.Message,
+            });
+          }
+        })
+        .catch((error) => {
+          setPayload({
+            type: 'error',
+            message: 'Error fetching user requests',
+          });
+        });
+    }
+  }, [travelCtx.state.chosenTrip]);
   const handleDialogOpen = () => setDialogOpen(true);
   const handleDialogClose = () => setDialogOpen(false);
   const handleOpen = () => setOpen(true);
@@ -45,7 +64,7 @@ const Dashboard: React.FC<ActionProps> = (props) => {
   const handleSubmit = () => {
     if (travelCtx.state.chosenTrip) {
       const body = {
-        user: [username, travelCtx.state.chosenTrip.tripId],
+        user: [username, travelCtx.state.chosenTrip.tripIdShared],
       };
       insertUser(body)
         .then(() => {
@@ -73,6 +92,7 @@ const Dashboard: React.FC<ActionProps> = (props) => {
       flexDirection="column"
       height="80vh"
       paddingTop="30px"
+      sx={{ textWrap: 'nowrap' }}
     >
       <Box
         position="absolute"
@@ -220,18 +240,14 @@ const buttonStylesSmall = {
   bgcolor: '#fff',
   color: '#1976d2',
   borderRadius: '8px',
-  padding: '6px 12px',
   boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
   margin: '0 4px',
   textTransform: 'none',
-  fontSize: '0.8rem',
   '&:hover': { backgroundColor: '#e3f2fd' },
 };
 
 const mainButtonStylesSmall = {
   flexBasis: '40%',
-  padding: '8px',
-  fontSize: '0.9rem',
   backgroundColor: '#1976d2',
   color: '#fff',
   borderRadius: '8px',

@@ -1,7 +1,7 @@
 import Axios from 'axios';
 import { setupCache } from 'axios-cache-interceptor';
 import { useLoading } from './Contexts/LoadingContext';
-
+import { auth } from './Login/FirebaseConfig';
 const instance = Axios.create();
 const axios = setupCache(instance, { debug: console.log });
 
@@ -10,8 +10,13 @@ export const useAxiosSetup = () => {
   const { setLoading } = useLoading();
 
   axios.interceptors.request.use(
-    (config) => {
+    async (config) => {
       setLoading(true);
+      let user = auth.currentUser; // Get currently signed-in user
+      if (user) {
+        const token = await user.getIdToken();
+        config['headers'].setAuthorization(`Bearer ${token}`);
+      }
       return config;
     },
     (error) => {
@@ -93,7 +98,7 @@ export async function insertTrip(body: any): Promise<any> {
 
 export async function fetchUsersForATrip(
   userCalled: boolean,
-  tripId: number
+  tripId: string
 ): Promise<any> {
   let cacheInstance = {};
   if (userCalled) {
@@ -148,7 +153,7 @@ export async function updateExpense(
 
 export async function fetchExpenseForTrip(
   userCalled: boolean,
-  tripId: number
+  tripId: string
 ): Promise<any> {
   let cacheInstance = {};
   if (userCalled) {
@@ -168,7 +173,7 @@ export async function fetchExpenseForTrip(
 
 export async function fetchBalances(
   userCalled: boolean,
-  tripId: number
+  tripId: string
 ): Promise<any> {
   let cacheInstance = {};
   if (userCalled) {
@@ -188,7 +193,8 @@ export async function fetchBalances(
 
 export async function deleteExpense(
   userCalled: boolean,
-  expenseId: number
+  expenseId: number,
+  tripId: string
 ): Promise<any> {
   if (userCalled) {
     axios.storage.remove('expense');
@@ -198,20 +204,48 @@ export async function deleteExpense(
   return queueRequest(() =>
     axios
       .get(process.env.REACT_APP_BACKENDURL + '/deleteExpenses', {
-        params: { expenseId: expenseId },
+        params: { expenseId: expenseId, tripId: tripId },
       })
       .then((response) => response)
   );
 }
 
-export async function deleteUser(userId: string): Promise<any> {
+export async function deleteUser(userId: string, tripId: string): Promise<any> {
   axios.storage.remove('summary');
   axios.storage.remove('expense');
   return queueRequest(() =>
     axios
       .get(process.env.REACT_APP_BACKENDURL + '/deleteUser', {
-        params: { userId: userId },
+        params: { userId: userId, tripId: tripId },
       })
+      .then((response) => response)
+  );
+}
+export async function sendTripRequest(tripId: string): Promise<any> {
+  return queueRequest(() =>
+    axios
+      .post(process.env.REACT_APP_BACKENDURL + '/sendTripUserRequest', {
+        tripId: tripId,
+      })
+      .then((response) => response)
+  );
+}
+export async function fetchTripRequestsForTrip(tripId: string): Promise<any> {
+  return queueRequest(() =>
+    axios
+      .get(process.env.REACT_APP_BACKENDURL + '/fetchTripRequestForTrip', {
+        params: { trip: tripId },
+      })
+      .then((response) => response)
+  );
+}
+export async function sendResponseForTripRequest(body: any): Promise<any> {
+  return queueRequest(() =>
+    axios
+      .post(
+        process.env.REACT_APP_BACKENDURL + '/registerResponseForTripRequest',
+        body
+      )
       .then((response) => response)
   );
 }

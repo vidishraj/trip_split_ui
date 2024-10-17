@@ -1,14 +1,20 @@
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
 
 interface TripResponse {
-  tripId: number;
+  tripIdShared: string;
   tripTitle: string;
   currencies: string[];
 }
 
 interface UserResponse {
-  tripId: number;
+  tripId: string;
   userId: number;
+  userName: string;
+}
+
+interface TripRequest {
+  userId: number;
+  email: string;
   userName: string;
 }
 interface TravelContextType {
@@ -16,6 +22,7 @@ interface TravelContextType {
   expenses: any;
   users: UserResponse[];
   balances: any;
+  tripRequests: undefined | TripRequest[];
   chosenTrip: TripResponse | undefined;
   summary: CurrentTripInterface | undefined;
   refreshData: any;
@@ -30,6 +37,7 @@ const initialState: TravelContextType = {
   expenses: [],
   users: [],
   balances: [],
+  tripRequests: undefined,
   chosenTrip: undefined,
   summary: { userCount: undefined },
   refreshData: () => {
@@ -42,6 +50,7 @@ type Action =
   | { type: 'SET_EXPENSES'; payload: any[] }
   | { type: 'SET_USERS'; payload: any[] }
   | { type: 'SET_BALANCES'; payload: any[] }
+  | { type: 'SET_TRIP_REQ'; payload: any[] }
   | { type: 'SET_REFRESHER'; payload: any }
   | { type: 'SET_CHOSEN_TRIP'; payload: TripResponse | undefined }
   | { type: 'SET_SUMMARY'; payload: CurrentTripInterface };
@@ -59,6 +68,8 @@ const reducer = (
       return { ...state, users: action.payload };
     case 'SET_BALANCES':
       return { ...state, balances: action.payload };
+    case 'SET_TRIP_REQ':
+      return { ...state, tripRequests: action.payload };
     case 'SET_REFRESHER':
       return { ...state, refreshData: action.payload };
     case 'SET_CHOSEN_TRIP':

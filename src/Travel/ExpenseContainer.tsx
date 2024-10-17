@@ -147,7 +147,7 @@ const ExpenseItem = ({ expense }: ExpenseProps) => {
 
   const handleDelete = () => {
     setConfirmDialog(false);
-    deleteExpense(true, expense.expenseId)
+    deleteExpense(true, expense.expenseId, expense.tripId)
       .then((response) => {
         setPayload({
           type: 'success',

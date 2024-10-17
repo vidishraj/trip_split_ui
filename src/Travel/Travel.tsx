@@ -24,7 +24,7 @@ export const TravelPage = () => {
 
   function refreshData() {
     if (travelCtx.state.chosenTrip) {
-      fetchUsersForATrip(true, travelCtx.state.chosenTrip.tripId)
+      fetchUsersForATrip(true, travelCtx.state.chosenTrip.tripIdShared)
         .then((response) => {
           const users = response.data.Message;
           travelCtx.dispatch({
@@ -46,7 +46,7 @@ export const TravelPage = () => {
           });
           console.log(error);
         });
-      fetchExpenseForTrip(true, travelCtx.state.chosenTrip.tripId)
+      fetchExpenseForTrip(true, travelCtx.state.chosenTrip.tripIdShared)
         .then((response) => {
           travelCtx.dispatch({
             type: 'SET_EXPENSES',
@@ -60,7 +60,7 @@ export const TravelPage = () => {
           });
           console.log(error);
         });
-      fetchBalances(true, travelCtx.state.chosenTrip.tripId)
+      fetchBalances(true, travelCtx.state.chosenTrip.tripIdShared)
         .then((response) => {
           travelCtx.dispatch({
             type: 'SET_BALANCES',
@@ -79,8 +79,8 @@ export const TravelPage = () => {
 
   useEffect(() => {
     // eslint-disable-next-line
-    const tripId = searchParams.get('tripId');
-    if (tripId) {
+    const tripIdShared = searchParams.get('tripIdShared');
+    if (tripIdShared && user) {
       fetchTrips(true)
         .then((response) => {
           travelCtx.dispatch({
@@ -93,7 +93,7 @@ export const TravelPage = () => {
               item['currencies'] = item['currencies'].toString()?.split(',');
             });
             const trip: any = items.find(
-              (item) => item['tripId'] === parseInt(tripId)
+              (item) => item['tripIdShared'] === parseInt(tripIdShared)
             );
             if (trip !== 'undefined' && trip) {
               travelCtx.dispatch({
@@ -112,7 +112,7 @@ export const TravelPage = () => {
         })
         .finally(() => {});
       refreshData();
-    } else {
+    } else if (user) {
       fetchTrips(true)
         .then((response) => {
           if (Array.isArray(response.data.Message)) {
@@ -134,13 +134,16 @@ export const TravelPage = () => {
         })
         .finally(() => {});
     } // eslint-disable-next-line
-  }, [navigate]);
+  }, [navigate, user]);
 
   useEffect(() => {
     if (travelCtx.state.chosenTrip) {
-      navigate(`/trip?tripId=${travelCtx.state.chosenTrip.tripId}`, {
-        replace: true,
-      });
+      navigate(
+        `/trip?tripIdShared=${travelCtx.state.chosenTrip.tripIdShared}`,
+        {
+          replace: true,
+        }
+      );
       refreshData();
     }
     travelCtx.dispatch({
