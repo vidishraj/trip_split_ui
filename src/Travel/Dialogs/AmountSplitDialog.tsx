@@ -130,6 +130,9 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
 
   const handleCheckboxChange = (index: number) => {
     const newCheckedUsers = [...checkedUsers];
+    if (newCheckedUsers[index].isChecked === true) {
+      setIsEqual(false);
+    }
     newCheckedUsers[index].isChecked = !newCheckedUsers[index].isChecked;
     setCheckedUsers(newCheckedUsers);
     calculateTotal();
@@ -196,11 +199,13 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
   };
 
   const handleSubmit = () => {
-    const submissionData = checkedUsers.map((user) => ({
-      userId: user.userId,
-      userName: user.userName,
-      amount: user.isChecked ? user['inr'] : 0,
-    }));
+    const submissionData = checkedUsers
+      .filter((item) => item.isChecked)
+      .map((user) => ({
+        userId: user.userId,
+        userName: user.userName,
+        amount: user.isChecked ? user['inr'] : 0,
+      }));
 
     onSubmit(submissionData);
   };
