@@ -121,13 +121,26 @@ const BalanceContainer = () => {
               </Box>
 
               {/* Balance */}
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  color: balance >= 0 ? '#4caf50' : '#f44336',
-                }}
-              >
-                ₹ {balance.toFixed(2)}
+              <Typography>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span
+                    style={{
+                      fontWeight: 'bold',
+                      color: balance['amount'] >= 0 ? '#4caf50' : '#f44336',
+                    }}
+                  >
+                    ₹ {balance['amount'].toFixed(2)}
+                  </span>
+                  <span
+                    style={{
+                      fontWeight: 'bold',
+                      color: '#f44336',
+                    }}
+                  >
+                    {' '}
+                    (₹ {balance['selfTransaction'].toFixed(2)})
+                  </span>
+                </div>
               </Typography>
             </Card>
           )
