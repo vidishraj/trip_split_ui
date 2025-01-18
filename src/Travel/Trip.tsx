@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   MenuItem,
   FormControl,
@@ -19,7 +19,7 @@ import { useTheme, useMediaQuery } from '@mui/material';
 import { AxiosResponse } from 'axios';
 import { useTravel } from '../Contexts/TravelContext';
 import { useMessage } from '../Contexts/NotifContext';
-import { fetchTrips, insertTrip, sendTripRequest } from '../Api';
+import { fetchTrips, insertTrip, sendTripRequest, updateTripTitle } from '../Api';
 import Lottie from 'lottie-react';
 import animationData from './tripAnimation.json';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -50,6 +50,8 @@ const TripPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>([]);
+  const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
+  const [editData, setEditData] = useState<any>(undefined);
 
   const handleCurrencyChange = (currency: string) => {
     setSelectedCurrencies((prev) => {
@@ -201,23 +203,36 @@ const TripPage = () => {
               boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2)',
             }}
           >
-            {travelCtx?.state?.trip?.map((item) => {
-              return (
-                <MenuItem
-                  key={item.tripIdShared}
-                  onClick={() => {
-                    travelCtx.dispatch({
-                      type: 'SET_CHOSEN_TRIP',
-                      payload: item,
-                    });
+            {travelCtx?.state?.trip?.map((item) => (
+              <MenuItem
+                key={item.tripIdShared}
+                value={item.tripIdShared}
+                sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                {item.tripTitle}
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditData(item); // Assuming `editData` will hold the current trip details
+                    setOpenEditDialog(true);
                   }}
-                  value={item.tripIdShared}
+                  sx={{
+                    marginLeft: '8px',
+                    color: theme.palette.primary.main,
+                    borderColor: theme.palette.primary.main,
+                    '&:hover': {
+                      backgroundColor: theme.palette.primary.light,
+                    },
+                  }}
                 >
-                  {item.tripTitle}
-                </MenuItem>
-              );
-            })}
+                  Edit
+                </Button>
+              </MenuItem>
+            ))}
           </Select>
+
         </FormControl>
         <Box
           display="flex"
@@ -400,9 +415,84 @@ const TripPage = () => {
             </Button>
           </DialogActions>
         </Dialog>
+        <EditDialog editData={editData} openEditDialog={openEditDialog} setOpenEditDialog={setOpenEditDialog}/>
       </Box>
     </Box>
   );
 };
 
+const EditDialog=({editData, openEditDialog, setOpenEditDialog}:{editData:any, openEditDialog:any, setOpenEditDialog:any})=>{
+  const [editedTripTitle, setEditedTripTitle] = useState('');
+  const travelCtx = useTravel();
+  const notif = useMessage()
+  useEffect(() => {
+    if(editData && editedTripTitle===''){
+      setEditedTripTitle(editData.tripTitle)
+    }
+  },[editData, editedTripTitle])
+  const handleEditSave = () => {
+    updateTripTitle(editedTripTitle, editData.tripIdShared).then((body) => {
+      fetchTrips(true)
+        .then((response) => {
+          if (Array.isArray(response.data.Message)) {
+            response.data.Message.forEach((item: any) => {
+              item['currencies'] = item['currencies'].toString().split(',');
+            });
+            travelCtx.dispatch({
+              type: 'SET_TRIP',
+              payload: response.data.Message,
+            });
+          }
+        })
+        .catch((error) => {
+          notif.setPayload({
+            type: 'error',
+            message: 'Error fetching trip.',
+          });
+        });
+
+    }).catch((error) => {
+      notif.setPayload({
+        type: 'error',
+        message: 'Error editing trip title.',
+      });
+    });
+    setOpenEditDialog(false);
+  };
+
+  return (
+    <>
+      {/* Existing Dialogs */}
+      <Dialog
+        open={openEditDialog}
+        onClose={() => setOpenEditDialog(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Edit Trip Title</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Trip Title"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={editedTripTitle}
+            onChange={(e) => setEditedTripTitle(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleEditSave}
+            disabled={editData?editedTripTitle===editData.tripTitle:true}
+          >
+            Save Changes
+          </Button>
+          <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}
 export default TripPage;

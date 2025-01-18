@@ -150,6 +150,19 @@ export async function updateExpense(
       .then((response) => response)
   );
 }
+export async function updateTripTitle(
+  title:string, tripId: string
+): Promise<any> {
+  axios.storage.remove('fetch-trip');
+  return queueRequest(() =>
+    axios
+      .post(process.env.REACT_APP_BACKENDURL + '/editTripTitle', {
+        title: title,
+        tripId: tripId,
+      })
+      .then((response) => response)
+  );
+}
 
 export async function fetchExpenseForTrip(
   userCalled: boolean,
