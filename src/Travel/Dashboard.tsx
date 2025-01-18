@@ -91,7 +91,6 @@ const Dashboard: React.FC<ActionProps> = (props) => {
       id="parentBox"
       display="flex"
       flexDirection="column"
-      height="80vh"
       paddingTop="30px"
       sx={{ textWrap: 'nowrap' }}
     >

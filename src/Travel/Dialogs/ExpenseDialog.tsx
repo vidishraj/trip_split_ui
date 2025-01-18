@@ -86,7 +86,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
             userDiv.push({
               userId: userIdInt,
               userName: '',
-              amount: editData['amount'] - editData['splitBetween'][userIdInt],
+              amount: -1 * editData['splitBetween'][userIdInt],
             });
           } else {
             userDiv.push({
