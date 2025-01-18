@@ -257,12 +257,14 @@ const ExpenseItem = ({ expense }: ExpenseProps) => {
                 key={userId}
                 variant="body2"
                 sx={{
-                  color: splitBetween[userId] >= 0 ? '#388e3c' : '#d32f2f',
+                  // color: splitBetween[userId] >= 0 ? '#388e3c' : '#d32f2f',
+                  color:'#d32f2f',
                   fontWeight: '500',
                 }}
               >
-                {getUserName(parseInt(userId))}: ₹{' '}
-                {splitBetween[userId].toFixed(2)}
+                {getUserName(parseInt(userId))}: ₹{''}
+                {splitBetween[userId]>=0?
+                  (-1*(amount-splitBetween[userId])).toFixed(2):splitBetween[userId].toFixed(2)}
               </Typography>
             ))}
           </Box>
