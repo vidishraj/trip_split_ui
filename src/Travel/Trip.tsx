@@ -206,6 +206,12 @@ const TripPage = () => {
             {travelCtx?.state?.trip?.map((item) => (
               <MenuItem
                 key={item.tripIdShared}
+                onClick={() => {
+                  travelCtx.dispatch({
+                    type: 'SET_CHOSEN_TRIP',
+                    payload: item,
+                  });
+                }}
                 value={item.tripIdShared}
                 sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               >
