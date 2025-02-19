@@ -168,7 +168,7 @@ const ExpenseItem = ({ expense }: ExpenseProps) => {
       sx={{
         width: '100%',
         minWidth: 320,
-        maxWidth: '100%',
+        maxWidth: 360,
         margin: '8px 0',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
         borderRadius: '12px',
