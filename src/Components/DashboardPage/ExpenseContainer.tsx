@@ -60,7 +60,7 @@ const ExpenseContainer = () => {
               You have seen it all!
             </Typography>
           }
-          height={'80%'}
+          height={'100%'}
           scrollableTarget={'parentBox'}
           style={{ width: '100%' }}
         >

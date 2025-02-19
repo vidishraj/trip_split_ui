@@ -283,12 +283,23 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
             onChange={(e) =>
               handleCurrencyAmountChange(currency, parseFloat(e.target.value))
             }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  {currencies.find((it) => it.label === currency)?.icon}
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    {currencies.find((it) => it.label === currency)?.icon}
+                  </InputAdornment>
+                ),
+                sx: {
+                  "& input[type=number]": {
+                    MozAppearance: "textfield", // Firefox: Remove arrows
+                  },
+                  "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
+                    WebkitAppearance: "none", // Chrome/Safari: Remove arrows
+                    margin: 0,
+                  },
+                },
+              },
             }}
             sx={{
               backgroundColor: '#fff',
