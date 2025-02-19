@@ -1,6 +1,4 @@
-
-// ConnectTripDialog.tsx
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -8,12 +6,15 @@ import {
   DialogActions,
   TextField,
   Button,
-  Theme,
-} from '@mui/material';
-import { useTheme } from '@mui/material';
-import { useMessage } from '../../Contexts/NotifContext';
-import { sendTripRequest } from '../../Api';
-import { MessageContextType } from '../../Common/types'
+  IconButton,
+} from "@mui/material";
+import { useTheme } from "@mui/material";
+import { useMessage } from "../../Contexts/NotifContext";
+import { sendTripRequest } from "../../Api";
+import { MessageContextType } from "../../Common/types";
+import TravelExploreIcon from "@mui/icons-material/TravelExplore";
+import SendIcon from "@mui/icons-material/Send";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 interface ConnectTripDialogProps {
   open: boolean;
@@ -22,17 +23,17 @@ interface ConnectTripDialogProps {
 
 export const ConnectTripDialog: React.FC<ConnectTripDialogProps> = ({
                                                                       open,
-                                                                      handleClose
+                                                                      handleClose,
                                                                     }) => {
-  const [tripIdConnect, setTripIdConnect] = useState<string>('');
-  const theme: Theme = useTheme();
+  const [tripIdConnect, setTripIdConnect] = useState<string>("");
+  const theme = useTheme();
   const notif: MessageContextType = useMessage();
 
   const sendTripConnectRequest = (): void => {
     if (tripIdConnect.length !== 6) {
       notif.setPayload({
-        type: 'error',
-        message: 'Trip Id should be 6 characters long',
+        type: "error",
+        message: "Trip ID should be exactly 6 characters long",
       });
       return;
     }
@@ -40,63 +41,103 @@ export const ConnectTripDialog: React.FC<ConnectTripDialogProps> = ({
     sendTripRequest(tripIdConnect)
       .then(() => {
         notif.setPayload({
-          type: 'success',
-          message: 'Request sent successfully. Ask your friend to add you!',
+          type: "success",
+          message: "Request sent successfully. Ask your friend to add you!",
         });
+        resetAndClose();
       })
       .catch(() => {
         notif.setPayload({
-          type: 'error',
-          message: 'Error occurred while sending request',
+          type: "error",
+          message: "Error occurred while sending request",
         });
       });
-
-    resetAndClose();
   };
 
   const resetAndClose = (): void => {
-    setTripIdConnect('');
+    setTripIdConnect("");
     handleClose();
   };
 
   return (
-    <Dialog open={open} onClose={resetAndClose} fullWidth maxWidth="sm">
-      <DialogTitle>Connect Trip</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={resetAndClose}
+      fullWidth
+      maxWidth="xs"
+      sx={{
+        "& .MuiPaper-root": {
+          borderRadius: "12px",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+          padding: "16px",
+        },
+      }}
+    >
+      {/* Title with Icon */}
+      <DialogTitle
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          fontWeight: "bold",
+        }}
+      >
+        <TravelExploreIcon color="primary" /> Connect Trip
+      </DialogTitle>
+
       <DialogContent>
+        {/* Trip ID Input */}
         <TextField
           autoFocus
           margin="dense"
-          id="trip-title"
-          label="Trip ID"
+          id="trip-id"
+          label="Trip ID (6 characters)"
           type="text"
           fullWidth
           variant="outlined"
           inputProps={{ maxLength: 6, minLength: 6 }}
           value={tripIdConnect}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTripIdConnect(e.target.value)}
+          onChange={(e) => setTripIdConnect(e.target.value)}
           sx={{
-            marginTop: '16px',
-            backgroundColor: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+            marginTop: "16px",
+            backgroundColor: "#F9FAFB",
+            borderRadius: "8px",
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "8px",
+            },
           }}
         />
       </DialogContent>
-      <DialogActions>
+
+      {/* Button Actions */}
+      <DialogActions sx={{ justifyContent: "space-between", padding: "16px" }}>
         <Button
           onClick={sendTripConnectRequest}
           disabled={tripIdConnect.length !== 6}
+          startIcon={<SendIcon />}
           sx={{
-            backgroundColor: tripIdConnect.length !== 6 ? 'grey' : '#1976d2',
-            color: '#fff',
-            '&:hover': { backgroundColor: '#1565c0' },
+            backgroundColor:
+              tripIdConnect.length !== 6
+                ? theme.palette.grey[400]
+                : theme.palette.primary.main,
+            color: "#fff",
+            "&:hover": {
+              backgroundColor:
+                tripIdConnect.length !== 6
+                  ? theme.palette.grey[400]
+                  : theme.palette.primary.dark,
+            },
+            borderRadius: "8px",
+            padding: "8px 16px",
+            transition: "0.3s",
           }}
         >
           Send Request
         </Button>
-        <Button onClick={resetAndClose} sx={{ color: theme.palette.grey[700] }}>
-          Cancel
-        </Button>
+
+        <IconButton onClick={resetAndClose} color="error">
+          <CancelIcon />
+        </IconButton>
       </DialogActions>
     </Dialog>
   );

@@ -1,5 +1,4 @@
-// CreateTripDialog.tsx
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -14,14 +13,19 @@ import {
   MenuItem,
   Checkbox,
   ListItemText,
-  SelectChangeEvent,
   Theme,
-} from '@mui/material';
-import { useTheme } from '@mui/material';
-import { useMessage } from '../../Contexts/NotifContext';
-import { insertTrip } from '../../Api';
-import { currencies } from '../../Common/currencyData';
-import { MessageContextType } from '../../Common/types'
+  Typography,
+  IconButton,
+} from "@mui/material";
+import { useTheme } from "@mui/material";
+import { useMessage } from "../../Contexts/NotifContext";
+import { insertTrip } from "../../Api";
+import { currencies } from "../../Common/currencyData";
+import { MessageContextType } from "../../Common/types";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import CancelIcon from "@mui/icons-material/Cancel";
+import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
+import SaveIcon from "@mui/icons-material/Save";
 
 interface CreateTripDialogProps {
   open: boolean;
@@ -32,9 +36,9 @@ interface CreateTripDialogProps {
 export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
                                                                     open,
                                                                     handleClose,
-                                                                    refetchTrips
+                                                                    refetchTrips,
                                                                   }) => {
-  const [tripTitle, setTripTitle] = useState<string>('');
+  const [tripTitle, setTripTitle] = useState<string>("");
   const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>([]);
   const theme: Theme = useTheme();
   const notif: MessageContextType = useMessage();
@@ -59,8 +63,8 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
       .then((response) => {
         if (response.status === 200) {
           notif.setPayload({
-            type: 'success',
-            message: 'Successfully created trip.',
+            type: "success",
+            message: "Successfully created trip.",
           });
         }
         handleClose();
@@ -68,8 +72,8 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
       })
       .catch((error) => {
         notif.setPayload({
-          type: 'error',
-          message: 'Error creating trip.',
+          type: "error",
+          message: "Error creating trip.",
         });
         handleClose();
         console.log(error);
@@ -77,15 +81,39 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
   };
 
   const resetAndClose = (): void => {
-    setTripTitle('');
+    setTripTitle("");
     setSelectedCurrencies([]);
     handleClose();
   };
 
   return (
-    <Dialog open={open} onClose={resetAndClose} fullWidth maxWidth="sm">
-      <DialogTitle>Create New Trip</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={resetAndClose}
+      fullWidth
+      maxWidth="sm"
+      sx={{
+        "& .MuiPaper-root": {
+          borderRadius: "12px",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+          padding: "16px",
+        },
+      }}
+    >
+      {/* Title with an Icon */}
+      <DialogTitle
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          fontWeight: "bold",
+        }}
+      >
+        <FlightTakeoffIcon color="primary" /> Create New Trip
+      </DialogTitle>
+
       <DialogContent>
+        {/* Trip Title Input */}
         <TextField
           autoFocus
           margin="dense"
@@ -96,15 +124,24 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
           variant="outlined"
           inputProps={{ maxLength: 150 }}
           value={tripTitle}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTripTitle(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setTripTitle(e.target.value)
+          }
           sx={{
-            marginTop: '16px',
-            backgroundColor: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+            marginTop: "16px",
+            backgroundColor: "#F9FAFB",
+            borderRadius: "8px",
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "8px",
+            },
+          }}
+          InputProps={{
+            startAdornment: <AddCircleOutlineIcon color="action" />,
           }}
         />
-        <Box sx={{ marginTop: '16px' }}>
+
+        {/* Currency Selection */}
+        <Box sx={{ marginTop: "16px" }}>
           <FormControl fullWidth variant="outlined">
             <InputLabel id="currency-select-label">
               Select Currencies
@@ -114,16 +151,20 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
               id="currency-select"
               multiple
               value={selectedCurrencies}
-              onChange={(e: SelectChangeEvent<string[]>) => {
-                // This is a type guard - normally not needed as you'd directly handle in MenuItem click
-              }}
-              renderValue={(selected: string[]) => selected.join(', ')}
+              renderValue={(selected: string[]) => selected.join(", ")}
               MenuProps={{
                 PaperProps: {
                   style: {
                     maxHeight: 48 * 4.5 + 8,
                     width: 250,
                   },
+                },
+              }}
+              sx={{
+                backgroundColor: "#F9FAFB",
+                borderRadius: "8px",
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "8px",
                 },
               }}
             >
@@ -140,32 +181,47 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
                 </MenuItem>
               ))}
             </Select>
-            <Box sx={{ marginTop: '8px', fontSize: '12px', color: '#999' }}>
-              <span>Minimum: 1 currency</span>
-              <br />
-              <span>Maximum: 3 currencies</span>
-            </Box>
           </FormControl>
+
+          {/* Currency Limits */}
+          <Typography
+            variant="body2"
+            sx={{ marginTop: "8px", fontSize: "12px", color: "#666" }}
+          >
+            Minimum: 1 currency | Maximum: 3 currencies
+          </Typography>
         </Box>
       </DialogContent>
-      <DialogActions>
+
+      {/* Actions: Save & Cancel */}
+      <DialogActions sx={{ justifyContent: "space-between", padding: "16px" }}>
         <Button
           onClick={createTrip}
           disabled={selectedCurrencies.length < 1 || tripTitle.length < 3}
+          startIcon={<SaveIcon />}
           sx={{
             backgroundColor:
               selectedCurrencies.length < 1 || tripTitle.length < 3
-                ? 'grey'
-                : '#1976d2',
-            color: '#fff',
-            '&:hover': { backgroundColor: '#1565c0' },
+                ? theme.palette.grey[400]
+                : theme.palette.primary.main,
+            color: "#fff",
+            "&:hover": {
+              backgroundColor:
+                selectedCurrencies.length < 1 || tripTitle.length < 3
+                  ? theme.palette.grey[400]
+                  : theme.palette.primary.dark,
+            },
+            borderRadius: "8px",
+            padding: "8px 16px",
+            transition: "0.3s",
           }}
         >
           Save Trip
         </Button>
-        <Button onClick={resetAndClose} sx={{ color: theme.palette.grey[700] }}>
-          Cancel
-        </Button>
+
+        <IconButton onClick={resetAndClose} color="error">
+          <CancelIcon />
+        </IconButton>
       </DialogActions>
     </Dialog>
   );

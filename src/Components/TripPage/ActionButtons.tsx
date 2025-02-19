@@ -26,7 +26,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         onClick={onCreateClick}
         startIcon={<Add />}
         sx={{
-          padding: isMobile ? '5px' : '16px',
+          padding: isMobile ? '10px' : '16px',
           fontSize: isMobile ? '12px' : '16px',
           backgroundColor: '#1976d2',
           color: '#fff',
@@ -45,7 +45,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         onClick={onConnectClick}
         startIcon={<ConnectWithoutContactIcon />}
         sx={{
-          padding: isMobile ? '5px' : '16px',
+          padding: isMobile ? '10px' : '16px',
           fontSize: isMobile ? '12px' : '16px',
           backgroundColor: '#1976d2',
           color: '#fff',

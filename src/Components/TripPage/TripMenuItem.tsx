@@ -56,6 +56,7 @@ export const TripMenuItem: React.FC<TripMenuItemProps> = ({
     <div style={{
       display: 'flex',
       justifyContent: 'space-between',
+      gap:'20px',
       alignItems: 'center',
       width: '100%'
     }}>
@@ -68,7 +69,7 @@ export const TripMenuItem: React.FC<TripMenuItemProps> = ({
           onClick={(e) => handleDeleteTrip(e, item.tripIdShared)}
           sx={{
             borderColor: theme.palette.error.light,
-            '&:hover': {
+            '&:active': {
               backgroundColor: theme.palette.error.light,
             },
           }}
@@ -83,7 +84,7 @@ export const TripMenuItem: React.FC<TripMenuItemProps> = ({
             marginLeft: '8px',
             color: theme.palette.primary.main,
             borderColor: theme.palette.primary.main,
-            '&:hover': {
+            '&:active': {
               backgroundColor: theme.palette.primary.light,
             },
           }}
