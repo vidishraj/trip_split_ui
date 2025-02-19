@@ -16,6 +16,8 @@ import { useUser } from '../Contexts/GlobalContext';
 import { auth } from '../Api/FirebaseConfig';
 import SignupDialog from '../Components/Signup';
 import { useAuth } from '../Contexts/AuthContext';
+import { useMessage } from '../Contexts/NotifContext';
+import notification from '../Components/Notification';
 
 const LoginContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -46,7 +48,7 @@ const Login: React.FC = () => {
   const { setUser } = useUser();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-
+  const notif = useMessage();
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -59,6 +61,8 @@ const Login: React.FC = () => {
       setUser(userCredential.user);
       navigate('/trip');
     } catch (error) {
+      notif.setPayload({type:'error', payload:"Error occured while logging in." +
+          " Try again later!"});
       console.error('Error logging in:', error);
     } finally {
       setLoading(false);
