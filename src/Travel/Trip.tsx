@@ -64,7 +64,26 @@ const TripPage = () => {
       return prev;
     });
   };
-
+  function refetchTrips(){
+    fetchTrips(true)
+      .then((response) => {
+        if (Array.isArray(response.data.Message)) {
+          response.data.Message.forEach((item: any) => {
+            item['currencies'] = item['currencies'].toString().split(',');
+          });
+          travelCtx.dispatch({
+            type: 'SET_TRIP',
+            payload: response.data.Message,
+          });
+        }
+      })
+      .catch((error) => {
+        notif.setPayload({
+          type: 'error',
+          message: 'Error fetching trip.',
+        });
+      });
+  }
   function createTrip() {
     insertTrip({
       trip: tripTitle,
@@ -78,24 +97,7 @@ const TripPage = () => {
           });
         }
         setOpen(false);
-        fetchTrips(true)
-          .then((response) => {
-            if (Array.isArray(response.data.Message)) {
-              response.data.Message.forEach((item: any) => {
-                item['currencies'] = item['currencies'].toString().split(',');
-              });
-              travelCtx.dispatch({
-                type: 'SET_TRIP',
-                payload: response.data.Message,
-              });
-            }
-          })
-          .catch((error) => {
-            notif.setPayload({
-              type: 'error',
-              message: 'Error fetching trip.',
-            });
-          });
+        refetchTrips();
       })
       .catch((error) => {
         notif.setPayload({
@@ -110,6 +112,8 @@ const TripPage = () => {
   function deleteTripWithId(tripId:string) {
     deleteTrip(true, tripId).then((response: AxiosResponse) => {
       if(response.status===200 ){
+
+        refetchTrips();
         notif.setPayload({type: 'success',
           message: 'Trip deleted successfully.'});
 
