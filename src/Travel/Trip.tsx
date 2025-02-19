@@ -19,7 +19,7 @@ import { useTheme, useMediaQuery } from '@mui/material';
 import { AxiosResponse } from 'axios';
 import { useTravel } from '../Contexts/TravelContext';
 import { useMessage } from '../Contexts/NotifContext';
-import { fetchTrips, insertTrip, sendTripRequest, updateTripTitle } from '../Api';
+import { deleteTrip, fetchTrips, insertTrip, sendTripRequest, updateTripTitle } from '../Api';
 import Lottie from 'lottie-react';
 import animationData from './tripAnimation.json';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -107,6 +107,22 @@ const TripPage = () => {
       });
   }
 
+  function deleteTripWithId(tripId:string) {
+    deleteTrip(true, tripId).then((response: AxiosResponse) => {
+      if(response.status===200 ){
+        notif.setPayload({type: 'success',
+          message: 'Trip deleted successfully.'});
+
+      }
+    }).catch((error) => {
+    if(error.status === 401) {
+      notif.setPayload({type: 'error', message: `Expenses exist for the trip`});
+    }
+    else{
+        notif.setPayload({type: 'error', message: 'Error deleting trip.'});
+      }
+    })
+  }
   function sendTripConnectRequest() {
     if (tripIdConnect.length !== 6) {
       notif.setPayload({
@@ -213,9 +229,30 @@ const TripPage = () => {
                   });
                 }}
                 value={item.tripIdShared}
-                sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                // sx={{ width:'100%',}}
               >
-                {item.tripTitle}
+                <div style={{display:'flex',justifyContent: 'space-between', alignItems: 'center', width:'100%'}}>
+
+                  <span>{item.tripTitle}</span>
+                  <div>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color={'error'}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteTripWithId(item.tripIdShared)
+                  }}
+                  sx={{
+                    // marginLeft: '8px',
+                    borderColor: theme.palette.error.light,
+                    '&:hover': {
+                      backgroundColor: theme.palette.error.light,
+                    },
+                  }}
+                >
+                  Delete
+                </Button>
                 <Button
                   variant="outlined"
                   size="small"
@@ -235,6 +272,8 @@ const TripPage = () => {
                 >
                   Edit
                 </Button>
+                </div>
+                </div>
               </MenuItem>
             ))}
           </Select>

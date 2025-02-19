@@ -86,6 +86,21 @@ export async function fetchTrips(userCalled: boolean): Promise<any> {
       .then((response) => response)
   );
 }
+export async function deleteTrip(
+  userCalled: boolean,
+  tripId: string
+): Promise<any> {
+  if (userCalled) {
+    axios.storage.remove('fetch');
+  }
+  return queueRequest(() =>
+    axios
+      .get(process.env.REACT_APP_BACKENDURL + '/deleteTrip', {
+        params: { tripId: tripId },
+      })
+      .then((response) => response)
+  );
+}
 
 export async function insertTrip(body: any): Promise<any> {
   axios.storage.remove('fetch-trip');
