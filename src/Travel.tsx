@@ -3,16 +3,16 @@ import {
   fetchExpenseForTrip,
   fetchTrips,
   fetchUsersForATrip,
-} from '../Api';
-import Dashboard from './Dashboard';
-import TripPage from '../Pages/Trip';
+} from './Api/Api';
+import Dashboard from './Pages/Dashboard';
+import TripPage from './Pages/Trip';
 import { useEffect } from 'react';
-import { useTravel } from '../Contexts/TravelContext';
-import { useMessage } from '../Contexts/NotifContext';
+import { useTravel } from './Contexts/TravelContext';
+import { useMessage } from './Contexts/NotifContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import Footer from '../Common/Footer';
-import { useUser } from '../Contexts/GlobalContext';
-import Login from '../Login/Login';
+import Footer from './Components/Footer';
+import { useUser } from './Contexts/GlobalContext';
+import Login from './Pages/Login';
 
 export const TravelPage = () => {
   const { setPayload } = useMessage();

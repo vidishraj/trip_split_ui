@@ -1,7 +1,7 @@
 import Axios from 'axios';
 import { setupCache } from 'axios-cache-interceptor';
-import { useLoading } from './Contexts/LoadingContext';
-import { auth } from './Login/FirebaseConfig';
+import { useLoading } from '../Contexts/LoadingContext';
+import { auth } from './FirebaseConfig';
 const instance = Axios.create();
 const axios = setupCache(instance, { debug: console.log });
 

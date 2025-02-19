@@ -2,7 +2,7 @@ import "./BalanceContainer.scss";
 import React,{useEffect, useState} from "react";
 import { Avatar, Box, Typography, useTheme, Card } from "@mui/material";
 import { ArrowForward } from "@mui/icons-material";
-import { useTravel } from "../Contexts/TravelContext";
+import { useTravel } from "../../Contexts/TravelContext";
 import FunctionsIcon from '@mui/icons-material/Functions';
 
 const BalanceContainer = () => {

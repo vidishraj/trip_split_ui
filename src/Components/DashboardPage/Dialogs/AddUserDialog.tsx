@@ -1,9 +1,9 @@
 import React from 'react';
 import { Dialog, DialogContent, Box, Button, Divider } from '@mui/material';
-import { useTravel } from '../../Contexts/TravelContext';
-import { sendResponseForTripRequest } from '../../Api';
-import { useMessage } from '../../Contexts/NotifContext';
-import { useLoading } from '../../Contexts/LoadingContext';
+import { useTravel } from '../../../Contexts/TravelContext';
+import { sendResponseForTripRequest } from '../../../Api/Api';
+import { useMessage } from '../../../Contexts/NotifContext';
+import { useLoading } from '../../../Contexts/LoadingContext';
 
 interface UsernameDialogProps {
   open: boolean;

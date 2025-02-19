@@ -11,9 +11,9 @@ import {
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useTravel } from '../../Contexts/TravelContext';
-import { useMessage } from '../../Contexts/NotifContext';
-import { deleteUser } from '../../Api';
+import { useTravel } from '../../../Contexts/TravelContext';
+import { useMessage } from '../../../Contexts/NotifContext';
+import { deleteUser } from '../../../Api/Api';
 
 interface NameListDialogProps {
   onClose: () => void;

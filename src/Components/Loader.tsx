@@ -2,7 +2,7 @@ import React from 'react';
 import { Box } from '@mui/material';
 import { useLoading } from '../Contexts/LoadingContext';
 import Lottie from 'lottie-react';
-import loginAnimation from './loaderAnimation.json';
+import loginAnimation from '../Assets/loaderAnimation.json';
 const Loader: React.FC = () => {
   const { loading } = useLoading();
 

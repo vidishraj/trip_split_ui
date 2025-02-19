@@ -13,9 +13,9 @@ import {
   Button,
 } from '@mui/material';
 import { useState, useEffect, useContext, ChangeEvent } from 'react';
-import { useTravel } from '../../Contexts/TravelContext';
-import { CurrencyContext } from '../../Contexts/CurrencyContext';
-import { currencies } from '../../Common/currencyData';
+import { useTravel } from '../../../Contexts/TravelContext';
+import { CurrencyContext } from '../../../Contexts/CurrencyContext';
+import { currencies } from '../../../Assets/currencyData';
 import { round } from './ExpenseDialog';
 
 interface User {

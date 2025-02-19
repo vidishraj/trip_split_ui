@@ -10,8 +10,8 @@ import {
 } from '@mui/material';
 import { useTravel } from '../../Contexts/TravelContext';
 import { useMessage } from '../../Contexts/NotifContext';
-import { updateTripTitle } from '../../Api';
-import { TripData, MessageContextType } from '../../Common/types';
+import { updateTripTitle } from '../../Api/Api';
+import { TripData, MessageContextType } from '../../Assets/types';
 
 interface EditTripDialogProps {
   editData: TripData | undefined;

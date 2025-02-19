@@ -19,9 +19,9 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { useMessage } from "../../Contexts/NotifContext";
-import { insertTrip } from "../../Api";
-import { currencies } from "../../Common/currencyData";
-import { MessageContextType } from "../../Common/types";
+import { insertTrip } from "../../Api/Api";
+import { currencies } from "../../Assets/currencyData";
+import { MessageContextType } from "../../Assets/types";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";

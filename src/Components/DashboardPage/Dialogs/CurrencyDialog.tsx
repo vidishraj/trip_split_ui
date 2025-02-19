@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { CurrencyContext } from '../../Contexts/CurrencyContext';
+import { CurrencyContext } from '../../../Contexts/CurrencyContext';
 import {
   Dialog,
   DialogTitle,
@@ -12,8 +12,8 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import { useTravel } from '../../Contexts/TravelContext';
-import { currencies } from '../../Common/currencyData';
+import { useTravel } from '../../../Contexts/TravelContext';
+import { currencies } from '../../../Assets/currencyData';
 
 const CurrencyDialog: React.FC<{ open: boolean; onClose: () => void }> = ({
   open,

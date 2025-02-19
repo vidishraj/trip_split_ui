@@ -11,10 +11,10 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/system';
 import Lottie from 'lottie-react';
-import loginAnimation from './loginAnimation.json';
+import loginAnimation from '../Assets/loginAnimation.json';
 import { useUser } from '../Contexts/GlobalContext';
-import { auth } from './FirebaseConfig';
-import SignupDialog from './Signup';
+import { auth } from '../Api/FirebaseConfig';
+import SignupDialog from '../Components/Signup';
 import { useAuth } from '../Contexts/AuthContext';
 
 const LoginContainer = styled(Box)(({ theme }) => ({

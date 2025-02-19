@@ -8,9 +8,9 @@ import { MessageProvider } from './Contexts/NotifContext';
 import { TravelProvider } from './Contexts/TravelContext';
 import { AuthProvider } from './Contexts/AuthContext';
 import { CurrencyProvider } from './Contexts/CurrencyContext';
-import NotificationMessage from './Travel/Notification';
+import NotificationMessage from './Components/Notification';
 import { LoadingProvider } from './Contexts/LoadingContext';
-import Loader from './Common/Loader';
+import Loader from './Components/Loader';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

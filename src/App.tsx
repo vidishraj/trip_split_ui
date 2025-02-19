@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
-import Login from './Login/Login';
-import { TravelPage } from './Travel/Travel';
-import { useAxiosSetup } from './Api';
+import Login from './Pages/Login';
+import { TravelPage } from './Travel';
+import { useAxiosSetup } from './Api/Api';
 
 function App() {
   useAxiosSetup(); // Set up the axios interceptors

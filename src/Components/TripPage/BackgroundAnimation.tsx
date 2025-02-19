@@ -1,7 +1,7 @@
 // BackgroundAnimation.tsx
 import { Box } from '@mui/material';
 import Lottie from 'lottie-react';
-import animationData from '../../Travel/tripAnimation.json';
+import animationData from '../../Assets/tripAnimation.json';
 
 interface BackgroundAnimationProps {
   isMobile: boolean;

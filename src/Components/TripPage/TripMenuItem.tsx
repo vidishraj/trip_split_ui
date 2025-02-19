@@ -2,9 +2,9 @@
 import React from 'react';
 import { Button } from '@mui/material';
 import { useTheme, Theme } from '@mui/material';
-import { deleteTrip } from '../../Api';
+import { deleteTrip } from '../../Api/Api';
 import { useMessage } from '../../Contexts/NotifContext';
-import { TripData, MessageContextType } from '../../Common/types';
+import { TripData, MessageContextType } from '../../Assets/types';
 
 interface TripMenuItemProps {
   item: TripData;

@@ -9,12 +9,12 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { useTheme, useMediaQuery } from '@mui/material';
-import { insertExpense, updateExpense } from '../../Api';
-import { useTravel } from '../../Contexts/TravelContext';
+import { insertExpense, updateExpense } from '../../../Api/Api';
+import { useTravel } from '../../../Contexts/TravelContext';
 import { AmountSplitDialog } from './AmountSplitDialog';
-import { CurrencyContext } from '../../Contexts/CurrencyContext';
-import { currencies } from '../../Common/currencyData';
-import { useMessage } from '../../Contexts/NotifContext';
+import { CurrencyContext } from '../../../Contexts/CurrencyContext';
+import { currencies } from '../../../Assets/currencyData';
+import { useMessage } from '../../../Contexts/NotifContext';
 
 interface ExpenseDialogProps {
   editMode?: boolean;

@@ -12,8 +12,8 @@ import {
 } from '@mui/material';
 import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
 import { useUser } from '../Contexts/GlobalContext';
-import { auth } from './FirebaseConfig';
-import { insertUser } from '../Api';
+import { auth } from '../Api/FirebaseConfig';
+import { insertUser } from '../Api/Api';
 
 interface SignupDialogProps {
   open: boolean;

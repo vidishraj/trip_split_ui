@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { useMessage } from "../../Contexts/NotifContext";
-import { sendTripRequest } from "../../Api";
-import { MessageContextType } from "../../Common/types";
+import { sendTripRequest } from "../../Api/Api";
+import { MessageContextType } from "../../Assets/types";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import SendIcon from "@mui/icons-material/Send";
 import CancelIcon from "@mui/icons-material/Cancel";

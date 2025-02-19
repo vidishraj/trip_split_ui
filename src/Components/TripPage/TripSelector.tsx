@@ -1,7 +1,7 @@
 // TripSelector.tsx
 import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import { TripMenuItem } from './TripMenuItem';
-import { TripData } from '../../Common/types';
+import { TripData } from '../../Assets/types';
 
 
 
