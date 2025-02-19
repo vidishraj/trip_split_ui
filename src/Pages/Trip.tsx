@@ -9,7 +9,9 @@ import { CreateTripDialog } from '../Components/TripPage/CreateTripDialog';
 import { ConnectTripDialog } from '../Components/TripPage/ConnectTripDialog';
 import { EditTripDialog } from '../Components/TripPage/EditTripDialog';
 import { TripData } from '../Common/types';
-import { ActionButtons, BackgroundAnimation, TripSelector } from '../Components/TripPage/TripSelector';
+import { TripSelector } from '../Components/TripPage/TripSelector';
+import { BackgroundAnimation } from '../Components/TripPage/BackgroundAnimation';
+import { ActionButtons } from '../Components/TripPage/ActionButtons';
 
 const TripPage: React.FC = () => {
   const [trip, setTrip] = useState<string>('');

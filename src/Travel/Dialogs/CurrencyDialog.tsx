@@ -13,7 +13,7 @@ import {
   ListItemText,
 } from '@mui/material';
 import { useTravel } from '../../Contexts/TravelContext';
-import { currencies } from '../Trip';
+import { currencies } from '../../Common/currencyData';
 
 const CurrencyDialog: React.FC<{ open: boolean; onClose: () => void }> = ({
   open,

@@ -13,7 +13,7 @@ import { insertExpense, updateExpense } from '../../Api';
 import { useTravel } from '../../Contexts/TravelContext';
 import { AmountSplitDialog } from './AmountSplitDialog';
 import { CurrencyContext } from '../../Contexts/CurrencyContext';
-import { currencies } from '../Trip';
+import { currencies } from '../../Common/currencyData';
 import { useMessage } from '../../Contexts/NotifContext';
 
 interface ExpenseDialogProps {

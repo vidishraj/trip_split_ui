@@ -5,7 +5,7 @@ import {
   fetchUsersForATrip,
 } from '../Api';
 import Dashboard from './Dashboard';
-import TripPage from './Trip';
+import TripPage from '../Pages/Trip';
 import { useEffect } from 'react';
 import { useTravel } from '../Contexts/TravelContext';
 import { useMessage } from '../Contexts/NotifContext';

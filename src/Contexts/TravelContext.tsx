@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
 
-interface TripResponse {
+export interface TripResponse {
   tripIdShared: string;
   tripTitle: string;
   currencies: string[];
