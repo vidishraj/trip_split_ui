@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, Card, Avatar, useTheme } from '@mui/material';
-import { useTravel } from '../Contexts/TravelContext';
+import "./BalanceContainer.scss";
+import React,{useEffect, useState} from "react";
+import { Avatar, Box, Typography, useTheme, Card } from "@mui/material";
+import { ArrowForward } from "@mui/icons-material";
+import { useTravel } from "../Contexts/TravelContext";
 import FunctionsIcon from '@mui/icons-material/Functions';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import './BalanceContainer.scss';
 
 const BalanceContainer = () => {
   const travelCtx = useTravel();
@@ -17,28 +17,17 @@ const BalanceContainer = () => {
     });
     setTotalExpenditure(totalExpenditureLoc);
   }, [travelCtx]);
-  const getUserName = (userId: number) => {
-    const user = travelCtx.state.users.find((u: any) => u.userId === userId);
-    return user ? user.userName : 'Unknown';
+  const getUserName = (userId:number) => {
+    const user = travelCtx.state.users.find((u) => u.userId === userId);
+    return user ? user.userName : "Unknown";
   };
 
+  if (!userBalances || userBalances.length === 0) {
+    return <Typography sx={{ textAlign: "center", mt: 2 }}>No Balance to show!</Typography>;
+  }
+
   return (
-    <Box
-      id="balanceBox"
-      flexGrow={1}
-      width="100%"
-      padding="16px"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      sx={{
-        height: '100%',
-        overflow: 'auto',
-        flexDirection: 'column',
-        gap: '16px',
-        backgroundColor: 'transparent',
-      }}
-    >
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center", mt: 3}}>
       <Card
         sx={{
           width: '80%',
@@ -83,98 +72,57 @@ const BalanceContainer = () => {
           ₹ {totalExpenditure.toFixed(2)}
         </Typography>
       </Card>
-      {Object.keys(userBalances).length > 0 ? (
-        Object.entries(userBalances).map(
-          ([userId, balance]: [userId: any, balance: any]) => (
-            <Card
-              key={userId}
-              sx={{
-                width: '80%',
-                maxWidth: 400,
-                padding: '16px',
-                margin: '8px 0',
-                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
-                borderRadius: '12px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                backdropFilter: 'blur(10px)',
-                backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                [theme.breakpoints.down('sm')]: {
-                  padding: '12px',
-                },
-              }}
-            >
-              {/* User Avatar and Name */}
-              <Box display="flex" alignItems="center">
-                <Avatar
-                  sx={{
-                    bgcolor: balance >= 0 ? '#4caf50' : '#f44336',
-                    marginRight: '12px',
-                  }}
-                >
-                  <AccountBalanceIcon />
-                </Avatar>
-                <Typography sx={{ fontWeight: 'bold', color: '#333' }}>
-                  {getUserName(Number(userId))}
-                </Typography>
-              </Box>
+      {userBalances.map((balance:any) => {
+        const senderName = getUserName(balance.from);
+        const receiverName = getUserName(balance.to);
 
-              {/* Balance */}
-              <Typography>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span
-                    style={{
-                      fontWeight: 'bold',
-                      color: balance['amount'] >= 0 ? '#4caf50' : '#f44336',
-                    }}
-                  >
-                    ₹ {balance['amount'].toFixed(2)}
-                  </span>
-                  <span
-                    style={{
-                      fontWeight: 'bold',
-                      color: '#f44336',
-                    }}
-                  >
-                    {' '}
-                    (₹ {balance['selfTransaction'].toFixed(2)})
-                  </span>
-                </div>
-              </Typography>
-            </Card>
-          )
-        )
-      ) : (
-        <Box
-          sx={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            borderRadius: '12px',
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-            transition: 'all 0.3s ease-in-out',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.4)',
-            },
-          }}
-        >
-          <Typography
-            variant="h4"
+        return (
+          <Box
+            key={`${balance.from}-${balance.to}`}
             sx={{
-              fontSize: '1.5rem',
-              fontWeight: 'bold',
-              color: 'rgba(0, 0, 0, 0.7)',
-              textShadow: '1px 1px 5px rgba(0, 0, 0, 0.2)',
+              display: "flex",
+              alignItems: "center",
+              justifyContent:'space-evenly',
+              gap: 2,
+              backgroundColor: "white",
+              boxShadow: 2,
+              borderRadius: 3,
+              padding: 2,
+              minWidth:'320px',
+              width: "550px",
+              margin: "auto",
             }}
           >
-            No balances to show!
-          </Typography>
-        </Box>
-      )}
+            {/* Sender */}
+            <Box sx={{ textAlign: "center" }}>
+              <Avatar sx={{ bgcolor: "rgb(244, 67, 54)", width: 56, height: 56, fontSize: 24 }}>
+                {senderName[0] || "U"}
+              </Avatar>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, mt: 1, color:'rgb(244, 67, 54)' }}>
+                {senderName}
+              </Typography>
+            </Box>
+
+            {/* Arrow with Amount */}
+            <Box sx={{ textAlign: "center" }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", color: "rgb(76, 175, 80)" }}>
+                ₹ {balance.amount.toFixed(2)}
+              </Typography>
+              <ArrowForward sx={{ fontSize: 36, color: "black" }} />
+            </Box>
+
+            {/* Receiver */}
+            <Box sx={{ textAlign: "center" }}>
+              <Avatar sx={{ bgcolor: "rgb(76, 175, 80)", width: 56, height: 56, fontSize: 24 }}>
+                {receiverName[0] || "U"}
+              </Avatar>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, mt: 1,color:"rgb(76, 175, 80)" }}>
+                {receiverName}
+              </Typography>
+            </Box>
+          </Box>
+        );
+      })}
     </Box>
   );
 };
