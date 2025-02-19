@@ -3,19 +3,14 @@ import React, { useState } from 'react';
 import {
   Card,
   CardContent,
-  Box,
-  Typography,
   Divider,
-  IconButton,
   useTheme
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { useTravel } from '../../Contexts/TravelContext';
-import { useMessage } from '../../Contexts/NotifContext';
+import { useTravel } from '../../../Contexts/TravelContext';
+import { useMessage } from '../../../Contexts/NotifContext';
 import ExpenseDialog from '../Dialogs/ExpenseDialog';
-import ConfirmationDialog from '../../Assets/ConfirmationDialog';
-import { deleteExpense } from '../../Api';
+import ConfirmationDialog from '../../ConfirmationDialog';
+import { deleteExpense } from '../../../Api/Api';
 import ExpenseDetails from './ExpenseDetails';
 import ExpenseHeader from './ExpenseHeader';
 

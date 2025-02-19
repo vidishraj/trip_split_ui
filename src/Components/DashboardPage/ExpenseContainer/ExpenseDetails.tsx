@@ -1,7 +1,7 @@
 // ExpenseComponents/ExpenseDetails.tsx
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { useTravel } from '../../Contexts/TravelContext';
+import { useTravel } from '../../../Contexts/TravelContext';
 
 interface ExpenseDetailsProps {
   amount: number;
