@@ -17,7 +17,6 @@ import { auth } from '../Api/FirebaseConfig';
 import SignupDialog from '../Components/Signup';
 import { useAuth } from '../Contexts/AuthContext';
 import { useMessage } from '../Contexts/NotifContext';
-import notification from '../Components/Notification';
 
 const LoginContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -63,7 +62,7 @@ const Login: React.FC = () => {
     } catch (error) {
       notif.setPayload({
         type: 'error',
-        payload: 'Error occured while logging in.' + ' Try again later!',
+        message: 'Error occurred while logging in.',
       });
       console.error('Error logging in:', error);
     } finally {

@@ -58,7 +58,7 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ open, onClose }) => {
             .catch(() => {
               notif.setPayload({
                 type: 'error',
-                payload:
+                message:
                   'Error occurred while inserting user after sign up.' +
                   ' Try again later!',
               });
@@ -68,7 +68,7 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ open, onClose }) => {
         .catch(() => {
           notif.setPayload({
             type: 'error',
-            payload: 'Error occurred while signing up. Try again later!',
+            message: 'Error occurred while signing up. Try again later!',
           });
           setError('Error signing up. Try again.');
         });
@@ -76,7 +76,7 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ open, onClose }) => {
     } catch (error) {
       notif.setPayload({
         type: 'error',
-        payload: 'Error occurred while signing up. Try again later!',
+        message: 'Error occurred while signing up. Try again later!',
       });
       setError('Error creating account. Please try again.');
     } finally {
