@@ -15,10 +15,6 @@ const BackgroundAnimation: React.FC<BackgroundAnimationProps> = ({
   return (
     <Box
       position="absolute"
-      top="0"
-      left="0"
-      right="0"
-      bottom="0"
       zIndex={-1}
       display={isMobile ? 'flex' : 'relative'}
       alignItems={isMobile ? 'center' : 'start'}
