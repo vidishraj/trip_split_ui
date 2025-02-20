@@ -38,7 +38,6 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({ open, onClose }) 
         const userName = getUserName(item.paidBy);
         if(item['selfExpense']){
           if ( Object.prototype.hasOwnProperty.call(dataObj, userName)) {
-          console.log(item)
           dataObj[userName] += parseInt(item.amount);
         } else {
           dataObj[userName] = parseInt(item.amount);
