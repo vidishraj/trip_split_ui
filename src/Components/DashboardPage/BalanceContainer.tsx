@@ -1,15 +1,17 @@
 import "./BalanceContainer.scss";
 import React, { useEffect, useState } from "react";
-import { Avatar, Box, Typography, useTheme, Card } from "@mui/material";
+import { Avatar, Box, Typography, useTheme, Card, Button } from '@mui/material';
 import { ArrowForward, CurrencyRupee, AccountCircle } from "@mui/icons-material";
 import { useTravel } from "../../Contexts/TravelContext";
 import FunctionsIcon from "@mui/icons-material/Functions";
+import SelfExpenseDialog from './Dialogs/SelfExpenseDialog';
 
 const BalanceContainer = () => {
   const travelCtx = useTravel();
   const theme = useTheme();
   const userBalances = travelCtx.state.balances;
   const [totalExpenditure, setTotalExpenditure] = useState(0);
+  const [selfExpenseDialog, setSelfExpenseDialog] = useState(false);
 
   useEffect(() => {
     let totalExpenditureLoc = 0;
@@ -29,7 +31,9 @@ const BalanceContainer = () => {
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center", mt: 3 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center",
+      justifyContent:'space-evenly',
+      mt: 3, height:'100%'}}>
       {/* Total Card */}
       <Card
         sx={{
@@ -75,7 +79,7 @@ const BalanceContainer = () => {
           {totalExpenditure.toFixed(2)}
         </Typography>
       </Card>
-
+      <Box>
       {/* Individual Transactions */}
       {userBalances.map((balance: any) => {
         const senderName = getUserName(balance.from);
@@ -150,6 +154,9 @@ const BalanceContainer = () => {
           </Box>
         );
       })}
+    </Box>
+      <Button onClick={()=>{setSelfExpenseDialog(true)}} startIcon={<FunctionsIcon/>} color='primary' variant='contained'> Net Self Expenses</Button>
+      <SelfExpenseDialog open={selfExpenseDialog} onClose={()=>setSelfExpenseDialog(false)}/>
     </Box>
   );
 };
