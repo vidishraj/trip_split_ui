@@ -61,8 +61,10 @@ const Login: React.FC = () => {
       setUser(userCredential.user);
       navigate('/trip');
     } catch (error) {
-      notif.setPayload({type:'error', payload:"Error occured while logging in." +
-          " Try again later!"});
+      notif.setPayload({
+        type: 'error',
+        payload: 'Error occured while logging in.' + ' Try again later!',
+      });
       console.error('Error logging in:', error);
     } finally {
       setLoading(false);

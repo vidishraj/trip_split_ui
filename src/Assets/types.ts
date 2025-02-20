@@ -16,7 +16,7 @@ export interface Currency {
 
 // types/context.ts
 export interface TravelContextState {
-  trip: TripResponse[]|undefined;
+  trip: TripResponse[] | undefined;
   chosenTrip: TripResponse | undefined;
   [key: string]: any;
 }

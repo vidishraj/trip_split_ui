@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -10,24 +10,27 @@ import {
   ListItemText,
   Typography,
   IconButton,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
-import { useTravel } from "../../../Contexts/TravelContext";
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import { useTravel } from '../../../Contexts/TravelContext';
 
 interface SelfExpenseDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({ open, onClose }) => {
+const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
+  open,
+  onClose,
+}) => {
   const [data, setData] = useState<{ [key: string]: number }>({}); // Fix: Properly typed state
   const travelCtx = useTravel();
 
   const getUserName = (userId: number) => {
     const user = travelCtx.state.users.find((u) => u.userId === userId);
-    return user ? user.userName : "Unknown";
+    return user ? user.userName : 'Unknown';
   };
 
   useEffect(() => {
@@ -36,12 +39,12 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({ open, onClose }) 
 
       travelCtx.state.expenses.forEach((item) => {
         const userName = getUserName(item.paidBy);
-        if(item['selfExpense']){
-          if ( Object.prototype.hasOwnProperty.call(dataObj, userName)) {
-          dataObj[userName] += parseInt(item.amount);
-        } else {
-          dataObj[userName] = parseInt(item.amount);
-        }
+        if (item['selfExpense']) {
+          if (Object.prototype.hasOwnProperty.call(dataObj, userName)) {
+            dataObj[userName] += parseInt(item.amount);
+          } else {
+            dataObj[userName] = parseInt(item.amount);
+          }
         }
       });
 
@@ -56,15 +59,21 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({ open, onClose }) 
       maxWidth="xs"
       fullWidth
       sx={{
-        "& .MuiPaper-root": {
-          borderRadius: "12px",
-          padding: "12px",
-          boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.2)",
+        '& .MuiPaper-root': {
+          borderRadius: '12px',
+          padding: '12px',
+          boxShadow: '0px 6px 20px rgba(0, 0, 0, 0.2)',
         },
       }}
     >
       {/* Header */}
-      <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Typography variant="h6" fontWeight="bold">
           Self Expenses
         </Typography>
@@ -77,9 +86,12 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({ open, onClose }) 
       <DialogContent dividers>
         <List>
           {Object.entries(data).map(([user, amount], index) => (
-            <ListItem key={index} sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <ListItem
+              key={index}
+              sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
+            >
               <ListItemAvatar>
-                <Avatar sx={{ bgcolor: "#1976d2" }}>
+                <Avatar sx={{ bgcolor: '#1976d2' }}>
                   <AccountCircleIcon />
                 </Avatar>
               </ListItemAvatar>

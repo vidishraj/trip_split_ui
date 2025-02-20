@@ -6,7 +6,10 @@ import {
   Button,
   TextField,
   MenuItem,
-  InputAdornment, Checkbox, FormControlLabel, Box,
+  InputAdornment,
+  Checkbox,
+  FormControlLabel,
+  Box,
 } from '@mui/material';
 import { useTheme, useMediaQuery } from '@mui/material';
 import { insertExpense, updateExpense } from '../../../Api/Api';
@@ -47,7 +50,9 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
     [key: string]: number;
   }>({});
   const enabledCurrency = 'inr';
-  const [selfExpense, setSelfExpense] = useState<boolean>(editMode && editData ? editData.selfExpense : false);
+  const [selfExpense, setSelfExpense] = useState<boolean>(
+    editMode && editData ? editData.selfExpense : false
+  );
   const [paidBy, setPaidBy] = useState<any>(
     editMode && editData
       ? {
@@ -82,14 +87,13 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
       if (editMode) {
         let userDiv: any = [];
         Object.keys(editData['splitBetween']).forEach((userId) => {
-
           let userIdInt = parseInt(userId);
           if (userIdInt === paidBy.userId) {
-              userDiv.push({
-                userId: userIdInt,
-                userName: '',
-                amount: editData['amount']-editData['splitBetween'][userIdInt],
-              });
+            userDiv.push({
+              userId: userIdInt,
+              userName: '',
+              amount: editData['amount'] - editData['splitBetween'][userIdInt],
+            });
           } else {
             userDiv.push({
               userId: userIdInt,
@@ -189,20 +193,24 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
     }
     userDivisionSum = round(userDivisionSum, 1);
     const originalPayload = editMode ? editData : {};
-    const selfExpenseCheck =
-      selfExpense?currencyAmounts[enabledCurrency] > 0:userDivisionSum === currencyAmounts[enabledCurrency];
+    const selfExpenseCheck = selfExpense
+      ? currencyAmounts[enabledCurrency] > 0
+      : userDivisionSum === currencyAmounts[enabledCurrency];
     const isFormComplete =
       date &&
       description &&
       currencyAmounts[enabledCurrency] > 0 &&
-      paidBy.userId && selfExpenseCheck;
+      paidBy.userId &&
+      selfExpenseCheck;
     let splitChanged = false;
-    if(selfExpense && userDivision===undefined){
-      setUserDivision([{
-        userId: paidBy.userId,
-        userName: '',
-        amount: currencyAmounts[enabledCurrency],
-      }])
+    if (selfExpense && userDivision === undefined) {
+      setUserDivision([
+        {
+          userId: paidBy.userId,
+          userName: '',
+          amount: currencyAmounts[enabledCurrency],
+        },
+      ]);
     }
     if (editMode) {
       userDivision?.forEach((element: any) => {
@@ -302,13 +310,14 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
                   </InputAdornment>
                 ),
                 sx: {
-                  "& input[type=number]": {
-                    MozAppearance: "textfield", // Firefox: Remove arrows
+                  '& input[type=number]': {
+                    MozAppearance: 'textfield', // Firefox: Remove arrows
                   },
-                  "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
-                    WebkitAppearance: "none", // Chrome/Safari: Remove arrows
-                    margin: 0,
-                  },
+                  '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button':
+                    {
+                      WebkitAppearance: 'none', // Chrome/Safari: Remove arrows
+                      margin: 0,
+                    },
                 },
               },
             }}
@@ -346,31 +355,42 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
             </MenuItem>
           ))}
         </TextField>
-        <Box display="flex" justifyContent="space-evenly" width={"100%"} gap={"5px"}>
-
-        <FormControlLabel sx={{textWrap:'nowrap'}} control={<Checkbox checked={selfExpense} onChange={(event, checked)=>{
-
-          setSelfExpense(checked)
-        }} />} label="Self-Expense" />
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={() => openAmountSetter(true)}
-          disabled={!isSplitEnabled || selfExpense}
-          sx={{
-            padding: isMobile ? '10px' : '12px',
-            backgroundColor: '#1976d2',
-            color: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-            '&:hover': {
-              backgroundColor: '#155a8a',
-            },
-          }}
+        <Box
+          display="flex"
+          justifyContent="space-evenly"
+          width={'100%'}
+          gap={'5px'}
         >
-          Split Amount
-        </Button>
-
+          <FormControlLabel
+            sx={{ textWrap: 'nowrap' }}
+            control={
+              <Checkbox
+                checked={selfExpense}
+                onChange={(event, checked) => {
+                  setSelfExpense(checked);
+                }}
+              />
+            }
+            label="Self-Expense"
+          />
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={() => openAmountSetter(true)}
+            disabled={!isSplitEnabled || selfExpense}
+            sx={{
+              padding: isMobile ? '10px' : '12px',
+              backgroundColor: '#1976d2',
+              color: '#fff',
+              borderRadius: '8px',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+              '&:hover': {
+                backgroundColor: '#155a8a',
+              },
+            }}
+          >
+            Split Amount
+          </Button>
         </Box>
         <AmountSplitDialog
           amount={currencyAmounts}
@@ -400,8 +420,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
         >
           {editMode ? 'Update' : 'Submit'}
         </Button>
-        <Button onClick={onClose} color="error"
-                startIcon={<CheckCircleIcon />}>
+        <Button onClick={onClose} color="error" startIcon={<CheckCircleIcon />}>
           Cancel
         </Button>
       </DialogActions>

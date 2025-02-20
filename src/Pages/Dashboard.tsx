@@ -27,7 +27,9 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [username, setUsername] = useState('');
   const [currencyDialogOpen, setCurrencyDialogOpen] = useState(false);
-  const [activeContainer, setActiveContainer] = useState<'expenses' | 'balances' | null>(null);
+  const [activeContainer, setActiveContainer] = useState<
+    'expenses' | 'balances' | null
+  >(null);
 
   useEffect(() => {
     if (travelCtx.state.chosenTrip?.tripIdShared) {
@@ -71,10 +73,7 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
       sx={{ textWrap: 'nowrap' }}
     >
       {/* Background Animation */}
-      <BackgroundAnimation
-        animationData={animationData}
-        isMobile={isMobile}
-      />
+      <BackgroundAnimation animationData={animationData} isMobile={isMobile} />
 
       {/* Trip ID Display */}
       <Box

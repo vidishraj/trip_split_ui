@@ -10,7 +10,11 @@ import {
   TextField,
   Typography,
   DialogActions,
-  Button, Stack, Select, InputAdornment, MenuItem,
+  Button,
+  Stack,
+  Select,
+  InputAdornment,
+  MenuItem,
 } from '@mui/material';
 import { useState, useEffect, useContext, ChangeEvent } from 'react';
 import { useTravel } from '../../../Contexts/TravelContext';
@@ -216,40 +220,40 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
 
   return (
     <Dialog open={open} onClose={onCancel} fullWidth>
-
       <DialogContent>
-
-        <Box display={'flex'} justifyContent={'space-evenly'} gap={"25px"}>
+        <Box display={'flex'} justifyContent={'space-evenly'} gap={'25px'}>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-          <Switch checked={isEqual} onChange={handleEqualToggle} />
-          <Typography variant="body1">Equal</Typography>
-        </Stack>
+            <Switch checked={isEqual} onChange={handleEqualToggle} />
+            <Typography variant="body1">Equal</Typography>
+          </Stack>
 
-        <Box marginBottom={2}>
-          <Typography variant="caption" fontWeight="bold">
-            Select Currency
-          </Typography>
-          <Select
-            value={selectedCurrency}
-            onChange={(e) => setSelectedCurrency(e.target.value)}
-            fullWidth
-            startAdornment={
-              <InputAdornment position="start">
-                <AttachMoneyIcon />
-              </InputAdornment>
-            }
-          >
-            {travelCtx.state.chosenTrip?.currencies.map((item, index) => (
-              <MenuItem key={index} value={currencies.find((it) => it.label === item)?.abr}>
-                {item}
-              </MenuItem>
-            ))}
-          </Select>
-        </Box>
+          <Box marginBottom={2}>
+            <Typography variant="caption" fontWeight="bold">
+              Select Currency
+            </Typography>
+            <Select
+              value={selectedCurrency}
+              onChange={(e) => setSelectedCurrency(e.target.value)}
+              fullWidth
+              startAdornment={
+                <InputAdornment position="start">
+                  <AttachMoneyIcon />
+                </InputAdornment>
+              }
+            >
+              {travelCtx.state.chosenTrip?.currencies.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  value={currencies.find((it) => it.label === item)?.abr}
+                >
+                  {item}
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
         </Box>
 
         <Divider sx={{ marginBottom: 2 }} />
-
 
         {checkedUsers.map((user, index) => (
           <Stack

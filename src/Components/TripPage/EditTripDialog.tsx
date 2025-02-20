@@ -21,11 +21,11 @@ interface EditTripDialogProps {
 }
 
 export const EditTripDialog: React.FC<EditTripDialogProps> = ({
-                                                                editData,
-                                                                open,
-                                                                handleClose,
-                                                                refetchTrips
-                                                              }) => {
+  editData,
+  open,
+  handleClose,
+  refetchTrips,
+}) => {
   const [editedTripTitle, setEditedTripTitle] = useState<string>('');
   const travelCtx: any = useTravel();
   const notif: MessageContextType = useMessage();
@@ -68,7 +68,9 @@ export const EditTripDialog: React.FC<EditTripDialogProps> = ({
           fullWidth
           variant="outlined"
           value={editedTripTitle}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditedTripTitle(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEditedTripTitle(e.target.value)
+          }
         />
       </DialogContent>
       <DialogActions>

@@ -1,9 +1,13 @@
 // TripSelector.tsx
-import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+} from '@mui/material';
 import { TripMenuItem } from './TripMenuItem';
 import { TripData } from '../../Assets/types';
-
-
 
 interface TripSelectorProps {
   trip: string;
@@ -16,14 +20,14 @@ interface TripSelectorProps {
 }
 
 export const TripSelector: React.FC<TripSelectorProps> = ({
-                                                            trip,
-                                                            handleTripChange,
-                                                            trips = [],
-                                                            travelCtx,
-                                                            isMobile,
-                                                            handleEditTrip,
-                                                            refetchTrips
-                                                          }) => {
+  trip,
+  handleTripChange,
+  trips = [],
+  travelCtx,
+  isMobile,
+  handleEditTrip,
+  refetchTrips,
+}) => {
   return (
     <FormControl
       variant="outlined"
@@ -34,7 +38,9 @@ export const TripSelector: React.FC<TripSelectorProps> = ({
         labelId="trip-select-label"
         id="trip-select"
         value={trip}
-        onChange={handleTripChange as (event: SelectChangeEvent<string>) => void}
+        onChange={
+          handleTripChange as (event: SelectChangeEvent<string>) => void
+        }
         label="Choose Trip"
         sx={{
           backgroundColor: '#fff',

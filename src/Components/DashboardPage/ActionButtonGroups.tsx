@@ -15,15 +15,15 @@ interface ActionButtonGroupsProps {
 }
 
 const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
-                                                                 isMobile,
-                                                                 userCount,
-                                                                 onToggleExpenses,
-                                                                 onToggleBalances,
-                                                                 onOpenNameList,
-                                                                 onOpenCurrencyDialog,
-                                                                 onOpenExpenseDialog,
-                                                                 onOpenUserDialog,
-                                                               }) => {
+  isMobile,
+  userCount,
+  onToggleExpenses,
+  onToggleBalances,
+  onOpenNameList,
+  onOpenCurrencyDialog,
+  onOpenExpenseDialog,
+  onOpenUserDialog,
+}) => {
   return (
     <>
       {/* Group 1: Spendings and See Balances */}

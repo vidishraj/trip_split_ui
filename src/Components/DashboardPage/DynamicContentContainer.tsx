@@ -13,11 +13,11 @@ interface DynamicContentContainerProps {
 }
 
 const DynamicContentContainer: React.FC<DynamicContentContainerProps> = ({
-                                                                           showExpenseContainer,
-                                                                           showBalancesContainer,
-                                                                           expenseDialogOpen,
-                                                                           onCloseExpenseDialog,
-                                                                         }) => {
+  showExpenseContainer,
+  showBalancesContainer,
+  expenseDialogOpen,
+  onCloseExpenseDialog,
+}) => {
   return (
     <Box
       id="outerBox"
@@ -35,10 +35,7 @@ const DynamicContentContainer: React.FC<DynamicContentContainerProps> = ({
       {showExpenseContainer && <ExpenseContainer />}
       {showBalancesContainer && <TransactionContainer />}
 
-      <ExpenseDialog
-        open={expenseDialogOpen}
-        onClose={onCloseExpenseDialog}
-      />
+      <ExpenseDialog open={expenseDialogOpen} onClose={onCloseExpenseDialog} />
     </Box>
   );
 };

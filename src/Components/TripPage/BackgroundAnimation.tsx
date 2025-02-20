@@ -7,7 +7,9 @@ interface BackgroundAnimationProps {
   isMobile: boolean;
 }
 
-export const BackgroundAnimation: React.FC<BackgroundAnimationProps> = ({ isMobile }) => {
+export const BackgroundAnimation: React.FC<BackgroundAnimationProps> = ({
+  isMobile,
+}) => {
   return (
     <Box
       position="absolute"

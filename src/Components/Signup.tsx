@@ -56,18 +56,28 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ open, onClose }) => {
           insertUser(body)
             .then(() => setUser(response.user))
             .catch(() => {
-              notif.setPayload({ type: 'error', payload: 'Error occurred while inserting user after sign up.' +
-                  ' Try again later!' });
+              notif.setPayload({
+                type: 'error',
+                payload:
+                  'Error occurred while inserting user after sign up.' +
+                  ' Try again later!',
+              });
               deleteUser(response.user);
             });
         })
         .catch(() => {
-          notif.setPayload({ type: 'error', payload: 'Error occurred while signing up. Try again later!' });
+          notif.setPayload({
+            type: 'error',
+            payload: 'Error occurred while signing up. Try again later!',
+          });
           setError('Error signing up. Try again.');
         });
       onClose();
     } catch (error) {
-      notif.setPayload({ type: 'error', payload: 'Error occurred while signing up. Try again later!' });
+      notif.setPayload({
+        type: 'error',
+        payload: 'Error occurred while signing up. Try again later!',
+      });
       setError('Error creating account. Please try again.');
     } finally {
       setLoading(false);
@@ -76,7 +86,9 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ fontSize: '1.5rem', fontWeight: 'bold', textAlign: 'center' }}>
+      <DialogTitle
+        sx={{ fontSize: '1.5rem', fontWeight: 'bold', textAlign: 'center' }}
+      >
         <HowToRegIcon color="primary" /> Create New Trip
       </DialogTitle>
       <DialogContent sx={{ padding: '20px' }}>
@@ -145,13 +157,21 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ open, onClose }) => {
           }}
         />
         {error && (
-          <Typography color="error" variant="body2" margin="dense" textAlign="center">
+          <Typography
+            color="error"
+            variant="body2"
+            margin="dense"
+            textAlign="center"
+          >
             {error}
           </Typography>
         )}
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'space-between', padding: '20px' }}>
-        <Button onClick={onClose} sx={{ color: 'grey.600', fontWeight: 'bold' }}>
+        <Button
+          onClick={onClose}
+          sx={{ color: 'grey.600', fontWeight: 'bold' }}
+        >
           Cancel
         </Button>
         <Button
@@ -161,7 +181,11 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ open, onClose }) => {
           variant="contained"
           sx={{ borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold' }}
         >
-          {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Sign Up'}
+          {loading ? (
+            <CircularProgress size={24} sx={{ color: '#fff' }} />
+          ) : (
+            'Sign Up'
+          )}
         </Button>
       </DialogActions>
     </Dialog>

@@ -21,17 +21,17 @@ interface DashboardDialogsProps {
 }
 
 const DashboardDialogs: React.FC<DashboardDialogsProps> = ({
-                                                             userDialogOpen,
-                                                             username,
-                                                             setUsername,
-                                                             onCloseUserDialog,
-                                                             currencyDialogOpen,
-                                                             onCloseCurrencyDialog,
-                                                             nameListOpen,
-                                                             onCloseNameList,
-                                                             refreshData,
-                                                             travelCtx
-                                                           }) => {
+  userDialogOpen,
+  username,
+  setUsername,
+  onCloseUserDialog,
+  currencyDialogOpen,
+  onCloseCurrencyDialog,
+  nameListOpen,
+  onCloseNameList,
+  refreshData,
+  travelCtx,
+}) => {
   const { setPayload } = useMessage();
 
   const handleSubmitUser = () => {
@@ -71,13 +71,14 @@ const DashboardDialogs: React.FC<DashboardDialogsProps> = ({
 
       {/* Currency Dialog */}
       {currencyDialogOpen && (
-        <CurrencyDialog open={currencyDialogOpen} onClose={onCloseCurrencyDialog} />
+        <CurrencyDialog
+          open={currencyDialogOpen}
+          onClose={onCloseCurrencyDialog}
+        />
       )}
 
       {/* Name List Dialog */}
-      {nameListOpen && (
-        <NameListDialog onClose={onCloseNameList} />
-      )}
+      {nameListOpen && <NameListDialog onClose={onCloseNameList} />}
     </>
   );
 };

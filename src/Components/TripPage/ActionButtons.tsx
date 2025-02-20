@@ -2,7 +2,6 @@ import { Box, Button } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
 
-
 interface ActionButtonsProps {
   isMobile: boolean;
   onCreateClick: () => void;
@@ -10,10 +9,10 @@ interface ActionButtonsProps {
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({
-                                                              isMobile,
-                                                              onCreateClick,
-                                                              onConnectClick
-                                                            }) => {
+  isMobile,
+  onCreateClick,
+  onConnectClick,
+}) => {
   return (
     <Box
       display="flex"

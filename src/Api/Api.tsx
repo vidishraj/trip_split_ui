@@ -166,7 +166,8 @@ export async function updateExpense(
   );
 }
 export async function updateTripTitle(
-  title:string, tripId: string
+  title: string,
+  tripId: string
 ): Promise<any> {
   axios.storage.remove('fetch-trip');
   return queueRequest(() =>

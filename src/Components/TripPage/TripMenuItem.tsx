@@ -13,10 +13,10 @@ interface TripMenuItemProps {
 }
 
 export const TripMenuItem: React.FC<TripMenuItemProps> = ({
-                                                            item,
-                                                            handleEditTrip,
-                                                            refetchTrips
-                                                          }) => {
+  item,
+  handleEditTrip,
+  refetchTrips,
+}) => {
   const theme: Theme = useTheme();
   const notif: MessageContextType = useMessage();
 
@@ -53,13 +53,15 @@ export const TripMenuItem: React.FC<TripMenuItemProps> = ({
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      gap:'20px',
-      alignItems: 'center',
-      width: '100%'
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        gap: '20px',
+        alignItems: 'center',
+        width: '100%',
+      }}
+    >
       <span>{item.tripTitle}</span>
       <div>
         <Button

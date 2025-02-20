@@ -1,11 +1,6 @@
 // ExpenseComponents/ExpenseItem.tsx
 import React, { useState } from 'react';
-import {
-  Card,
-  CardContent,
-  Divider,
-  useTheme
-} from '@mui/material';
+import { Card, CardContent, Divider, useTheme } from '@mui/material';
 import { useTravel } from '../../../Contexts/TravelContext';
 import { useMessage } from '../../../Contexts/NotifContext';
 import ExpenseDialog from '../Dialogs/ExpenseDialog';
@@ -71,7 +66,7 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
       }}
     >
       <CardContent sx={{ paddingBottom: '12px !important' }}>
-        <ExpenseHeader 
+        <ExpenseHeader
           title={expense.expenseDesc}
           date={formattedDate}
           onEdit={handleEdit}
@@ -87,13 +82,13 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
 
         <Divider sx={{ marginBottom: '8px', backgroundColor: '#ddd' }} />
 
-        <ExpenseDetails 
+        <ExpenseDetails
           amount={expense.amount}
           paidBy={expense.paidBy}
           splitBetween={expense.splitBetween}
         />
       </CardContent>
-      
+
       <ExpenseDialog
         editMode={true}
         editData={expense}

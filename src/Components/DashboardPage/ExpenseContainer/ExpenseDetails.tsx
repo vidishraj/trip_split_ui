@@ -14,7 +14,7 @@ interface ExpenseDetailsProps {
 const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({
   amount,
   paidBy,
-  splitBetween
+  splitBetween,
 }) => {
   const travelCtx = useTravel();
 
@@ -44,9 +44,9 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({
           <strong>Split Between:</strong>
         </Typography>
         <Box display="flex" flexDirection="column" alignItems="flex-end">
-          <SplitDetails 
-            splitBetween={splitBetween} 
-            amount={amount} 
+          <SplitDetails
+            splitBetween={splitBetween}
+            amount={amount}
             getUserName={getUserName}
           />
         </Box>
@@ -63,10 +63,10 @@ interface SplitDetailsProps {
   getUserName: (userId: number) => string;
 }
 
-const SplitDetails: React.FC<SplitDetailsProps> = ({ 
-  splitBetween, 
-  amount, 
-  getUserName 
+const SplitDetails: React.FC<SplitDetailsProps> = ({
+  splitBetween,
+  amount,
+  getUserName,
 }) => {
   return (
     <>

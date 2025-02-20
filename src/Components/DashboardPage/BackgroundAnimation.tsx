@@ -9,9 +9,9 @@ interface BackgroundAnimationProps {
 }
 
 const BackgroundAnimation: React.FC<BackgroundAnimationProps> = ({
-                                                                   animationData,
-                                                                   isMobile
-                                                                 }) => {
+  animationData,
+  isMobile,
+}) => {
   return (
     <Box
       position="absolute"

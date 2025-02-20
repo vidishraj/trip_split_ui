@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -16,16 +16,16 @@ import {
   Theme,
   Typography,
   IconButton,
-} from "@mui/material";
-import { useTheme } from "@mui/material";
-import { useMessage } from "../../Contexts/NotifContext";
-import { insertTrip } from "../../Api/Api";
-import { currencies } from "../../Assets/currencyData";
-import { MessageContextType } from "../../Assets/types";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import CancelIcon from "@mui/icons-material/Cancel";
-import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
-import SaveIcon from "@mui/icons-material/Save";
+} from '@mui/material';
+import { useTheme } from '@mui/material';
+import { useMessage } from '../../Contexts/NotifContext';
+import { insertTrip } from '../../Api/Api';
+import { currencies } from '../../Assets/currencyData';
+import { MessageContextType } from '../../Assets/types';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CancelIcon from '@mui/icons-material/Cancel';
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import SaveIcon from '@mui/icons-material/Save';
 
 interface CreateTripDialogProps {
   open: boolean;
@@ -34,11 +34,11 @@ interface CreateTripDialogProps {
 }
 
 export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
-                                                                    open,
-                                                                    handleClose,
-                                                                    refetchTrips,
-                                                                  }) => {
-  const [tripTitle, setTripTitle] = useState<string>("");
+  open,
+  handleClose,
+  refetchTrips,
+}) => {
+  const [tripTitle, setTripTitle] = useState<string>('');
   const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>([]);
   const theme: Theme = useTheme();
   const notif: MessageContextType = useMessage();
@@ -63,8 +63,8 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
       .then((response) => {
         if (response.status === 200) {
           notif.setPayload({
-            type: "success",
-            message: "Successfully created trip.",
+            type: 'success',
+            message: 'Successfully created trip.',
           });
         }
         handleClose();
@@ -72,8 +72,8 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
       })
       .catch((error) => {
         notif.setPayload({
-          type: "error",
-          message: "Error creating trip.",
+          type: 'error',
+          message: 'Error creating trip.',
         });
         handleClose();
         console.log(error);
@@ -81,7 +81,7 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
   };
 
   const resetAndClose = (): void => {
-    setTripTitle("");
+    setTripTitle('');
     setSelectedCurrencies([]);
     handleClose();
   };
@@ -93,20 +93,20 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
       fullWidth
       maxWidth="sm"
       sx={{
-        "& .MuiPaper-root": {
-          borderRadius: "12px",
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
-          padding: "16px",
+        '& .MuiPaper-root': {
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+          padding: '16px',
         },
       }}
     >
       {/* Title with an Icon */}
       <DialogTitle
         sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          fontWeight: "bold",
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          fontWeight: 'bold',
         }}
       >
         <FlightTakeoffIcon color="primary" /> Create New Trip
@@ -128,11 +128,11 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
             setTripTitle(e.target.value)
           }
           sx={{
-            marginTop: "16px",
-            backgroundColor: "#F9FAFB",
-            borderRadius: "8px",
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "8px",
+            marginTop: '16px',
+            backgroundColor: '#F9FAFB',
+            borderRadius: '8px',
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '8px',
             },
           }}
           InputProps={{
@@ -141,7 +141,7 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
         />
 
         {/* Currency Selection */}
-        <Box sx={{ marginTop: "16px" }}>
+        <Box sx={{ marginTop: '16px' }}>
           <FormControl fullWidth variant="outlined">
             <InputLabel id="currency-select-label">
               Select Currencies
@@ -151,7 +151,7 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
               id="currency-select"
               multiple
               value={selectedCurrencies}
-              renderValue={(selected: string[]) => selected.join(", ")}
+              renderValue={(selected: string[]) => selected.join(', ')}
               MenuProps={{
                 PaperProps: {
                   style: {
@@ -161,10 +161,10 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
                 },
               }}
               sx={{
-                backgroundColor: "#F9FAFB",
-                borderRadius: "8px",
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "8px",
+                backgroundColor: '#F9FAFB',
+                borderRadius: '8px',
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '8px',
                 },
               }}
             >
@@ -186,7 +186,7 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
           {/* Currency Limits */}
           <Typography
             variant="body2"
-            sx={{ marginTop: "8px", fontSize: "12px", color: "#666" }}
+            sx={{ marginTop: '8px', fontSize: '12px', color: '#666' }}
           >
             Minimum: 1 currency | Maximum: 3 currencies
           </Typography>
@@ -194,7 +194,7 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
       </DialogContent>
 
       {/* Actions: Save & Cancel */}
-      <DialogActions sx={{ justifyContent: "space-between", padding: "16px" }}>
+      <DialogActions sx={{ justifyContent: 'space-between', padding: '16px' }}>
         <Button
           onClick={createTrip}
           disabled={selectedCurrencies.length < 1 || tripTitle.length < 3}
@@ -204,16 +204,16 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
               selectedCurrencies.length < 1 || tripTitle.length < 3
                 ? theme.palette.grey[400]
                 : theme.palette.primary.main,
-            color: "#fff",
-            "&:hover": {
+            color: '#fff',
+            '&:hover': {
               backgroundColor:
                 selectedCurrencies.length < 1 || tripTitle.length < 3
                   ? theme.palette.grey[400]
                   : theme.palette.primary.dark,
             },
-            borderRadius: "8px",
-            padding: "8px 16px",
-            transition: "0.3s",
+            borderRadius: '8px',
+            padding: '8px 16px',
+            transition: '0.3s',
           }}
         >
           Save Trip

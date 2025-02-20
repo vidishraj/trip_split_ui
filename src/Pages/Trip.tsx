@@ -1,6 +1,6 @@
 // TripPage.tsx
 import React, { useState } from 'react';
-import { Box} from '@mui/material';
+import { Box } from '@mui/material';
 import { useTheme, useMediaQuery, Theme } from '@mui/material';
 import { useTravel } from '../Contexts/TravelContext';
 import { useMessage } from '../Contexts/NotifContext';
@@ -25,7 +25,9 @@ const TripPage: React.FC = () => {
   const theme: Theme = useTheme();
   const isMobile: boolean = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const handleTripChange = (event: React.ChangeEvent<{ value: unknown }>): void => {
+  const handleTripChange = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ): void => {
     setTrip(event.target.value as string);
   };
 

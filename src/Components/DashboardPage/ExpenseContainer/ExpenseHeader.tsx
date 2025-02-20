@@ -11,11 +11,11 @@ interface ExpenseHeaderProps {
   onDelete: () => void;
 }
 
-const ExpenseHeader: React.FC<ExpenseHeaderProps> = ({ 
-  title, 
-  date, 
-  onEdit, 
-  onDelete 
+const ExpenseHeader: React.FC<ExpenseHeaderProps> = ({
+  title,
+  date,
+  onEdit,
+  onDelete,
 }) => {
   return (
     <>
