@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,7 +6,7 @@ import {
   Button,
   TextField,
   MenuItem,
-  InputAdornment,
+  InputAdornment, Checkbox, FormControlLabel, Box,
 } from '@mui/material';
 import { useTheme, useMediaQuery } from '@mui/material';
 import { insertExpense, updateExpense } from '../../../Api/Api';
@@ -15,6 +15,7 @@ import { AmountSplitDialog } from './AmountSplitDialog';
 import { CurrencyContext } from '../../../Contexts/CurrencyContext';
 import { currencies } from '../../../Assets/currencyData';
 import { useMessage } from '../../../Contexts/NotifContext';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 interface ExpenseDialogProps {
   editMode?: boolean;
@@ -34,7 +35,6 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
   const travelCtx = useTravel();
   const { setPayload } = useMessage();
   const { state: currencyState } = useContext(CurrencyContext);
-
   const [date, setDate] = useState(
     editMode && editData
       ? new Date(editData.date).toISOString().substr(0, 10)
@@ -47,6 +47,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
     [key: string]: number;
   }>({});
   const enabledCurrency = 'inr';
+  const [selfExpense, setSelfExpense] = useState<boolean>(editMode && editData ? editData.selfExpense : false);
   const [paidBy, setPaidBy] = useState<any>(
     editMode && editData
       ? {
@@ -81,13 +82,14 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
       if (editMode) {
         let userDiv: any = [];
         Object.keys(editData['splitBetween']).forEach((userId) => {
+
           let userIdInt = parseInt(userId);
           if (userIdInt === paidBy.userId) {
-            userDiv.push({
-              userId: userIdInt,
-              userName: '',
-              amount: editData['splitBetween'][userIdInt],
-            });
+              userDiv.push({
+                userId: userIdInt,
+                userName: '',
+                amount: editData['amount']-editData['splitBetween'][userIdInt],
+              });
           } else {
             userDiv.push({
               userId: userIdInt,
@@ -124,6 +126,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
         userId: item.userId,
         amount: item.amount,
       })),
+      selfExpense: selfExpense,
     };
 
     if (editMode) {
@@ -186,13 +189,21 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
     }
     userDivisionSum = round(userDivisionSum, 1);
     const originalPayload = editMode ? editData : {};
+    const selfExpenseCheck =
+      selfExpense?currencyAmounts[enabledCurrency] > 0:userDivisionSum === currencyAmounts[enabledCurrency];
     const isFormComplete =
       date &&
       description &&
       currencyAmounts[enabledCurrency] > 0 &&
-      paidBy.userId &&
-      userDivisionSum === currencyAmounts[enabledCurrency];
+      paidBy.userId && selfExpenseCheck;
     let splitChanged = false;
+    if(selfExpense && userDivision===undefined){
+      setUserDivision([{
+        userId: paidBy.userId,
+        userName: '',
+        amount: currencyAmounts[enabledCurrency],
+      }])
+    }
     if (editMode) {
       userDivision?.forEach((element: any) => {
         let userIdInt = parseInt(element.userId);
@@ -212,7 +223,6 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
       currencyAmounts['inr'] !== originalPayload.amount ||
       paidBy.userId !== originalPayload.paidBy ||
       splitChanged;
-
     setIsSubmitEnabled(
       editMode
         ? hasChanges && userDivisionSum === currencyAmounts[enabledCurrency]
@@ -224,6 +234,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
     description,
     currencyAmounts,
     enabledCurrency,
+    selfExpense,
     paidBy,
     userDivision,
     editMode,
@@ -335,12 +346,17 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
             </MenuItem>
           ))}
         </TextField>
+        <Box display="flex" justifyContent="space-evenly" width={"100%"} gap={"5px"}>
 
+        <FormControlLabel sx={{textWrap:'nowrap'}} control={<Checkbox checked={selfExpense} onChange={(event, checked)=>{
+
+          setSelfExpense(checked)
+        }} />} label="Self-Expense" />
         <Button
           variant="contained"
           fullWidth
           onClick={() => openAmountSetter(true)}
-          disabled={!isSplitEnabled}
+          disabled={!isSplitEnabled || selfExpense}
           sx={{
             padding: isMobile ? '10px' : '12px',
             backgroundColor: '#1976d2',
@@ -354,6 +370,8 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
         >
           Split Amount
         </Button>
+
+        </Box>
         <AmountSplitDialog
           amount={currencyAmounts}
           open={amountSetter}
@@ -377,11 +395,13 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
           onClick={handleSubmit}
           color="primary"
           variant="contained"
+          startIcon={<CheckCircleIcon />}
           disabled={!isSubmitEnabled}
         >
           {editMode ? 'Update' : 'Submit'}
         </Button>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={onClose} color="error"
+                startIcon={<CheckCircleIcon />}>
           Cancel
         </Button>
       </DialogActions>

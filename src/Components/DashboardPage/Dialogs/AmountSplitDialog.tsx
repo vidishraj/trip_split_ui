@@ -10,13 +10,17 @@ import {
   TextField,
   Typography,
   DialogActions,
-  Button,
+  Button, Stack, Select, InputAdornment, MenuItem,
 } from '@mui/material';
 import { useState, useEffect, useContext, ChangeEvent } from 'react';
 import { useTravel } from '../../../Contexts/TravelContext';
 import { CurrencyContext } from '../../../Contexts/CurrencyContext';
 import { currencies } from '../../../Assets/currencyData';
 import { round } from './ExpenseDialog';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import PersonIcon from '@mui/icons-material/Person';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 interface User {
   userId: any;
@@ -212,121 +216,80 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
 
   return (
     <Dialog open={open} onClose={onCancel} fullWidth>
-      <DialogTitle>Distribute Amount</DialogTitle>
 
       <DialogContent>
-        <FormControlLabel
-          control={<Switch checked={isEqual} onChange={handleEqualToggle} />}
-          label="Equal"
-        />
 
-        <Divider sx={{ marginY: 2 }} />
+        <Box display={'flex'} justifyContent={'space-evenly'} gap={"25px"}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+          <Switch checked={isEqual} onChange={handleEqualToggle} />
+          <Typography variant="body1">Equal</Typography>
+        </Stack>
 
         <Box marginBottom={2}>
-          <Typography variant="caption">Select Currency</Typography>
-          <TextField
-            select
+          <Typography variant="caption" fontWeight="bold">
+            Select Currency
+          </Typography>
+          <Select
             value={selectedCurrency}
-            onChange={handleCurrencyChange}
-            SelectProps={{
-              native: true,
-            }}
+            onChange={(e) => setSelectedCurrency(e.target.value)}
             fullWidth
+            startAdornment={
+              <InputAdornment position="start">
+                <AttachMoneyIcon />
+              </InputAdornment>
+            }
           >
             {travelCtx.state.chosenTrip?.currencies.map((item, index) => (
-              <option
-                key={index}
-                value={currencies.find((it) => it.label === item)?.abr}
-              >
+              <MenuItem key={index} value={currencies.find((it) => it.label === item)?.abr}>
                 {item}
-              </option>
+              </MenuItem>
             ))}
-          </TextField>
+          </Select>
+        </Box>
         </Box>
 
-        {checkedUsers.map((user, index) => (
-          <Box
-            key={user.userId}
-            display="flex"
-            alignItems="center"
-            marginBottom={2}
-          >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={user.isChecked}
-                  onChange={() => handleCheckboxChange(index)}
-                />
-              }
-              label={user.userName}
-              sx={{ flex: 1 }}
-            />
+        <Divider sx={{ marginBottom: 2 }} />
 
+
+        {checkedUsers.map((user, index) => (
+          <Stack
+            key={user.userId}
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{ mb: 2 }}
+          >
+            <Checkbox
+              checked={user.isChecked}
+              onChange={() => handleCheckboxChange(index)}
+              icon={<PersonIcon />}
+              checkedIcon={<CheckCircleIcon color="primary" />}
+            />
+            <Typography sx={{ flexGrow: 1 }}>{user.userName}</Typography>
             <TextField
               type="text"
-              variant="outlined"
               size="small"
-              value={
-                rawInputValues[index] && rawInputValues[index][selectedCurrency]
-                  ? rawInputValues[index][selectedCurrency]
-                  : ''
-              }
-              onChange={(e) => {
-                const inputValue = e.target.value;
-                if (!isEqual && inputValue.match(/^\d*\.?\d{0,1}$/)) {
-                  handleAmountChange(index, inputValue);
-                }
-              }}
-              onBlur={() => {
-                if (!rawInputValues[index][selectedCurrency]) {
-                  setRawInputValues((prev) => ({
-                    ...prev,
-                    [index]: { [selectedCurrency]: '0' },
-                  }));
-                  handleAmountChange(index, '0');
-                }
-              }}
+              value={rawInputValues[index]?.[selectedCurrency] || ''}
+              onChange={(e) => handleAmountChange(index, e.target.value)}
               disabled={isEqual || !user.isChecked}
-              slotProps={{
-                htmlInput: {
-                  inputMode: 'decimal',
-                  pattern: '^d*.?d{0,1}$',
-                },
-              }}
-              sx={{ width: '120px' }}
+              sx={{ width: '100px' }}
             />
-          </Box>
+          </Stack>
         ))}
-
-        {amount[selectedCurrency] !== currentTotal[selectedCurrency] && (
-          <>
-            <Typography color="error" variant="caption">
-              The total amount should equal {selectedCurrency}{' '}
-              {amount[selectedCurrency]}
-            </Typography>
-            <br />
-            <Typography color="error" variant="caption">
-              Remaining {selectedCurrency}{' '}
-              {round(
-                amount[selectedCurrency] - currentTotal[selectedCurrency],
-                1
-              )}
-            </Typography>
-          </>
-        )}
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onCancel} color="secondary">
-          Cancel
-        </Button>
         <Button
-          onClick={handleSubmit}
+          onClick={() => onSubmit(checkedUsers)}
           color="primary"
           variant="contained"
+          startIcon={<CheckCircleIcon />}
           disabled={submitStatus}
         >
           Submit
+        </Button>
+        <Button onClick={onCancel} color="error" startIcon={<CancelIcon />}>
+          Cancel
         </Button>
       </DialogActions>
     </Dialog>
