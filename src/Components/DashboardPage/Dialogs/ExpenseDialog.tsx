@@ -399,7 +399,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
             const userDiv: any[] = items.map((item: any) => ({
               userId: item.userId,
               userName: item.userName,
-              amount: item.amount,
+              amount: item[enabledCurrency],
             }));
             setUserDivision(userDiv);
             openAmountSetter(false);
