@@ -10,6 +10,8 @@ interface UserResponse {
   tripId: string;
   userId: number;
   userName: string;
+  email: string;
+  deletable: boolean;
 }
 
 interface TripRequest {
