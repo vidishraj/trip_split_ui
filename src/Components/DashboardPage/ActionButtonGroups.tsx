@@ -1,7 +1,7 @@
-// DashboardComponents/ActionButtonGroups.tsx
 import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import { People, AttachMoney, CurrencyExchange } from '@mui/icons-material';
+import { People, AttachMoney, CurrencyExchange, Notes, Calculate, Grid3x3 } from '@mui/icons-material';
+import { useTravel } from '../../Contexts/TravelContext';
 
 interface ActionButtonGroupsProps {
   isMobile: boolean;
@@ -12,6 +12,8 @@ interface ActionButtonGroupsProps {
   onOpenCurrencyDialog: () => void;
   onOpenExpenseDialog: () => void;
   onOpenUserDialog: () => void;
+  onOpenNotes: () => void;
+  onOpenCalculator: () => void;
 }
 
 const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
@@ -23,77 +25,123 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
   onOpenCurrencyDialog,
   onOpenExpenseDialog,
   onOpenUserDialog,
+  onOpenNotes,
+  onOpenCalculator
 }) => {
+  const travelCtx = useTravel();
   return (
-    <>
-      {/* Group 1: Spendings and See Balances */}
-      <Box display="flex" justifyContent="center" mb={1}>
-        <Button
-          variant="outlined"
-          startIcon={<AttachMoney />}
-          onClick={onToggleExpenses}
-          sx={buttonStylesSmall}
-        >
-          <Typography variant={isMobile ? 'caption' : 'body2'}>
-            See Expenses
-          </Typography>
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={<AttachMoney />}
-          onClick={onToggleBalances}
-          sx={buttonStylesSmall}
-        >
-          <Typography variant={isMobile ? 'caption' : 'body2'}>
-            See Balances
-          </Typography>
-        </Button>
+    <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+      {/* Left side: main action buttons */}
+      <Box flexGrow={1}>
+        {/* Group 1: Spendings and See Balances */}
+        <Box display="flex" justifyContent="center" mb={1}>
+          <Button
+            variant="outlined"
+            startIcon={<AttachMoney />}
+            onClick={onToggleExpenses}
+            sx={buttonStylesSmall}
+          >
+            <Typography variant={isMobile ? 'caption' : 'body2'}>
+              See Expenses
+            </Typography>
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<AttachMoney />}
+            onClick={onToggleBalances}
+            sx={buttonStylesSmall}
+          >
+            <Typography variant={isMobile ? 'caption' : 'body2'}>
+              See Balances
+            </Typography>
+          </Button>
+        </Box>
+
+        {/* Group 2: Users and Rates */}
+        <Box display="flex" justifyContent="center" mb={1}>
+          <Button
+            variant="outlined"
+            startIcon={<People />}
+            onClick={onOpenNameList}
+            sx={buttonStylesSmall}
+          >
+            <Typography variant={isMobile ? 'caption' : 'body2'}>
+              {userCount} Users
+            </Typography>
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<CurrencyExchange />}
+            onClick={onOpenCurrencyDialog}
+            sx={buttonStylesSmall}
+          >
+            <Typography variant={isMobile ? 'caption' : 'body2'}>
+              Rates
+            </Typography>
+          </Button>
+        </Box>
+
+        {/* Group 3: Add Expense and Add User */}
+        <Box display="flex" justifyContent="center" mb={1}>
+          <Button
+            variant="contained"
+            startIcon={<AttachMoney />}
+            sx={mainButtonStylesSmall}
+            onClick={onOpenExpenseDialog}
+          >
+            Add Expense
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<People />}
+            sx={mainButtonStylesSmall}
+            onClick={onOpenUserDialog}
+          >
+            Add User
+          </Button>
+        </Box>
       </Box>
 
-      {/* Group 2: Users and Rates */}
-      <Box display="flex" justifyContent="center" mb={1}>
-        <Button
-          variant="outlined"
-          startIcon={<People />}
-          onClick={onOpenNameList}
-          sx={buttonStylesSmall}
-        >
-          <Typography variant={isMobile ? 'caption' : 'body2'}>
-            {userCount} Users
-          </Typography>
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={<CurrencyExchange />}
-          onClick={onOpenCurrencyDialog}
-          sx={buttonStylesSmall}
-        >
-          <Typography variant={isMobile ? 'caption' : 'body2'}>
-            Rates
-          </Typography>
-        </Button>
-      </Box>
+      {/* Right side: Notes and Calculator */}
+      {/* Trip ID Display */}
 
-      {/* Group 3: Add Expense and Add User */}
-      <Box display="flex" justifyContent="center" mb={1}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="flex-start"
+        // ml={2}
+      >
         <Button
-          variant="contained"
-          startIcon={<AttachMoney />}
-          sx={mainButtonStylesSmall}
-          onClick={onOpenExpenseDialog}
+          variant="outlined"
+          startIcon={<Grid3x3 />}
+          sx={{ ...buttonStylesSmall, mb: 1 }}
         >
-          Add Expense
+          <Typography variant={isMobile ? 'caption' : 'body2'}>
+            {travelCtx.state.chosenTrip?.tripIdShared}</Typography>
+        </Button>
+        <Button
+          variant="outlined"
+          startIcon={<Notes />}
+          onClick={onOpenNotes}
+          sx={{ ...buttonStylesSmall, mb: 1 }}
+        >
+          <Typography variant={isMobile ? 'caption' : 'body2'}>Notes</Typography>
         </Button>
         <Button
           variant="contained"
-          startIcon={<People />}
-          sx={mainButtonStylesSmall}
-          onClick={onOpenUserDialog}
+          startIcon={<Calculate />}
+          onClick={onOpenCalculator}
+          sx={{
+            ...mainButtonStylesSmall,
+            zIndex: 9999, // max z-index to always be clickable
+            position: 'relative',
+          }}
         >
-          Add User
+          Calculator
         </Button>
       </Box>
-    </>
+    </Box>
   );
 };
 

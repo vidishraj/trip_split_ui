@@ -278,3 +278,54 @@ export async function sendResponseForTripRequest(body: any): Promise<any> {
       .then((response) => response)
   );
 }
+
+export async function fetchNotes(tripId: string, page: number): Promise<any> {
+  axios.storage.remove('fetch-notes');
+  return queueRequest(() =>
+    axios
+      .get(
+        process.env.REACT_APP_BACKENDURL + '/getNotes',
+        {
+          id: 'fetch-notes',params: { tripId: tripId, page: page },}
+      )
+      .then((response) => response)
+  );
+}
+
+export async function createNote(body: any): Promise<any> {
+  axios.storage.remove('fetch-notes');
+
+  return queueRequest(() =>
+    axios
+      .post(
+        process.env.REACT_APP_BACKENDURL + '/createNote',
+        body
+      )
+      .then((response) => response)
+  );
+}
+
+export async function updateNote(body: any): Promise<any> {
+  axios.storage.remove('fetch-notes');
+
+  return queueRequest(() =>
+    axios
+      .put(
+        process.env.REACT_APP_BACKENDURL + '/editNote',
+        body
+      )
+      .then((response) => response)
+  );
+}
+export async function deleteNote(tripId: string, noteId: string): Promise<any> {
+  axios.storage.remove('fetch-notes');
+
+  return queueRequest(() =>
+    axios
+      .delete(
+        process.env.REACT_APP_BACKENDURL + '/deleteNote',
+        {params:{tripId: tripId, noteId: noteId }}
+      )
+      .then((response) => response)
+  );
+}

@@ -10,6 +10,8 @@ import BackgroundAnimation from '../Components/DashboardPage/BackgroundAnimation
 import ActionButtonGroups from '../Components/DashboardPage/ActionButtonGroups';
 import DynamicContentContainer from '../Components/DashboardPage/DynamicContentContainer';
 import DashboardDialogs from '../Components/DashboardPage/DashboardDialogs';
+import NotesModal from '../Components/DashboardPage/Dialogs/NotesDialog';
+import Calculator from '../Components/Calculator/Calculator';
 
 interface ActionProps {
   refreshData: () => void;
@@ -25,6 +27,8 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
   const [nameListOpen, setNameListOpen] = useState(false);
   const [expenseDialog, setExpenseDialog] = useState(false);
   const [userDialogOpen, setUserDialogOpen] = useState(false);
+  const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+  const [calcDialogOpen, setCalcDialogOpen] = useState(false);
   const [username, setUsername] = useState('');
   const [currencyDialogOpen, setCurrencyDialogOpen] = useState(false);
   const [activeContainer, setActiveContainer] = useState<
@@ -75,19 +79,6 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
       {/* Background Animation */}
       <BackgroundAnimation animationData={animationData} isMobile={isMobile} />
 
-      {/* Trip ID Display */}
-      <Box
-        sx={{
-          position: 'absolute',
-          zIndex: 8,
-          width: 'fit-content',
-          right: 10,
-          top: 5,
-          marginRight: '10px',
-        }}
-      >
-        TripId: {travelCtx.state.chosenTrip?.tripIdShared}
-      </Box>
 
       {/* Action Buttons */}
       <ActionButtonGroups
@@ -99,8 +90,13 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
         onOpenCurrencyDialog={() => setCurrencyDialogOpen(true)}
         onOpenExpenseDialog={() => setExpenseDialog(true)}
         onOpenUserDialog={handleOpenUserDialog}
+        onOpenNotes={()=>setNotesDialogOpen(true)}
+        onOpenCalculator={()=>{setCalcDialogOpen(!calcDialogOpen)}}
       />
-
+      <Calculator
+        isVisible={calcDialogOpen}
+        onClose={() => setCalcDialogOpen(false)}
+      />
       {/* Dynamic Content Container */}
       <DynamicContentContainer
         showExpenseContainer={activeContainer === 'expenses'}
@@ -128,6 +124,8 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
         refreshData={refreshData}
         travelCtx={travelCtx}
       />
+      <NotesModal open={notesDialogOpen} onClose={()=>setNotesDialogOpen(false)} />
+
     </Box>
   );
 };
