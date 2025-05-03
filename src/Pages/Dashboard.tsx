@@ -73,7 +73,6 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
       id="parentBox"
       display="flex"
       flexDirection="column"
-      paddingTop="30px"
       sx={{ textWrap: 'nowrap' }}
     >
       {/* Background Animation */}

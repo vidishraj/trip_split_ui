@@ -30,7 +30,7 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
 }) => {
   const travelCtx = useTravel();
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+    <Box display="flex" justifyContent="space-between" alignItems="flex-start" padding={"1rem"}>
       {/* Left side: main action buttons */}
       <Box flexGrow={1}>
         {/* Group 1: Spendings and See Balances */}
@@ -54,6 +54,14 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
             <Typography variant={isMobile ? 'caption' : 'body2'}>
               See Balances
             </Typography>
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<Grid3x3 />}
+            sx={{ ...buttonStylesSmall }}
+          >
+            <Typography variant={isMobile ? 'caption' : 'body2'}>
+              {travelCtx.state.chosenTrip?.tripIdShared}</Typography>
           </Button>
         </Box>
 
@@ -79,6 +87,14 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
               Rates
             </Typography>
           </Button>
+          <Button
+            variant="outlined"
+            startIcon={<Notes />}
+            onClick={onOpenNotes}
+            sx={{ ...buttonStylesSmall }}
+          >
+            <Typography variant={isMobile ? 'caption' : 'body2'}>Notes</Typography>
+          </Button>
         </Box>
 
         {/* Group 3: Add Expense and Add User */}
@@ -99,48 +115,24 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
           >
             Add User
           </Button>
+          <Button
+            variant="contained"
+            startIcon={<Calculate />}
+            onClick={onOpenCalculator}
+            sx={{
+              ...mainButtonStylesSmall,
+              zIndex: 9999, // max z-index to always be clickable
+              position: 'relative',
+            }}
+          >
+            Calculator
+          </Button>
         </Box>
       </Box>
 
       {/* Right side: Notes and Calculator */}
       {/* Trip ID Display */}
 
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="flex-start"
-        // ml={2}
-      >
-        <Button
-          variant="outlined"
-          startIcon={<Grid3x3 />}
-          sx={{ ...buttonStylesSmall, mb: 1 }}
-        >
-          <Typography variant={isMobile ? 'caption' : 'body2'}>
-            {travelCtx.state.chosenTrip?.tripIdShared}</Typography>
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={<Notes />}
-          onClick={onOpenNotes}
-          sx={{ ...buttonStylesSmall, mb: 1 }}
-        >
-          <Typography variant={isMobile ? 'caption' : 'body2'}>Notes</Typography>
-        </Button>
-        <Button
-          variant="contained"
-          startIcon={<Calculate />}
-          onClick={onOpenCalculator}
-          sx={{
-            ...mainButtonStylesSmall,
-            zIndex: 9999, // max z-index to always be clickable
-            position: 'relative',
-          }}
-        >
-          Calculator
-        </Button>
-      </Box>
     </Box>
   );
 };
