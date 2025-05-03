@@ -1,4 +1,4 @@
-import React, {  useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Modal,
@@ -23,13 +23,12 @@ interface Note {
   userId: number;
 }
 
-
 interface NotesModalProps {
   open: boolean;
   onClose: () => void;
 }
-interface UserMapType{
-  [key: number]: {email: string, userName:string};
+interface UserMapType {
+  [key: number]: { email: string; userName: string };
 }
 const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
   const [notes, setNotes] = useState<Note[] | undefined>(undefined);
@@ -42,8 +41,8 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editNoteContent, setEditNoteContent] = useState('');
   const travelCtx = useTravel();
-  const auth = useAuth()
-  const [userMap, setUserMap] = useState<UserMapType>({})
+  const auth = useAuth();
+  const [userMap, setUserMap] = useState<UserMapType>({});
   const loadNotes = async (page: number) => {
     try {
       setLoading(true);
@@ -62,10 +61,10 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
 
   useEffect(() => {
     if (open) {
-      let users:UserMapType = {}
-      travelCtx.state.users.forEach((user)=>{
-        users[user.userId] = {userName:user.userName, email: user.email }
-      })
+      const users: UserMapType = {};
+      travelCtx.state.users.forEach((user) => {
+        users[user.userId] = { userName: user.userName, email: user.email };
+      });
       setUserMap(users);
       loadNotes(1);
       setIsAddingNote(false);
@@ -141,7 +140,7 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
   const handleDeleteNote = async (noteId: string) => {
     try {
       const tripId = travelCtx.state.chosenTrip?.tripIdShared;
-      if(tripId){
+      if (tripId) {
         await deleteNote(tripId, noteId);
         await loadNotes(currentPage);
       }
@@ -189,8 +188,8 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
             />
-            <Box display="flex" justifyContent="flex-end" mt={2}>
-              <Button onClick={handleCancelAdd} sx={{ mr: 1 }} variant="text">
+            <Box display="flex" justifyContent="flex-end" mt={2} gap={1} flexWrap="wrap">
+              <Button onClick={handleCancelAdd} variant="text">
                 Cancel
               </Button>
               <Button
@@ -213,22 +212,22 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
           >
             <CircularProgress />
           </Box>
-        ) :notes.length===0?
-          <Box width={"100%"} display={"flex"} alignItems={"center"} justifyContent={"center"}>
-            <Typography variant="h5" mt={1}>
-            No Notes Bitch
-          </Typography>
+        ) : notes.length === 0 ? (
+          <Box width="100%" display="flex" alignItems="center" justifyContent="center">
+            <Typography variant="h6" mt={1} textAlign="center">
+              No Notes Bitch
+            </Typography>
           </Box>
-          : (
+        ) : (
           <>
-            <Box maxHeight="400px" overflow="auto">
+            <Box maxHeight={{ xs: '300px', sm: '400px' }} overflow="auto">
               {notes.map((note: Note) => (
                 <Card
                   key={note.noteId}
                   sx={{ mb: 2, backgroundColor: '#f5f5f5' }}
                 >
-                  <CardContent>
-                    <Typography variant="body1" fontWeight="bold">
+                  <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+                    <Typography variant="body1" fontWeight="bold" noWrap>
                       {userMap[note.userId].userName}
                     </Typography>
                     {editingNoteId === note.noteId ? (
@@ -243,12 +242,8 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
                           inputProps={{ maxLength: 1000 }}
                           sx={{ mt: 1 }}
                         />
-                        <Box mt={2} display="flex" justifyContent="flex-end">
-                          <Button
-                            onClick={handleCancelEdit}
-                            sx={{ mr: 1 }}
-                            variant="text"
-                          >
+                        <Box mt={2} display="flex" justifyContent="flex-end" gap={1} flexWrap="wrap">
+                          <Button onClick={handleCancelEdit} variant="text">
                             Cancel
                           </Button>
                           <Button
@@ -262,17 +257,18 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
                           </Button>
                         </Box>
                       </>
-                    ) :  (
+                    ) : (
                       <>
                         <Typography variant="body2" mt={1}>
                           {note.note}
                         </Typography>
-                        {userMap[note.userId].email===auth.currentUser?.email &&
+                        {userMap[note.userId].email === auth.currentUser?.email && (
                           <Box
                             mt={2}
                             display="flex"
                             justifyContent="flex-end"
                             gap={1}
+                            flexWrap="wrap"
                           >
                             <Button
                               onClick={() => handleEditClick(note)}
@@ -290,7 +286,7 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
                               Delete
                             </Button>
                           </Box>
-                        }
+                        )}
                       </>
                     )}
                   </CardContent>
@@ -320,7 +316,13 @@ const modalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 500,
+  width: {
+    xs: '90vw',
+    sm: '80vw',
+    md: '600px',
+  },
+  maxHeight: '90vh',
+  overflowY: 'auto',
   bgcolor: 'background.paper',
   boxShadow: 24,
   borderRadius: '12px',
