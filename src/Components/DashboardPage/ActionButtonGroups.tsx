@@ -28,6 +28,32 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
   onOpenNotes,
   onOpenCalculator
 }) => {
+
+  const buttonStylesSmall = {
+    flexBasis: '40%',
+    bgcolor: '#fff',
+    color: '#1976d2',
+    maxWidth: isMobile?'100px':'100%',
+    fontSize: isMobile?'10px':'',
+    borderRadius: '8px',
+    boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
+    margin: '0 4px',
+    textTransform: 'none',
+    '&:hover': { backgroundColor: '#e3f2fd' },
+  };
+
+  const mainButtonStylesSmall = {
+    flexBasis: '40%',
+    maxWidth: isMobile?'110px':'100%',
+    fontSize: isMobile?'10px':'',
+    backgroundColor: '#1976d2',
+    color: '#fff',
+    borderRadius: '8px',
+    margin: '0 4px',
+    boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
+    textTransform: 'none',
+    '&:hover': { backgroundColor: '#1565c0' },
+  };
   const travelCtx = useTravel();
   return (
     <Box display="flex" justifyContent="space-between" alignItems="flex-start" padding={"1rem"}>
@@ -41,9 +67,7 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
             onClick={onToggleExpenses}
             sx={buttonStylesSmall}
           >
-            <Typography variant={isMobile ? 'caption' : 'body2'}>
               See Expenses
-            </Typography>
           </Button>
           <Button
             variant="outlined"
@@ -51,17 +75,14 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
             onClick={onToggleBalances}
             sx={buttonStylesSmall}
           >
-            <Typography variant={isMobile ? 'caption' : 'body2'}>
               See Balances
-            </Typography>
           </Button>
           <Button
             variant="outlined"
             startIcon={<Grid3x3 />}
-            sx={{ ...buttonStylesSmall }}
+            sx={buttonStylesSmall }
           >
-            <Typography variant={isMobile ? 'caption' : 'body2'}>
-              {travelCtx.state.chosenTrip?.tripIdShared}</Typography>
+              {travelCtx.state.chosenTrip?.tripIdShared}
           </Button>
         </Box>
 
@@ -73,9 +94,7 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
             onClick={onOpenNameList}
             sx={buttonStylesSmall}
           >
-            <Typography variant={isMobile ? 'caption' : 'body2'}>
               {userCount} Users
-            </Typography>
           </Button>
           <Button
             variant="outlined"
@@ -83,17 +102,15 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
             onClick={onOpenCurrencyDialog}
             sx={buttonStylesSmall}
           >
-            <Typography variant={isMobile ? 'caption' : 'body2'}>
               Rates
-            </Typography>
           </Button>
           <Button
             variant="outlined"
             startIcon={<Notes />}
             onClick={onOpenNotes}
-            sx={{ ...buttonStylesSmall }}
+            sx={buttonStylesSmall }
           >
-            <Typography variant={isMobile ? 'caption' : 'body2'}>Notes</Typography>
+          Notes
           </Button>
         </Box>
 
@@ -137,26 +154,5 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
   );
 };
 
-const buttonStylesSmall = {
-  flexBasis: '40%',
-  bgcolor: '#fff',
-  color: '#1976d2',
-  borderRadius: '8px',
-  boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
-  margin: '0 4px',
-  textTransform: 'none',
-  '&:hover': { backgroundColor: '#e3f2fd' },
-};
-
-const mainButtonStylesSmall = {
-  flexBasis: '40%',
-  backgroundColor: '#1976d2',
-  color: '#fff',
-  borderRadius: '8px',
-  margin: '0 4px',
-  boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
-  textTransform: 'none',
-  '&:hover': { backgroundColor: '#1565c0' },
-};
 
 export default ActionButtonGroups;
