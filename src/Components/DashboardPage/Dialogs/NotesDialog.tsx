@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {  useEffect, useState } from 'react';
 import {
   Box,
   Modal,
@@ -23,12 +23,6 @@ interface Note {
   userId: number;
 }
 
-interface NotesResponse {
-  notes: Note[];
-  totalItems: number;
-  currentPage: number;
-  totalPages: number;
-}
 
 interface NotesModalProps {
   open: boolean;

@@ -1,8 +1,6 @@
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
-  FormControlLabel,
   Switch,
   Divider,
   Box,
@@ -199,23 +197,6 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
       setCheckedUsers(newCheckedUsers);
     }
     calculateTotal();
-  };
-
-  const handleCurrencyChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSelectedCurrency(e.target.value);
-    calculateTotal();
-  };
-
-  const handleSubmit = () => {
-    const submissionData = checkedUsers
-      .filter((item) => item.isChecked)
-      .map((user) => ({
-        userId: user.userId,
-        userName: user.userName,
-        amount: user.isChecked ? user['inr'] : 0,
-      }));
-
-    onSubmit(submissionData);
   };
 
   return (

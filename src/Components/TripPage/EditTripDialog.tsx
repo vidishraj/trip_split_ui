@@ -8,7 +8,6 @@ import {
   TextField,
   Button,
 } from '@mui/material';
-import { useTravel } from '../../Contexts/TravelContext';
 import { useMessage } from '../../Contexts/NotifContext';
 import { updateTripTitle } from '../../Api/Api';
 import { TripData, MessageContextType } from '../../Assets/types';
@@ -27,7 +26,6 @@ export const EditTripDialog: React.FC<EditTripDialogProps> = ({
   refetchTrips,
 }) => {
   const [editedTripTitle, setEditedTripTitle] = useState<string>('');
-  const travelCtx: any = useTravel();
   const notif: MessageContextType = useMessage();
 
   useEffect(() => {
