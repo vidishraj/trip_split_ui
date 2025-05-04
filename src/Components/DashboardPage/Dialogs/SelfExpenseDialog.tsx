@@ -21,11 +21,6 @@ interface SelfExpenseDialogProps {
   open: boolean;
   onClose: () => void;
 }
-interface UserExpenses{
-  selfExpense:number;
-  netExpense:number;
-  userId:number;
-}
 const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
   open,
   onClose,
@@ -95,7 +90,7 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
                       </Box>
                       <Box display="flex" alignItems={"center"}>
                         (<CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
-                        {formatNumber(indiBalance['selfExpense'][userId])})
+                        {formatNumber(indiBalance['selfExpense'][userId]?indiBalance['selfExpense'][userId]:0)})
 
                       </Box>
                     </Typography>
