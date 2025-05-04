@@ -1,6 +1,6 @@
 .wrapper {
-  max-width: 400px;
-  padding: 10px;
+  max-width: 220px;
+  max-height: 350px;
   border-radius: 10px;
   background-color: #485461;
   background-image: linear-gradient(315deg, white 0%, whitesmoke 74%);
