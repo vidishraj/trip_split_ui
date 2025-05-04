@@ -219,6 +219,26 @@ export async function fetchBalances(
       .then((response) => response)
   );
 }
+export async function fetchIndividualBalance(
+  userCalled: boolean,
+  tripId: string
+): Promise<any> {
+  let cacheInstance = {};
+  if (userCalled) {
+    axios.storage.remove('expense');
+    axios.storage.remove('balances');
+    axios.storage.remove('IndiBalances');
+  }
+  return queueRequest(() =>
+    axios
+      .get(process.env.REACT_APP_BACKENDURL + '/fetchIndividualBalance', {
+        params: { trip: tripId },
+        id: 'IndiBalances',
+        cache: cacheInstance,
+      })
+      .then((response) => response)
+  );
+}
 
 export async function deleteExpense(
   userCalled: boolean,

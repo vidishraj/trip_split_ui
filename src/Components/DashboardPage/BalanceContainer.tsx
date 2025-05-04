@@ -59,9 +59,10 @@ const BalanceContainer = () => {
           boxShadow: '0px 4px 14px rgba(0, 0, 0, 0.15)',
           borderRadius: '12px',
           display: 'flex',
-          justifyContent: 'space-between',
+          flexDirection: 'column',
           alignItems: 'center',
           backdropFilter: 'blur(10px)',
+          gap:'8px',
           backgroundColor: 'rgba(255, 255, 255, 0.75)',
           [theme.breakpoints.down('sm')]: {
             padding: '12px',
@@ -69,7 +70,9 @@ const BalanceContainer = () => {
           },
         }}
       >
-        <Box display="flex" alignItems="center">
+        <Box display="flex" alignItems="center"
+             justifyContent='space-between' width="100%">
+          <Box display="flex" alignItems="center">
           <Avatar
             sx={{
               marginRight: '12px',
@@ -83,7 +86,7 @@ const BalanceContainer = () => {
           >
             Total
           </Typography>
-        </Box>
+          </Box>
         <Typography
           sx={{
             fontWeight: 'bold',
@@ -96,6 +99,19 @@ const BalanceContainer = () => {
           <CurrencyRupee sx={{ fontSize: '1rem', mr: 0.5 }} />
           {totalExpenditure.toFixed(2)}
         </Typography>
+        </Box>
+
+        <Button
+          onClick={() => {
+            setSelfExpenseDialog(true);
+          }}
+          startIcon={<FunctionsIcon />}
+          color="primary"
+          variant="contained"
+        >
+          {' '}
+          Individual Expenses
+        </Button>
       </Card>
       <Box>
         {/* Individual Transactions */}
@@ -197,17 +213,6 @@ const BalanceContainer = () => {
           );
         })}
       </Box>
-      <Button
-        onClick={() => {
-          setSelfExpenseDialog(true);
-        }}
-        startIcon={<FunctionsIcon />}
-        color="primary"
-        variant="contained"
-      >
-        {' '}
-        Net Self Expenses
-      </Button>
       <SelfExpenseDialog
         open={selfExpenseDialog}
         onClose={() => setSelfExpenseDialog(false)}

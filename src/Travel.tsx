@@ -1,6 +1,6 @@
 import {
   fetchBalances,
-  fetchExpenseForTrip,
+  fetchExpenseForTrip, fetchIndividualBalance,
   fetchTrips,
   fetchUsersForATrip,
 } from './Api/Api';
@@ -73,6 +73,19 @@ export const TravelPage = () => {
             message: 'Error fetching balances for trip',
           });
           console.log(error);
+        });
+      fetchIndividualBalance(true, travelCtx.state.chosenTrip.tripIdShared)
+        .then((response) => {
+          travelCtx.dispatch({
+            type: 'SET_INDIVIDUAL_BALANCES',
+            payload: response.data.Message,
+          });
+        })
+        .catch((error) => {
+          setPayload({
+            type: 'error',
+            message: 'Error fetching individual balances for trip',
+          });
         });
     }
   }

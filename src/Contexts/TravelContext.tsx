@@ -24,6 +24,7 @@ interface TravelContextType {
   expenses: any;
   users: UserResponse[];
   balances: any;
+  indiBalance: any;
   tripRequests: undefined | TripRequest[];
   chosenTrip: TripResponse | undefined;
   summary: CurrentTripInterface | undefined;
@@ -39,6 +40,7 @@ const initialState: TravelContextType = {
   expenses: [],
   users: [],
   balances: [],
+  indiBalance: {},
   tripRequests: undefined,
   chosenTrip: undefined,
   summary: { userCount: undefined },
@@ -52,6 +54,7 @@ type Action =
   | { type: 'SET_EXPENSES'; payload: any[] }
   | { type: 'SET_USERS'; payload: any[] }
   | { type: 'SET_BALANCES'; payload: any[] }
+  | { type: 'SET_INDIVIDUAL_BALANCES'; payload: any }
   | { type: 'SET_TRIP_REQ'; payload: any[] }
   | { type: 'SET_REFRESHER'; payload: any }
   | { type: 'SET_CHOSEN_TRIP'; payload: TripResponse | undefined }
@@ -70,6 +73,8 @@ const reducer = (
       return { ...state, users: action.payload };
     case 'SET_BALANCES':
       return { ...state, balances: action.payload };
+    case 'SET_INDIVIDUAL_BALANCES':
+      return { ...state, indiBalance: action.payload };
     case 'SET_TRIP_REQ':
       return { ...state, tripRequests: action.payload };
     case 'SET_REFRESHER':

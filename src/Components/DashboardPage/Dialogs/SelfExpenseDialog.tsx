@@ -9,7 +9,7 @@ import {
   Avatar,
   ListItemText,
   Typography,
-  IconButton,
+  IconButton, Box,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -20,12 +20,16 @@ interface SelfExpenseDialogProps {
   open: boolean;
   onClose: () => void;
 }
-
+interface UserExpenses{
+  selfExpense:number;
+  netExpense:number;
+  userId:number;
+}
 const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
   open,
   onClose,
 }) => {
-  const [data, setData] = useState<{ [key: string]: number }>({}); // Fix: Properly typed state
+  const [data, setData] = useState<UserExpenses[]>([]);
   const travelCtx = useTravel();
 
   const getUserName = (userId: number) => {
@@ -35,20 +39,30 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
 
   useEffect(() => {
     if (travelCtx.state.expenses && Array.isArray(travelCtx.state.expenses)) {
+      const finalData: UserExpenses[]= []
       const dataObj: { [key: string]: number } = {}; // Fix: Typed object
 
       travelCtx.state.expenses.forEach((item) => {
-        const userName = getUserName(item.paidBy);
         if (item['selfExpense']) {
+          const userName = "";
           if (Object.prototype.hasOwnProperty.call(dataObj, userName)) {
-            dataObj[userName] += parseInt(item.amount);
+            dataObj[item.paidBy] += parseInt(item.amount);
           } else {
-            dataObj[userName] = parseInt(item.amount);
+            dataObj[item.paidBy] = parseInt(item.amount);
           }
         }
       });
 
-      setData(dataObj);
+      Object.keys(dataObj).forEach((key)=>{
+        const newUser :UserExpenses = {
+          selfExpense:dataObj[key],
+          netExpense:travelCtx.state.indiBalance[key],
+          userId:Number(key)
+        }
+        finalData.push(newUser);
+      })
+
+      setData(finalData);
     }
   }, [travelCtx.state.expenses]);
 
@@ -85,7 +99,7 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
       {/* List */}
       <DialogContent dividers>
         <List>
-          {Object.entries(data).map(([user, amount], index) => (
+          {data.map((userData, index) => (
             <ListItem
               key={index}
               sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
@@ -98,13 +112,20 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
               <ListItemText
                 primary={
                   <Typography fontWeight="bold" fontSize="1rem">
-                    {user}
+                    {getUserName(userData.userId)}
                   </Typography>
                 }
                 secondary={
-                  <Typography display="flex" alignItems="center" color="green">
-                    <CurrencyRupeeIcon fontSize="small" sx={{ mr: 0.5 }} />
-                    {amount.toFixed(2)}
+                  <Typography display="flex" alignItems="center" gap="5px" color="green">
+                    <Box display="flex" alignItems={"center"}>
+                    <CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
+                    {userData.netExpense}
+                    </Box>
+                    <Box  display="flex" alignItems={"center"}>
+                    (<CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
+                    {userData.selfExpense})
+
+                    </Box>
                   </Typography>
                 }
               />
