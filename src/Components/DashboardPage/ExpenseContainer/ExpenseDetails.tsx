@@ -2,6 +2,7 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { useTravel } from '../../../Contexts/TravelContext';
+import { formatNumber } from '../../../Contexts/CurrencyContext';
 
 interface ExpenseDetailsProps {
   amount: number;
@@ -27,7 +28,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({
     <>
       <Box display="flex" justifyContent="space-between" marginBottom="8px">
         <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-          ₹ {amount.toFixed(2)}
+          ₹ {formatNumber(amount)}
         </Typography>
         <Typography variant="body2" sx={{ color: '#333' }}>
           <strong>Paid By:</strong> {getUserName(paidBy)}
@@ -81,8 +82,8 @@ const SplitDetails: React.FC<SplitDetailsProps> = ({
         >
           {getUserName(parseInt(userId))}: ₹{''}
           {splitBetween[userId] >= 0
-            ? (-1 * (amount - splitBetween[userId])).toFixed(2)
-            : splitBetween[userId].toFixed(2)}
+            ? formatNumber(-1 * (amount - splitBetween[userId]))
+            : formatNumber(splitBetween[userId])}
         </Typography>
       ))}
     </>

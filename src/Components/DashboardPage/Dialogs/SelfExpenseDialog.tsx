@@ -15,6 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { useTravel } from '../../../Contexts/TravelContext';
+import { formatNumber } from '../../../Contexts/CurrencyContext';
 
 interface SelfExpenseDialogProps {
   open: boolean;
@@ -119,11 +120,11 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
                   <Typography display="flex" alignItems="center" gap="5px" color="green">
                     <Box display="flex" alignItems={"center"}>
                     <CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
-                    {userData.netExpense}
+                    {formatNumber(userData.netExpense)}
                     </Box>
                     <Box  display="flex" alignItems={"center"}>
                     (<CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
-                    {userData.selfExpense})
+                    {formatNumber(userData.selfExpense)})
 
                     </Box>
                   </Typography>

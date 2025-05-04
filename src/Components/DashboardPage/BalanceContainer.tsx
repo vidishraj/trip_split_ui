@@ -9,6 +9,7 @@ import {
 import { useTravel } from '../../Contexts/TravelContext';
 import FunctionsIcon from '@mui/icons-material/Functions';
 import SelfExpenseDialog from './Dialogs/SelfExpenseDialog';
+import { formatNumber } from '../../Contexts/CurrencyContext';
 
 const BalanceContainer = () => {
   const travelCtx = useTravel();
@@ -97,7 +98,7 @@ const BalanceContainer = () => {
           }}
         >
           <CurrencyRupee sx={{ fontSize: '1rem', mr: 0.5 }} />
-          {totalExpenditure.toFixed(2)}
+          {formatNumber(totalExpenditure)}
         </Typography>
         </Box>
 
@@ -180,7 +181,7 @@ const BalanceContainer = () => {
                   }}
                 >
                   <CurrencyRupee sx={{ fontSize: '1rem', mr: 0.5 }} />
-                  {balance.amount.toFixed(2)}
+                  {formatNumber(balance.amount)}
                 </Typography>
                 <ArrowForward sx={{ fontSize: 32, color: '#333' }} />
               </Box>

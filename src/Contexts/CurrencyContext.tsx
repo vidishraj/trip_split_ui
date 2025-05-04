@@ -42,6 +42,21 @@ const currencyReducer = (
       return state;
   }
 };
+export const formatNumber = (
+  value: number | string,
+  locale: string = 'en-IN',
+  options: Intl.NumberFormatOptions = {}
+): string => {
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(num)) return '-';
+
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    ...options,
+  }).format(num);
+};
+
 
 export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
