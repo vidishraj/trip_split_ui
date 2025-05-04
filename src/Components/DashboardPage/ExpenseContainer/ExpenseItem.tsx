@@ -18,7 +18,6 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
   const travelCtx = useTravel();
   const { setPayload } = useMessage();
   const [confirmDialog, setConfirmDialog] = useState(false);
-  const [editMode, setEditMode] = useState(false);
   const formattedDate = new Date(expense.date).toLocaleDateString(undefined, {
     weekday: 'short',
     year: 'numeric',
@@ -27,7 +26,7 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
   });
 
   const handleEdit = () => {
-    setEditMode(true);
+    travelCtx.dispatch({type:'SET_EXPENSE_DIALOG_STATE',payload:true})
   };
 
   const handleDelete = () => {
@@ -92,8 +91,7 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
       <ExpenseDialog
         editMode={true}
         editData={expense}
-        open={editMode}
-        onClose={() => setEditMode(false)}
+        onClose={()=>travelCtx.dispatch({type:'SET_EXPENSE_DIALOG_STATE',payload:false})}
       />
     </Card>
   );

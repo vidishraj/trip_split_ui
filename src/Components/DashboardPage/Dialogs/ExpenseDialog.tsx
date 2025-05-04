@@ -9,7 +9,7 @@ import {
   InputAdornment,
   Checkbox,
   FormControlLabel,
-  Box,
+  Box, IconButton,
 } from '@mui/material';
 import { useTheme, useMediaQuery } from '@mui/material';
 import { insertExpense, updateExpense } from '../../../Api/Api';
@@ -19,16 +19,16 @@ import { CurrencyContext } from '../../../Contexts/CurrencyContext';
 import { currencies } from '../../../Assets/currencyData';
 import { useMessage } from '../../../Contexts/NotifContext';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Calculate } from '@mui/icons-material';
+import Calculator from '../../Calculator/Calculator';
 
 interface ExpenseDialogProps {
   editMode?: boolean;
   editData?: any;
-  open: boolean;
   onClose: () => void;
 }
 
 const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
-  open,
   onClose,
   editMode,
   editData,
@@ -249,8 +249,10 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
     editData,
   ]);
 
+  const [calcState, setCalcState] = useState(false);
+
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog open={travelCtx.state.expenseDialogOpen} onClose={onClose} fullWidth maxWidth="sm">
       <DialogContent
         sx={{
           padding: isMobile ? '16px' : '24px',
@@ -262,6 +264,10 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
           gap: '16px',
         }}
       >
+        <IconButton onClick={()=>setCalcState(true)} sx={{borderRadius:'50%', alignSelf:'flex-end', border:'grey 0.5px solid'}}>
+          <Calculate />
+          <Calculator isVisible={calcState} onClose={()=>{setCalcState(false)}}/>
+        </IconButton>
         <TextField
           label="Date"
           type="date"

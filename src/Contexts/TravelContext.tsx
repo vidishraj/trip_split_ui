@@ -29,6 +29,7 @@ interface TravelContextType {
   chosenTrip: TripResponse | undefined;
   summary: CurrentTripInterface | undefined;
   refreshData: any;
+  expenseDialogOpen: boolean;
 }
 
 interface CurrentTripInterface {
@@ -47,6 +48,7 @@ const initialState: TravelContextType = {
   refreshData: () => {
     console.log('No refresher registered');
   },
+  expenseDialogOpen: false
 };
 
 type Action =
@@ -58,6 +60,7 @@ type Action =
   | { type: 'SET_TRIP_REQ'; payload: any[] }
   | { type: 'SET_REFRESHER'; payload: any }
   | { type: 'SET_CHOSEN_TRIP'; payload: TripResponse | undefined }
+  | { type: 'SET_EXPENSE_DIALOG_STATE'; payload: boolean }
   | { type: 'SET_SUMMARY'; payload: CurrentTripInterface };
 
 const reducer = (
@@ -83,6 +86,8 @@ const reducer = (
       return { ...state, chosenTrip: action.payload };
     case 'SET_SUMMARY':
       return { ...state, summary: action.payload };
+    case 'SET_EXPENSE_DIALOG_STATE':
+      return { ...state, expenseDialogOpen: action.payload };
     default:
       return state;
   }

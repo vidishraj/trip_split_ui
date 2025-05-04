@@ -8,14 +8,12 @@ import ExpenseDialog from './Dialogs/ExpenseDialog';
 interface DynamicContentContainerProps {
   showExpenseContainer: boolean;
   showBalancesContainer: boolean;
-  expenseDialogOpen: boolean;
   onCloseExpenseDialog: () => void;
 }
 
 const DynamicContentContainer: React.FC<DynamicContentContainerProps> = ({
   showExpenseContainer,
   showBalancesContainer,
-  expenseDialogOpen,
   onCloseExpenseDialog,
 }) => {
   return (
@@ -35,7 +33,7 @@ const DynamicContentContainer: React.FC<DynamicContentContainerProps> = ({
       {showExpenseContainer && <ExpenseContainer />}
       {showBalancesContainer && <TransactionContainer />}
 
-      <ExpenseDialog open={expenseDialogOpen} onClose={onCloseExpenseDialog} />
+      <ExpenseDialog onClose={onCloseExpenseDialog} />
     </Box>
   );
 };

@@ -138,7 +138,7 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
             onClick={onOpenCalculator}
             sx={{
               ...mainButtonStylesSmall,
-              zIndex: 9999, // max z-index to always be clickable
+              zIndex: travelCtx.state.expenseDialogOpen?0:9999, // max z-index to always be clickable
               position: 'relative',
             }}
           >

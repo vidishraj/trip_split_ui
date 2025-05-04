@@ -3,6 +3,9 @@ import Wrapper from "./Wrapper";
 import Screen from "./Screen";
 import ButtonBox from "./ButtonBox";
 import Button from "./Button";
+import { useTravel } from '../../Contexts/TravelContext';
+import { Close } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 
 const btnValues = [
   ["C", "+-", "%", "/"],
@@ -43,7 +46,7 @@ const zeroDivisionError = "Can't divide with 0";
 const Calculator: React.FC<CalculatorProps> = ({ isVisible, onClose }) => {
   const [calc, setCalc] = useState<CalcState>({ sign: "", num: 0, res: 0 });
   const calculatorRef = useRef<HTMLDivElement>(null);
-
+  const {state} = useTravel()
   useEffect(() => {
     if (isVisible && calculatorRef.current) {
       calculatorRef.current.style.zIndex = "9999";
@@ -172,37 +175,42 @@ const Calculator: React.FC<CalculatorProps> = ({ isVisible, onClose }) => {
     <div
       ref={calculatorRef}
       style={{
-        position: "absolute",
-        top: 150,
-        right:0,
-        display: isVisible ? "flex" : "none",
-        justifyContent: "flex-end",
+        position: 'absolute',
+        top: state.expenseDialogOpen ? 0 : 150,
+        right: state.expenseDialogOpen ? 50 : 0,
+        maxWidth: '220px',
+        maxHeight: '350px',
+        display: isVisible ? 'flex' : 'none',
+        justifyContent: 'flex-end',
         zIndex: 9999,
         flexGrow: 1,
-        padding: "0.5rem",
+        padding: '0.5rem',
       }}
     >
-      {/*<div style={{ textAlign: "right" }}>*/}
-      {/*  <button*/}
-      {/*    onClick={onClose}*/}
-      {/*    style={{*/}
-      {/*      background: "transparent",*/}
-      {/*      border: "none",*/}
-      {/*      color: "#fff",*/}
-      {/*      fontSize: "1.2rem",*/}
-      {/*      cursor: "pointer",*/}
-      {/*    }}*/}
-      {/*  >*/}
-      {/*    ✖*/}
-      {/*  </button>*/}
-      {/*</div>*/}
+      <IconButton
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          onClose();
+        }}
+        sx={{ position: 'absolute', color: 'white', top: 0, right: 0 }}
+      >
+        <Close
+          sx={{
+            backgroundColor: 'red',
+            borderRadius: '50%',
+            maxWidth: '20px',
+            maxHeight: '20px',
+          }}
+        ></Close>
+      </IconButton>
       <Wrapper>
         <Screen value={calc.num ? calc.num : calc.res} />
         <ButtonBox>
           {btnValues.flat().map((btn, i) => (
             <Button
               key={i}
-              className={btn === "=" ? "equals" : ""}
+              className={btn === '=' ? 'equals' : ''}
               value={btn}
               onClick={(e: any) => buttonClickHandler(e, btn)}
             />

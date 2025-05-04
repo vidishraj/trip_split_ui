@@ -25,7 +25,6 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
 
   // State declarations
   const [nameListOpen, setNameListOpen] = useState(false);
-  const [expenseDialog, setExpenseDialog] = useState(false);
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
   const [calcDialogOpen, setCalcDialogOpen] = useState(false);
@@ -87,7 +86,7 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
         onToggleBalances={() => handleToggleContainer('balances')}
         onOpenNameList={() => setNameListOpen(true)}
         onOpenCurrencyDialog={() => setCurrencyDialogOpen(true)}
-        onOpenExpenseDialog={() => setExpenseDialog(true)}
+        onOpenExpenseDialog={() => {travelCtx.dispatch({type:'SET_EXPENSE_DIALOG_STATE',payload:true})}}
         onOpenUserDialog={handleOpenUserDialog}
         onOpenNotes={()=>setNotesDialogOpen(true)}
         onOpenCalculator={()=>{setCalcDialogOpen(!calcDialogOpen)}}
@@ -100,8 +99,9 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
       <DynamicContentContainer
         showExpenseContainer={activeContainer === 'expenses'}
         showBalancesContainer={activeContainer === 'balances'}
-        expenseDialogOpen={expenseDialog}
-        onCloseExpenseDialog={() => setExpenseDialog(false)}
+        onCloseExpenseDialog={() => {
+          travelCtx.dispatch({type:'SET_EXPENSE_DIALOG_STATE',payload:false})
+        }}
       />
 
       {/* Dialogs */}
