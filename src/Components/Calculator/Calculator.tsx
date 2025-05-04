@@ -210,7 +210,7 @@ const Calculator: React.FC<CalculatorProps> = ({ isVisible, onClose }) => {
           {btnValues.flat().map((btn, i) => (
             <Button
               key={i}
-              className={btn === '=' ? 'equals' : ''}
+              className={btn === '=' ? 'equals' : 'normalButton'}
               value={btn}
               onClick={(e: any) => buttonClickHandler(e, btn)}
             />

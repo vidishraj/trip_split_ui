@@ -1,4 +1,4 @@
-button {
+.normalButton {
   width: 40px;
   border: none;
   background-color: #1976d2;
@@ -10,7 +10,7 @@ button {
   outline: none;
 }
 
-button:hover {
+.normalButton:hover {
   background-color: #1976d2;
 }
 
