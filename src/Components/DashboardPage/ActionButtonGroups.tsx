@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Button, ClickAwayListener, Tooltip, styled, tooltipClasses } from '@mui/material';
 import { People, AttachMoney, CurrencyExchange, Notes, Calculate, Grid3x3 } from '@mui/icons-material';
 import { useTravel } from '../../Contexts/TravelContext';
 
@@ -15,6 +15,22 @@ interface ActionButtonGroupsProps {
   onOpenNotes: () => void;
   onOpenCalculator: () => void;
 }
+const CustomTooltip = styled(({ className, ...props }: any) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(() => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: '#1976d2',
+    color: '#fff',
+    fontSize: '0.9rem',
+    padding: '10px 14px',
+    borderRadius: '8px',
+    boxShadow: '0px 3px 12px rgba(0,0,0,0.2)',
+    fontWeight: 500,
+    textAlign: 'center',
+    maxWidth: 220,
+    lineHeight: 1.4,
+  },
+}));
 
 const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
   isMobile,
@@ -55,6 +71,20 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
     '&:hover': { backgroundColor: '#1565c0' },
   };
   const travelCtx = useTravel();
+
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+
+  const handleTooltipClick = () => {
+    setTooltipOpen(true);
+    setTimeout(() => {
+      setTooltipOpen(false);
+    }, 2500);
+  };
+
+
+  const handleTooltipClose = () => {
+    setTooltipOpen(false);
+  };
   return (
     <Box display="flex" justifyContent="space-between" alignItems="flex-start" padding={"1rem"}>
       {/* Left side: main action buttons */}
@@ -77,13 +107,29 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
           >
               See Balances
           </Button>
-          <Button
-            variant="outlined"
-            startIcon={<Grid3x3 />}
-            sx={buttonStylesSmall }
-          >
-              {travelCtx.state.chosenTrip?.tripIdShared}
-          </Button>
+          <ClickAwayListener onClickAway={handleTooltipClose}>
+
+              <CustomTooltip
+                title="Share this Id with your friends to add them to the trip!"
+                placement="top"
+                open={tooltipOpen}
+                disableFocusListener
+                disableHoverListener
+                disableTouchListener
+              >
+                <Button
+                  variant="outlined"
+                  startIcon={<Grid3x3 />}
+                  sx={buttonStylesSmall}
+                  onClick={handleTooltipClick}
+                >
+                  {travelCtx.state.chosenTrip?.tripIdShared}
+                </Button>
+              </CustomTooltip>
+
+          </ClickAwayListener>
+
+
         </Box>
 
         {/* Group 2: Users and Rates */}
@@ -138,7 +184,7 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
             onClick={onOpenCalculator}
             sx={{
               ...mainButtonStylesSmall,
-              zIndex: travelCtx.state.expenseDialogOpen?0:9999, // max z-index to always be clickable
+              zIndex: travelCtx.state.expenseDialogOpen || tooltipOpen?0:9999, // max z-index to always be clickable
               position: 'relative',
             }}
           >
@@ -149,7 +195,6 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
 
       {/* Right side: Notes and Calculator */}
       {/* Trip ID Display */}
-
     </Box>
   );
 };
