@@ -135,7 +135,7 @@ const BalanceContainer = () => {
               }}
             >
               {/* Sender */}
-              <Box sx={{ textAlign: 'center', minWidth: 80 }}>
+              <Box sx={{ display:'flex', flexDirection:'column', alignItems:'center',textAlign: 'center', minWidth: 80 }}>
                 <Avatar
                   sx={{
                     bgcolor: '#f44336',
@@ -179,7 +179,7 @@ const BalanceContainer = () => {
               </Box>
 
               {/* Receiver */}
-              <Box sx={{ textAlign: 'center', minWidth: 80 }}>
+              <Box sx={{display:'flex', flexDirection:'column', alignItems:'center', textAlign: 'center', minWidth: 80 }}>
                 <Avatar
                   sx={{
                     bgcolor: '#4caf50',
