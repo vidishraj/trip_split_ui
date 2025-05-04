@@ -45,7 +45,7 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
 
       travelCtx.state.expenses.forEach((item) => {
         if (item['selfExpense']) {
-          const userName = "";
+          const userName = item.paidBy;
           if (Object.prototype.hasOwnProperty.call(dataObj, userName)) {
             dataObj[item.paidBy] += parseInt(item.amount);
           } else {
