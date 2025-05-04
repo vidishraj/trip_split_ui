@@ -8,6 +8,7 @@
   cursor: pointer;
   border-radius: 10px;
   outline: none;
+  text-align: center;
 }
 
 .normalButton:hover {
