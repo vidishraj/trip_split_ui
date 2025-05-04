@@ -65,7 +65,7 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
 
       setData(finalData);
     }
-  }, [travelCtx.state.expenses]);
+  }, [travelCtx.state.expenses, travelCtx.state.indiBalance]);
 
   return (
     <Dialog
