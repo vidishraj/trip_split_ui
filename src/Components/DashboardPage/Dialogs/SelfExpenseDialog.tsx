@@ -90,7 +90,8 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
                       </Box>
                       <Box display="flex" alignItems={"center"}>
                         (<CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
-                        {formatNumber(indiBalance['selfExpense'][userId]?indiBalance['selfExpense'][userId]:0)})
+                        {formatNumber(indiBalance['selfExpense'] &&
+                        indiBalance['selfExpense'][userId]?indiBalance['selfExpense'][userId]:0)})
 
                       </Box>
                     </Typography>

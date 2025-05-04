@@ -172,7 +172,9 @@ const Calculator: React.FC<CalculatorProps> = ({ isVisible, onClose }) => {
     <div
       ref={calculatorRef}
       style={{
-        position: "relative",
+        position: "absolute",
+        top: 150,
+        right:0,
         display: isVisible ? "flex" : "none",
         justifyContent: "flex-end",
         zIndex: 9999,
