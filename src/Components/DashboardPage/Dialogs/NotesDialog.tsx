@@ -215,7 +215,7 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
         ) : notes.length === 0 ? (
           <Box width="100%" display="flex" alignItems="center" justifyContent="center">
             <Typography variant="h6" mt={1} textAlign="center">
-              No Notes Bitch
+              Add a new note!
             </Typography>
           </Box>
         ) : (
