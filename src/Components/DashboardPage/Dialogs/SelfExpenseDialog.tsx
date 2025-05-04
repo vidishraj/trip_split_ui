@@ -54,9 +54,9 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
         }
       });
 
-      Object.keys(dataObj).forEach((key)=>{
+      Object.keys(travelCtx.state.indiBalance).forEach((key)=>{
         const newUser :UserExpenses = {
-          selfExpense:dataObj[key],
+          selfExpense:dataObj[key]?dataObj[key]:0,
           netExpense:travelCtx.state.indiBalance[key],
           userId:Number(key)
         }
