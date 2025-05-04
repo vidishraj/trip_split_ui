@@ -15,16 +15,8 @@ const BalanceContainer = () => {
   const travelCtx = useTravel();
   const theme = useTheme();
   const userBalances = travelCtx.state.balances;
-  const [totalExpenditure, setTotalExpenditure] = useState(0);
   const [selfExpenseDialog, setSelfExpenseDialog] = useState(false);
 
-  useEffect(() => {
-    let totalExpenditureLoc = 0;
-    travelCtx.state.expenses.forEach((item: any) => {
-      totalExpenditureLoc += item.amount;
-    });
-    setTotalExpenditure(totalExpenditureLoc);
-  }, [travelCtx]);
 
   const getUserName = (userId: number) => {
     const user = travelCtx.state.users.find((u) => u.userId === userId);
@@ -91,14 +83,14 @@ const BalanceContainer = () => {
         <Typography
           sx={{
             fontWeight: 'bold',
-            color: totalExpenditure >= 0 ? '#4caf50' : '#f44336',
+            color: travelCtx.state.indiBalance['total'] && travelCtx.state.indiBalance['total'] >= 0 ? '#4caf50' : '#f44336',
             display: 'flex',
             alignItems: 'center',
             fontSize: '1.2rem',
           }}
         >
           <CurrencyRupee sx={{ fontSize: '1rem', mr: 0.5 }} />
-          {formatNumber(totalExpenditure)}
+          {formatNumber(travelCtx.state.indiBalance['total'])}
         </Typography>
         </Box>
 

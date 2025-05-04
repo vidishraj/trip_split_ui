@@ -30,42 +30,12 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
   open,
   onClose,
 }) => {
-  const [data, setData] = useState<UserExpenses[]>([]);
-  const travelCtx = useTravel();
+  const {indiBalance, users} = useTravel().state;
 
   const getUserName = (userId: number) => {
-    const user = travelCtx.state.users.find((u) => u.userId === userId);
+    const user = users.find((u) => u.userId === userId);
     return user ? user.userName : 'Unknown';
   };
-
-  useEffect(() => {
-    if (travelCtx.state.expenses && Array.isArray(travelCtx.state.expenses)) {
-      const finalData: UserExpenses[]= []
-      const dataObj: { [key: string]: number } = {}; // Fix: Typed object
-
-      travelCtx.state.expenses.forEach((item) => {
-        if (item['selfExpense']) {
-          const userName = item.paidBy;
-          if (Object.prototype.hasOwnProperty.call(dataObj, userName)) {
-            dataObj[item.paidBy] += parseInt(item.amount);
-          } else {
-            dataObj[item.paidBy] = parseInt(item.amount);
-          }
-        }
-      });
-
-      Object.keys(travelCtx.state.indiBalance).forEach((key)=>{
-        const newUser :UserExpenses = {
-          selfExpense:dataObj[key]?dataObj[key]:0,
-          netExpense:travelCtx.state.indiBalance[key],
-          userId:Number(key)
-        }
-        finalData.push(newUser);
-      })
-
-      setData(finalData);
-    }
-  }, [travelCtx.state.expenses, travelCtx.state.indiBalance]);
 
   return (
     <Dialog
@@ -90,7 +60,7 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
         }}
       >
         <Typography variant="h6" fontWeight="bold">
-          Self Expenses
+          Expenses
         </Typography>
         <IconButton onClick={onClose} size="small">
           <CloseIcon />
@@ -100,38 +70,40 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
       {/* List */}
       <DialogContent dividers>
         <List>
-          {data.map((userData, index) => (
-            <ListItem
-              key={index}
-              sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
-            >
-              <ListItemAvatar>
-                <Avatar sx={{ bgcolor: '#1976d2' }}>
-                  <AccountCircleIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography fontWeight="bold" fontSize="1rem">
-                    {getUserName(userData.userId)}
-                  </Typography>
-                }
-                secondary={
-                  <Typography display="flex" alignItems="center" gap="5px" color="green">
-                    <Box display="flex" alignItems={"center"}>
-                    <CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
-                    {formatNumber(userData.netExpense)}
-                    </Box>
-                    <Box  display="flex" alignItems={"center"}>
-                    (<CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
-                    {formatNumber(userData.selfExpense)})
+          {indiBalance && Object.keys(indiBalance['expense']).map((userId:string, index) => {
+              return(
+              <ListItem
+                key={index}
+                sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
+              >
+                <ListItemAvatar>
+                  <Avatar sx={{ bgcolor: '#1976d2' }}>
+                    <AccountCircleIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Typography fontWeight="bold" fontSize="1rem">
+                      {getUserName(Number(userId))}
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography display="flex" alignItems="center" gap="5px" color="green">
+                      <Box display="flex" alignItems={"center"}>
+                        <CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
+                        {formatNumber(indiBalance['expense'][userId])}
+                      </Box>
+                      <Box display="flex" alignItems={"center"}>
+                        (<CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
+                        {formatNumber(indiBalance['selfExpense'][userId])})
 
-                    </Box>
-                  </Typography>
-                }
-              />
-            </ListItem>
-          ))}
+                      </Box>
+                    </Typography>
+                  }
+                />
+              </ListItem>)
+
+          })}
         </List>
       </DialogContent>
     </Dialog>
