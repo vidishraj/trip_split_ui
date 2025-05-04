@@ -177,7 +177,7 @@ const Calculator: React.FC<CalculatorProps> = ({ isVisible, onClose }) => {
       style={{
         position: 'absolute',
         top: state.expenseDialogOpen ? 0 : 150,
-        right: state.expenseDialogOpen ? 50 : 0,
+        right: state.expenseDialogOpen ? 50 : 10,
         maxWidth: '220px',
         maxHeight: '350px',
         display: isVisible ? 'flex' : 'none',
