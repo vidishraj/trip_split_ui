@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Card, CardContent, Divider, useTheme } from '@mui/material';
 import { useTravel } from '../../../Contexts/TravelContext';
 import { useMessage } from '../../../Contexts/NotifContext';
-import ExpenseDialog from '../Dialogs/ExpenseDialog';
 import ConfirmationDialog from '../../ConfirmationDialog';
 import { deleteExpense } from '../../../Api/Api';
 import ExpenseDetails from './ExpenseDetails';
@@ -26,7 +25,8 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
   });
 
   const handleEdit = () => {
-    travelCtx.dispatch({type:'SET_EXPENSE_DIALOG_STATE',payload:true})
+    travelCtx.dispatch({type:'SET_SELECTED_EXPENSE',payload:expense});
+    travelCtx.dispatch({type:'SET_EXPENSE_DIALOG_STATE',payload:true});
   };
 
   const handleDelete = () => {
@@ -87,12 +87,6 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
           splitBetween={expense.splitBetween}
         />
       </CardContent>
-
-      <ExpenseDialog
-        editMode={true}
-        editData={expense}
-        onClose={()=>travelCtx.dispatch({type:'SET_EXPENSE_DIALOG_STATE',payload:false})}
-      />
     </Card>
   );
 };

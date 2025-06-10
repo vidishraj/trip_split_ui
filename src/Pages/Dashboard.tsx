@@ -67,6 +67,11 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
     setUsername('');
   };
 
+  const handleOpenExpenseDialog = () => {
+    travelCtx.dispatch({type: 'SET_SELECTED_EXPENSE', payload: null});
+    travelCtx.dispatch({type: 'SET_EXPENSE_DIALOG_STATE', payload: true});
+  };
+
   return (
     <Box
       id="parentBox"
@@ -86,10 +91,10 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
         onToggleBalances={() => handleToggleContainer('balances')}
         onOpenNameList={() => setNameListOpen(true)}
         onOpenCurrencyDialog={() => setCurrencyDialogOpen(true)}
-        onOpenExpenseDialog={() => {travelCtx.dispatch({type:'SET_EXPENSE_DIALOG_STATE',payload:true})}}
+        onOpenExpenseDialog={handleOpenExpenseDialog}
         onOpenUserDialog={handleOpenUserDialog}
-        onOpenNotes={()=>setNotesDialogOpen(true)}
-        onOpenCalculator={()=>{setCalcDialogOpen(!calcDialogOpen)}}
+        onOpenNotes={() => setNotesDialogOpen(true)}
+        onOpenCalculator={() => {setCalcDialogOpen(!calcDialogOpen)}}
       />
       <Calculator
         isVisible={calcDialogOpen}

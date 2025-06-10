@@ -4,6 +4,7 @@ import { Box } from '@mui/material';
 import ExpenseContainer from './ExpenseContainer';
 import TransactionContainer from './BalanceContainer';
 import ExpenseDialog from './Dialogs/ExpenseDialog';
+import { useTravel } from '../../Contexts/TravelContext';
 
 interface DynamicContentContainerProps {
   showExpenseContainer: boolean;
@@ -16,6 +17,8 @@ const DynamicContentContainer: React.FC<DynamicContentContainerProps> = ({
   showBalancesContainer,
   onCloseExpenseDialog,
 }) => {
+  const travelCtx = useTravel();
+  
   return (
     <Box
       id="outerBox"
@@ -33,7 +36,11 @@ const DynamicContentContainer: React.FC<DynamicContentContainerProps> = ({
       {showExpenseContainer && <ExpenseContainer />}
       {showBalancesContainer && <TransactionContainer />}
 
-      <ExpenseDialog onClose={onCloseExpenseDialog} />
+      <ExpenseDialog 
+        onClose={onCloseExpenseDialog}
+        editMode={Boolean(travelCtx.state.selectedExpense)}
+        editData={travelCtx.state.selectedExpense}
+      />
     </Box>
   );
 };
