@@ -1,0 +1,30 @@
+name: Deploy to Linux Server
+
+on:
+  push:
+    branches:
+      - master  # or your deployment branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Pull latest changes and restart service
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          cd /home/opc/React/trip_split_ui
+          sudo git pull
+          sudo npm i
+          npm run build
+          sudo rm -r /var/www/trip/
+          sudo mv build/ /var/www/trip/
+        EOF
