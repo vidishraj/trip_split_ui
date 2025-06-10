@@ -1,7 +1,7 @@
 // src/Login.tsx
 import React, { useEffect, useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -17,6 +17,8 @@ import { auth } from '../Api/FirebaseConfig';
 import SignupDialog from '../Components/Signup';
 import { useAuth } from '../Contexts/AuthContext';
 import { useMessage } from '../Contexts/NotifContext';
+import { useTravel } from '../Contexts/TravelContext';
+import { fetchTrips } from '../Api/Api';
 
 const LoginContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -46,8 +48,11 @@ const Login: React.FC = () => {
   const [openSignup, setOpenSignup] = useState(false);
   const { setUser } = useUser();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { currentUser } = useAuth();
   const notif = useMessage();
+  const travelCtx = useTravel();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -58,6 +63,7 @@ const Login: React.FC = () => {
         password
       );
       setUser(userCredential.user);
+      
       navigate('/trip');
     } catch (error) {
       notif.setPayload({
@@ -77,12 +83,15 @@ const Login: React.FC = () => {
   const handleCloseSignup = () => {
     setOpenSignup(false);
   };
+
   useEffect(() => {
     if (currentUser) {
       setUser(currentUser);
-      navigate('/trip');
-    } // eslint-disable-next-line
-  }, [currentUser]);
+      const returnTo = searchParams.get('returnTo');    
+      navigate(returnTo || '/trip');
+    }
+  }, [currentUser, navigate, searchParams]);
+
   return (
     <LoginContainer>
       <Container maxWidth="sm">
@@ -124,7 +133,7 @@ const Login: React.FC = () => {
             onClick={handleOpenSignup}
             style={{ marginTop: '8px' }}
           >
-            Don’t have an account? Sign Up
+            Don't have an account? Sign Up
           </Button>
         </LoginBox>
       </Container>

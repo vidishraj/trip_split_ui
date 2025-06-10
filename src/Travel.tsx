@@ -159,11 +159,33 @@ export const TravelPage = () => {
       );
       refreshData();
     }
+    const tripIdMatch = searchParams.get('tripIdShared');
+    const trips = travelCtx.state.trip;
+      if (tripIdMatch && trips) {
+        // Extract tripIdShared from the returnTo URL
+          // Fetch trips and set the chosen trip
+            trips.forEach((item: any) => {
+              item.currencies = item.currencies.toString().split(',');
+            });
+            travelCtx.dispatch({
+              type: 'SET_TRIP',
+              payload: trips
+            });
+            const targetTrip = trips.find((item: any) => item.tripIdShared === tripIdMatch);
+            console.log(targetTrip);
+            if (targetTrip) {
+              travelCtx.dispatch({
+                type: 'SET_CHOSEN_TRIP',
+                payload: targetTrip
+              });
+            }
+          
+      }
     travelCtx.dispatch({
       type: 'SET_REFRESHER',
       payload: refreshData,
     }); // eslint-disable-next-line
-  }, [travelCtx.state.chosenTrip, navigate]);
+  }, [travelCtx.state.chosenTrip, navigate, searchParams, travelCtx.state.trip]);
 
   return (
     <>
