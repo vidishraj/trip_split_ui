@@ -23,7 +23,7 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
           cd /home/opc/React/trip_split_ui
           sudo git pull
-          npm i
+          sudo npm i
           npm run build
           sudo rm -r /var/www/trip/
           sudo mv build/ /var/www/trip/
