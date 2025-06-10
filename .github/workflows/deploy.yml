@@ -3,7 +3,7 @@ name: Deploy to Linux Server
 on:
   push:
     branches:
-      - Personal  # or your deployment branch
+      - master  # or your deployment branch
 
 jobs:
   deploy:
