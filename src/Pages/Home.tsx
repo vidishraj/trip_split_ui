@@ -11,7 +11,7 @@ import CalculateIcon from '@mui/icons-material/Calculate';
 import GroupsIcon from '@mui/icons-material/Groups';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import LaunchIcon from '@mui/icons-material/Launch';
-
+import NewspaperIcon from '@mui/icons-material/Newspaper';
 const HeroContainer = styled(Box)(({ theme }) => ({
   minHeight: '100vh',
   background: 'linear-gradient(135deg, #f5f5f5 0%, #e3f2fd 100%)',
@@ -144,6 +144,11 @@ const Home: React.FC = () => {
       description: 'Keep track of who owes what with detailed balance summaries',
       icon: <AccountBalanceWalletIcon />,
     },
+    {
+      title: 'Other Features',
+      description: 'Add notes for a trip and use the embed calculator for added convenience',
+      icon: <NewspaperIcon />,
+    }
   ];
 
   return (
