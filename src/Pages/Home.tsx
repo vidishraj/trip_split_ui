@@ -146,7 +146,7 @@ const Home: React.FC = () => {
     },
     {
       title: 'Other Features',
-      description: 'Add notes for a trip and use the embed calculator for added convenience',
+      description: 'Add notes for a trip and use the embedded calculator for added convenience',
       icon: <NewspaperIcon />,
     }
   ];
