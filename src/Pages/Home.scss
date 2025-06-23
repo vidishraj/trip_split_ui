@@ -1,0 +1,86 @@
+.hero-container {
+  position: relative;
+  
+  .background-animation {
+    width: 100%;
+    height: 100%;
+    transform: scale(1.5);
+    filter: blur(2px);
+  }
+  
+  .animation-wrapper {
+    @media (max-width: 600px) {
+      .lottie-animation {
+        width: 100% !important;
+        height: auto !important;
+        transform: scale(1.2);
+      }
+    }
+
+    .lottie-animation {
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+    }
+  }
+
+  .feature-card {
+    @media (max-width: 600px) {
+      margin: 0.5rem 0;
+    }
+
+    &:hover {
+      .feature-icon {
+        transform: scale(1.1) rotate(5deg);
+      }
+    }
+  }
+
+  .gradient-text {
+    background: linear-gradient(45deg, #42a5f5, #64b5f6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 2px;
+      left: 2px;
+      background: linear-gradient(45deg, #1976d2, #42a5f5);
+      filter: blur(20px);
+      opacity: 0.3;
+      z-index: -1;
+    }
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  .lottie-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes gradientBG {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+} 
