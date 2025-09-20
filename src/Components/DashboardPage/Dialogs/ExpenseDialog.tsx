@@ -204,7 +204,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
 
     const selfExpenseCheck = selfExpense
       ? amount > 0
-      : userDivisionSum === amount;
+      : userDivision && userDivision.length > 0 && userDivisionSum === amount;
 
     const isFormComplete = date && description && amount > 0 && paidBy.userId && selfExpenseCheck;
 
