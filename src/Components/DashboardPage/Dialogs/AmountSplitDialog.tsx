@@ -120,6 +120,50 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
     });
   };
 
+  const redistributeEqually = (newCheckedUsers: User[]) => {
+    const checkedCount = newCheckedUsers.filter(user => user.isChecked).length;
+    if (checkedCount === 0) return;
+
+    const newRawInputValues = { ...rawInputValues };
+    let total = initializeTotal(amount);
+
+    newCheckedUsers.forEach((user, index) => {
+      if (user.isChecked) {
+        Object.keys(amount).forEach((curr) => {
+          const value = round(amount[curr] / checkedCount, 1);
+          newRawInputValues[index][curr] = value.toString();
+          newCheckedUsers[index][curr] = value;
+          total[curr] += value;
+        });
+      } else {
+        // Zero out unchecked users
+        Object.keys(amount).forEach((curr) => {
+          newRawInputValues[index][curr] = '0';
+          newCheckedUsers[index][curr] = 0;
+        });
+      }
+    });
+
+    // Balance any remainder among checked users
+    const checkedIndices = newCheckedUsers
+      .map((user, index) => user.isChecked ? index : -1)
+      .filter(index => index !== -1);
+    
+    if (checkedIndices.length > 0) {
+      Object.keys(amount).forEach((curr) => {
+        const remainder = round(amount[curr] - total[curr], 1);
+        if (remainder !== 0) {
+          const firstCheckedIndex = checkedIndices[0];
+          newRawInputValues[firstCheckedIndex][curr] = 
+            (parseFloat(newRawInputValues[firstCheckedIndex][curr]) + remainder).toString();
+          newCheckedUsers[firstCheckedIndex][curr] += remainder;
+        }
+      });
+    }
+
+    setRawInputValues(newRawInputValues);
+  };
+
   const checkSubmitDisabled = (currTotal: Record<string, string>) => {
     setSubmitStatus(
       !(
@@ -130,16 +174,35 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
   };
 
   const handleEqualToggle = () => {
-    if (!isEqual) initializeValues();
+    if (!isEqual) {
+      // When turning equal toggle ON, redistribute equally among checked users
+      redistributeEqually(checkedUsers);
+    }
     setIsEqual((prev) => !prev);
   };
 
   const handleCheckboxChange = (index: number) => {
     const newCheckedUsers = [...checkedUsers];
-    if (newCheckedUsers[index].isChecked === true) {
-      setIsEqual(false);
-    }
     newCheckedUsers[index].isChecked = !newCheckedUsers[index].isChecked;
+    
+    // If equal toggle is on, redistribute amounts equally among checked users
+    if (isEqual) {
+      redistributeEqually(newCheckedUsers);
+    } else {
+      // If not in equal mode, just zero out the unchecked user's amount
+      if (!newCheckedUsers[index].isChecked) {
+        Object.keys(amount).forEach((curr) => {
+          newCheckedUsers[index][curr] = 0;
+        });
+        
+        const newRawInputValues = { ...rawInputValues };
+        Object.keys(amount).forEach((curr) => {
+          newRawInputValues[index][curr] = '0';
+        });
+        setRawInputValues(newRawInputValues);
+      }
+    }
+    
     setCheckedUsers(newCheckedUsers);
     calculateTotal();
   };
