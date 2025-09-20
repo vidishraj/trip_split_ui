@@ -265,7 +265,7 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
 
       <DialogActions>
         <Button
-          onClick={() => onSubmit(checkedUsers)}
+          onClick={() => onSubmit(checkedUsers.filter(user => user.isChecked))}
           color="primary"
           variant="contained"
           startIcon={<CheckCircleIcon />}
