@@ -101,7 +101,6 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
     };
     setTempFilters(clearedFilters);
     onFilterChange(clearedFilters);
-    setFilterDialogOpen(false);
   };
 
   const getSortLabel = () => {
@@ -142,8 +141,7 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
   return (
     <Box 
       display="flex" 
-      gap={isMobile ? 0.5 : 1} 
-      alignItems="center" 
+      justifyContent="center"
       p={isMobile ? '8px 12px' : '12px 16px'}
       sx={{
         backgroundColor: 'rgba(255, 255, 255, 0.6)',
@@ -153,6 +151,12 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
       }}
     >
+      <Box 
+        display="flex" 
+        gap={isMobile ? 0.5 : 1} 
+        alignItems="center"
+        sx={{ maxWidth: '600px', width: '100%' }}
+      >
       {/* Quick Search */}
       <TextField
         size="small"
@@ -254,17 +258,37 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
         {isMobile ? <SortIcon fontSize="small" /> : 'Sort'}
       </Button>
 
+      {/* Clear Filters Button */}
+      {getActiveFilterCount() > 0 && (
+        <Button
+          variant="outlined"
+          startIcon={!isMobile && <ClearIcon />}
+          onClick={handleClearFilters}
+          sx={{
+            ...buttonStyles,
+            backgroundColor: '#fff',
+            color: '#f44336',
+            border: '1px solid #f44336',
+            '&:hover': { 
+              backgroundColor: '#ffebee' 
+            },
+          }}
+        >
+          {isMobile ? <ClearIcon fontSize="small" /> : 'Clear'}
+        </Button>
+      )}
+      </Box>
+
       {/* Filter Dialog */}
       <Dialog 
         open={filterDialogOpen} 
         onClose={() => setFilterDialogOpen(false)} 
         maxWidth="sm" 
         fullWidth
-        fullScreen={isMobile}
       >
         <DialogTitle sx={{ 
           backgroundColor: '#f0f4f8',
-          borderRadius: isMobile ? '0' : '12px 12px 0 0',
+          borderRadius: '12px 12px 0 0',
           textAlign: 'center',
           fontWeight: 600
         }}>
@@ -406,7 +430,7 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
         <DialogActions sx={{ 
           backgroundColor: '#f0f4f8',
           padding: isMobile ? '16px' : '24px',
-          borderRadius: isMobile ? '0' : '0 0 12px 12px',
+          borderRadius: '0 0 12px 12px',
           gap: 1
         }}>
           <Button 
@@ -452,11 +476,10 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
         onClose={() => setSortDialogOpen(false)} 
         maxWidth="xs" 
         fullWidth
-        fullScreen={isMobile}
       >
         <DialogTitle sx={{ 
           backgroundColor: '#f0f4f8',
-          borderRadius: isMobile ? '0' : '12px 12px 0 0',
+          borderRadius: '12px 12px 0 0',
           textAlign: 'center',
           fontWeight: 600
         }}>
@@ -498,17 +521,19 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
                   boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
                 }}
               >
-                {tempSort.field === 'date' ? (
+                {tempSort.field === 'date' && (
                   <>
                     <MenuItem value="desc">Newest First</MenuItem>
                     <MenuItem value="asc">Oldest First</MenuItem>
                   </>
-                ) : tempSort.field === 'description' ? (
+                )}
+                {tempSort.field === 'description' && (
                   <>
                     <MenuItem value="asc">A to Z</MenuItem>
                     <MenuItem value="desc">Z to A</MenuItem>
                   </>
-                ) : (
+                )}
+                {(tempSort.field === 'amount' || tempSort.field === 'paidBy') && (
                   <>
                     <MenuItem value="desc">High to Low</MenuItem>
                     <MenuItem value="asc">Low to High</MenuItem>
@@ -521,7 +546,7 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
         <DialogActions sx={{ 
           backgroundColor: '#f0f4f8',
           padding: isMobile ? '16px' : '24px',
-          borderRadius: isMobile ? '0' : '0 0 12px 12px',
+          borderRadius: '0 0 12px 12px',
           gap: 1
         }}>
           <Button 

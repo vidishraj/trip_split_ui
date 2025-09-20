@@ -324,6 +324,45 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
             />
           </Stack>
         ))}
+        
+        {/* Helper text for remaining amount */}
+        {submitStatus && (
+          <Box 
+            sx={{ 
+              mt: 2, 
+              p: 2, 
+              backgroundColor: '#ffebee', 
+              borderRadius: '8px',
+              border: '1px solid #f44336'
+            }}
+          >
+            <Typography 
+              variant="caption" 
+              color="error" 
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                fontWeight: 500
+              }}
+            >
+              {(() => {
+                const totalAmount = amount[selectedCurrency] || 0;
+                const currentAmount = currentTotal[selectedCurrency] || 0;
+                const difference = round(totalAmount - currentAmount, 1);
+                const currencySymbol = currencies.find(c => c.abr === selectedCurrency)?.icon || '₹';
+                
+                if (difference > 0) {
+                  return `${currencySymbol}${difference} more needed to complete the split`;
+                } else if (difference < 0) {
+                  return `${currencySymbol}${Math.abs(difference)} over the total amount`;
+                } else {
+                  return 'Amount split correctly';
+                }
+              })()}
+            </Typography>
+          </Box>
+        )}
       </DialogContent>
 
       <DialogActions>
