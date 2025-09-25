@@ -495,7 +495,14 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
               <Select
                 value={tempSort.field}
                 label="Sort By"
-                onChange={(e) => setTempSort({ ...tempSort, field: e.target.value as SortOptions['field'] })}
+                onChange={(e) => {
+                  const newField = e.target.value as SortOptions['field'];
+                  setTempSort({ 
+                    ...tempSort, 
+                    field: newField,
+                    direction: newField === 'date' ? 'desc' : 'asc'
+                  });
+                }}
                 sx={{
                   backgroundColor: '#fff',
                   borderRadius: '8px',
