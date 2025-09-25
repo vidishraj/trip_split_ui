@@ -245,7 +245,10 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
         variant="outlined"
         startIcon={!isMobile && <SortIcon />}
         onClick={() => {
-          setTempSort(currentSort);
+          const validDirection = currentSort.field === 'date' ? 
+            (currentSort.direction === 'asc' || currentSort.direction === 'desc' ? currentSort.direction : 'desc') :
+            (currentSort.direction === 'asc' || currentSort.direction === 'desc' ? currentSort.direction : 'asc');
+          setTempSort({ ...currentSort, direction: validDirection });
           setSortDialogOpen(true);
         }}
         sx={{
@@ -528,24 +531,18 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
                   boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
                 }}
               >
-                {tempSort.field === 'date' && (
-                  <>
-                    <MenuItem value="desc">Newest First</MenuItem>
-                    <MenuItem value="asc">Oldest First</MenuItem>
-                  </>
-                )}
-                {tempSort.field === 'description' && (
-                  <>
-                    <MenuItem value="asc">A to Z</MenuItem>
-                    <MenuItem value="desc">Z to A</MenuItem>
-                  </>
-                )}
-                {(tempSort.field === 'amount' || tempSort.field === 'paidBy') && (
-                  <>
-                    <MenuItem value="desc">High to Low</MenuItem>
-                    <MenuItem value="asc">Low to High</MenuItem>
-                  </>
-                )}
+                {tempSort.field === 'date' && [
+                  <MenuItem key="desc" value="desc">Newest First</MenuItem>,
+                  <MenuItem key="asc" value="asc">Oldest First</MenuItem>
+                ]}
+                {tempSort.field === 'description' && [
+                  <MenuItem key="asc" value="asc">A to Z</MenuItem>,
+                  <MenuItem key="desc" value="desc">Z to A</MenuItem>
+                ]}
+                {(tempSort.field === 'amount' || tempSort.field === 'paidBy') && [
+                  <MenuItem key="desc" value="desc">High to Low</MenuItem>,
+                  <MenuItem key="asc" value="asc">Low to High</MenuItem>
+                ]}
               </Select>
             </FormControl>
           </Stack>
