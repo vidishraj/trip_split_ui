@@ -1,5 +1,5 @@
 import './BalanceContainer.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Avatar, Box, Typography, useTheme, Card, Button } from '@mui/material';
 import {
   ArrowForward,

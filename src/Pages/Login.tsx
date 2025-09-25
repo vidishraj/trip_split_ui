@@ -1,7 +1,7 @@
 // src/Login.tsx
 import React, { useEffect, useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -17,8 +17,8 @@ import { auth } from '../Api/FirebaseConfig';
 import SignupDialog from '../Components/Signup';
 import { useAuth } from '../Contexts/AuthContext';
 import { useMessage } from '../Contexts/NotifContext';
-import { useTravel } from '../Contexts/TravelContext';
-import { fetchTrips } from '../Api/Api';
+// import { useTravel } from '../Contexts/TravelContext';
+// import { fetchTrips } from '../Api/Api';
 
 const LoginContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -51,7 +51,7 @@ const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { currentUser } = useAuth();
   const notif = useMessage();
-  const travelCtx = useTravel();
+  // const travelCtx = useTravel();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,7 +90,7 @@ const Login: React.FC = () => {
       const returnTo = searchParams.get('returnTo');    
       navigate(returnTo || '/trip');
     }
-  }, [currentUser, navigate, searchParams]);
+  }, [currentUser, navigate, searchParams, setUser]);
 
   return (
     <LoginContainer>

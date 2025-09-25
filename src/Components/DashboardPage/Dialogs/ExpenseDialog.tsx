@@ -129,7 +129,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
         }));
       }
     }
-  }, [travelCtx.state.chosenTrip, editMode, editData, currencyState.currencies]);
+  }, [travelCtx.state.chosenTrip, travelCtx.state.users, editMode, editData, currencyState.currencies]);
   // Memoize currency amount change handler
   const handleCurrencyAmountChange = useCallback((currency: string, amount: number) => {
     const abr = currencies.find((c) => c.label === currency)?.abr;
@@ -224,7 +224,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
         return amount !== element.amount;
       }) ?? false);
 
-    return hasChanges && userDivisionSum === amount;
+    return hasChanges && isFormComplete;
   }, [formState, editMode, editData, enabledCurrency]);
 
   return (

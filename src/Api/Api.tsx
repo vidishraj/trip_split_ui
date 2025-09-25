@@ -306,7 +306,9 @@ export async function fetchNotes(tripId: string, page: number): Promise<any> {
       .get(
         process.env.REACT_APP_BACKENDURL + '/getNotes',
         {
-          id: 'fetch-notes',params: { tripId: tripId, page: page },}
+          id: 'fetch-notes',
+          params: { tripId: tripId, page: page },
+        }
       )
       .then((response) => response)
   );
@@ -346,6 +348,16 @@ export async function deleteNote(tripId: string, noteId: string): Promise<any> {
         process.env.REACT_APP_BACKENDURL + '/deleteNote',
         {params:{tripId: tripId, noteId: noteId }}
       )
+      .then((response) => response)
+  );
+}
+
+export async function fetchIndividualSpending(tripId: string): Promise<any> {
+  return queueRequest(() =>
+    axios
+      .get(process.env.REACT_APP_BACKENDURL + '/fetchIndividualSpending', {
+        params: { tripId: tripId },
+      })
       .then((response) => response)
   );
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Modal,
@@ -43,7 +43,7 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
   const travelCtx = useTravel();
   const auth = useAuth();
   const [userMap, setUserMap] = useState<UserMapType>({});
-  const loadNotes = async (page: number) => {
+  const loadNotes = useCallback(async (page: number) => {
     try {
       setLoading(true);
       if (travelCtx.state.chosenTrip?.tripIdShared) {
@@ -57,7 +57,7 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [travelCtx.state.chosenTrip?.tripIdShared]);
 
   useEffect(() => {
     if (open) {
@@ -70,7 +70,7 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
       setIsAddingNote(false);
       setNewNote('');
     }
-  }, [open]);
+  }, [open, loadNotes, travelCtx.state.users]);
 
   const handlePageChange = (_: any, value: number) => {
     loadNotes(value);

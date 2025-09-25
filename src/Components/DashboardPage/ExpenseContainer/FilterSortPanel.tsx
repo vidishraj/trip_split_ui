@@ -103,19 +103,19 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
     onFilterChange(clearedFilters);
   };
 
-  const getSortLabel = () => {
-    const fieldLabels = {
-      date: 'Date',
-      amount: 'Amount',
-      description: 'Description',
-      paidBy: 'Paid By'
-    };
-    const directionLabels = {
-      asc: currentSort.field === 'date' ? 'Oldest First' : 'Low to High',
-      desc: currentSort.field === 'date' ? 'Newest First' : 'High to Low'
-    };
-    return `${fieldLabels[currentSort.field]} (${directionLabels[currentSort.direction]})`;
-  };
+  // const getSortLabel = () => {
+  //   const fieldLabels = {
+  //     date: 'Date',
+  //     amount: 'Amount',
+  //     description: 'Description',
+  //     paidBy: 'Paid By'
+  //   };
+  //   const directionLabels = {
+  //     asc: currentSort.field === 'date' ? 'Oldest First' : 'Low to High',
+  //     desc: currentSort.field === 'date' ? 'Newest First' : 'High to Low'
+  //   };
+  //   return `${fieldLabels[currentSort.field]} (${directionLabels[currentSort.direction]})`;
+  // };
 
   const buttonStyles = {
     borderRadius: '8px',

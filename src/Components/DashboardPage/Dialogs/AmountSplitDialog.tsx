@@ -14,7 +14,7 @@ import {
   InputAdornment,
   MenuItem,
 } from '@mui/material';
-import { useState, useEffect, useContext, ChangeEvent } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useTravel } from '../../../Contexts/TravelContext';
 import { CurrencyContext } from '../../../Contexts/CurrencyContext';
 import { currencies } from '../../../Assets/currencyData';
@@ -65,13 +65,28 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
     Record<number, Record<string, string>>
   >({});
   const [submitStatus, setSubmitStatus] = useState(true);
+  const [initialAmountSet, setInitialAmountSet] = useState(false);
+
+  // Reset state when dialog opens/closes
+  useEffect(() => {
+    if (open) {
+      setInitialAmountSet(false);
+    }
+  }, [open]);
 
   useEffect(() => {
-    initializeValues();
+    if (!initialAmountSet) {
+      // First time opening - use edit values if available
+      initializeValues(true);
+      setInitialAmountSet(true);
+    } else {
+      // Amount changed after initialization - reset to equal distribution
+      initializeValues(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount]);
 
-  const initializeValues = () => {
+  const initializeValues = (useEditValues = false) => {
     const newCheckedUsers = [...checkedUsers];
     const newRawInputValues: Record<number, Record<string, string>> = {};
     let total = initializeTotal(amount);
@@ -79,8 +94,8 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
     newCheckedUsers.forEach((user, index) => {
       newRawInputValues[index] = {};
       Object.keys(amount).forEach((curr) => {
-        const value = editMode
-          ? editValues.find((v) => v.userId === user.userId)?.amount || 0
+        const value = useEditValues && editMode
+          ? editValues.find((v) => v.userId === user.userId)?.amount || round(amount[curr] / users.length, 1)
           : round(amount[curr] / users.length, 1);
 
         newRawInputValues[index][curr] = value.toString();
@@ -350,7 +365,19 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
                 const totalAmount = amount[selectedCurrency] || 0;
                 const currentAmount = currentTotal[selectedCurrency] || 0;
                 const difference = round(totalAmount - currentAmount, 1);
-                const currencySymbol = currencies.find(c => c.abr === selectedCurrency)?.icon || '₹';
+                const getCurrencySymbol = (abr: string) => {
+                  const symbolMap: Record<string, string> = {
+                    'usd': '$',
+                    'inr': '₹',
+                    'eur': '€',
+                    'gbp': '£',
+                    'aud': 'A$',
+                    'thb': '฿'
+                  };
+                  return symbolMap[abr] || '₹';
+                };
+                
+                const currencySymbol = getCurrencySymbol(selectedCurrency);
                 
                 if (difference > 0) {
                   return `${currencySymbol}${difference} more needed to complete the split`;
