@@ -70,6 +70,7 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
     >
       {/* Header */}
       <DialogTitle
+        component="div"
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -114,10 +115,10 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
                       </Typography>
                     }
                     secondary={
-                      <Typography display="flex" alignItems="center" color="#4caf50" fontWeight="bold">
+                      <span style={{ display: 'flex', alignItems: 'center', color: '#4caf50', fontWeight: 'bold' }}>
                         <CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
                         {formatNumber(Number(amount))}
-                      </Typography>
+                      </span>
                     }
                   />
                 </ListItem>
@@ -131,10 +132,10 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
                     </Typography>
                   }
                   secondary={
-                    <Typography display="flex" alignItems="center" color="#1976d2" fontWeight="bold" fontSize="1.1rem">
+                    <span style={{ display: 'flex', alignItems: 'center', color: '#1976d2', fontWeight: 'bold', fontSize: '1.1rem' }}>
                       <CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
                       {individualSpending.Message?.totalTripCost ? formatNumber(individualSpending.Message.totalTripCost) : '0'}
-                    </Typography>
+                    </span>
                   }
                 />
               </ListItem>
@@ -175,18 +176,17 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
                     </Typography>
                   }
                   secondary={
-                    <Typography display="flex" alignItems="center" gap="5px" color="green">
-                      <Box display="flex" alignItems={"center"}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'green' }}>
+                      <span style={{ display: 'flex', alignItems: 'center' }}>
                         <CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
                         {formatNumber(indiBalance['expense'][userId])}
-                      </Box>
-                      <Box display="flex" alignItems={"center"}>
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center' }}>
                         (<CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
                         {formatNumber(indiBalance['selfExpense'] &&
                         indiBalance['selfExpense'][userId]?indiBalance['selfExpense'][userId]:0)})
-
-                      </Box>
-                    </Typography>
+                      </span>
+                    </span>
                   }
                 />
               </ListItem>)

@@ -44,7 +44,6 @@ export const TravelPage = () => {
             type: 'error',
             message: 'Error fetching users for trip',
           });
-          console.log(error);
         });
       fetchExpenseForTrip(true, travelCtx.state.chosenTrip.tripIdShared)
         .then((response) => {
@@ -58,7 +57,6 @@ export const TravelPage = () => {
             type: 'error',
             message: 'Error fetching expenses for trip',
           });
-          console.log(error);
         });
       fetchBalances(true, travelCtx.state.chosenTrip.tripIdShared)
         .then((response) => {
@@ -72,7 +70,6 @@ export const TravelPage = () => {
             type: 'error',
             message: 'Error fetching balances for trip',
           });
-          console.log(error);
         });
       fetchIndividualBalance(true, travelCtx.state.chosenTrip.tripIdShared)
         .then((response) => {
@@ -117,7 +114,6 @@ export const TravelPage = () => {
           }
         })
         .catch((error) => {
-          console.log(error);
           setPayload({
             type: 'error',
             message: 'Error fetching trips.',
@@ -139,7 +135,6 @@ export const TravelPage = () => {
           }
         })
         .catch((error) => {
-          console.log(error);
           setPayload({
             type: 'error',
             message: 'Error fetching trips',
@@ -172,7 +167,6 @@ export const TravelPage = () => {
               payload: trips
             });
             const targetTrip = trips.find((item: any) => item.tripIdShared === tripIdMatch);
-            console.log(targetTrip);
             if (targetTrip) {
               travelCtx.dispatch({
                 type: 'SET_CHOSEN_TRIP',

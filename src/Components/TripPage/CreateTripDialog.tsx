@@ -76,7 +76,6 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
           message: 'Error creating trip.',
         });
         handleClose();
-        console.log(error);
       });
   };
 

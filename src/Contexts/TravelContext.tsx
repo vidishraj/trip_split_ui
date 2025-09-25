@@ -47,7 +47,6 @@ const initialState: TravelContextType = {
   chosenTrip: undefined,
   summary: { userCount: undefined },
   refreshData: () => {
-    console.log('No refresher registered');
   },
   expenseDialogOpen: false,
   selectedExpense: null

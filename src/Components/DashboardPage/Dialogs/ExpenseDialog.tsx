@@ -254,8 +254,8 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
           }}
         >
           <Calculate />
-          <Calculator isVisible={calcState} onClose={() => setCalcState(false)}/>
         </IconButton>
+        <Calculator isVisible={calcState} onClose={() => setCalcState(false)}/>
 
         <TextField
           label="Date"

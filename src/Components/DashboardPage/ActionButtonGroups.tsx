@@ -15,9 +15,7 @@ interface ActionButtonGroupsProps {
   onOpenNotes: () => void;
   onOpenCalculator: () => void;
 }
-const CustomTooltip = styled(({ className, ...props }: any) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(() => ({
+const CustomTooltip = styled(Tooltip)(() => ({
   [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: '#1976d2',
     color: '#fff',
