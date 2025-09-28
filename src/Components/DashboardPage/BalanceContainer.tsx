@@ -23,13 +23,6 @@ const BalanceContainer = () => {
     return user ? user.userName : 'Unknown';
   };
 
-  if (!userBalances || userBalances.length === 0) {
-    return (
-      <Typography sx={{ textAlign: 'center', mt: 2 }}>
-        No Balance to show!
-      </Typography>
-    );
-  }
 
   return (
     <Box
@@ -106,8 +99,9 @@ const BalanceContainer = () => {
           Individual Expenses
         </Button>
       </Card>
-      <Box>
-        {/* Individual Transactions */}
+      {/* Individual Transactions */}
+      {userBalances && userBalances.length > 0 ? (
+        <Box>
         {userBalances.map((balance: any) => {
           const senderName = getUserName(balance.from);
           const receiverName = getUserName(balance.to);
@@ -205,7 +199,12 @@ const BalanceContainer = () => {
             </Box>
           );
         })}
-      </Box>
+        </Box>
+      ) : (
+        <Typography sx={{ textAlign: 'center', mt: 2, color: '#666' }}>
+          No balance transactions to show
+        </Typography>
+      )}
       <SelfExpenseDialog
         open={selfExpenseDialog}
         onClose={() => setSelfExpenseDialog(false)}

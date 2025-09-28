@@ -71,12 +71,28 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
   const travelCtx = useTravel();
 
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [tooltipMessage, setTooltipMessage] = useState("Share this Id with your friends to add them to the trip!");
 
-  const handleTooltipClick = () => {
-    setTooltipOpen(true);
-    setTimeout(() => {
-      setTooltipOpen(false);
-    }, 2500);
+  const handleTooltipClick = async () => {
+    const tripId = travelCtx.state.chosenTrip?.tripIdShared;
+    if (tripId) {
+      try {
+        await navigator.clipboard.writeText(tripId);
+        setTooltipMessage("Trip ID copied to clipboard!");
+        setTooltipOpen(true);
+        setTimeout(() => {
+          setTooltipOpen(false);
+          setTooltipMessage("Share this Id with your friends to add them to the trip!");
+        }, 2000);
+      } catch (err) {
+        setTooltipMessage("Failed to copy trip ID");
+        setTooltipOpen(true);
+        setTimeout(() => {
+          setTooltipOpen(false);
+          setTooltipMessage("Share this Id with your friends to add them to the trip!");
+        }, 2000);
+      }
+    }
   };
 
 
@@ -108,7 +124,7 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
           <ClickAwayListener onClickAway={handleTooltipClose}>
 
               <CustomTooltip
-                title="Share this Id with your friends to add them to the trip!"
+                title={tooltipMessage}
                 placement="top"
                 open={tooltipOpen}
                 disableFocusListener
