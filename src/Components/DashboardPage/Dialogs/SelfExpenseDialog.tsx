@@ -158,7 +158,7 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
           Net balance (what you owe/are owed) and personal expenses (in brackets)
         </Typography>
         <List>
-          {indiBalance && Object.keys(indiBalance['expense']).map((userId:string, index) => {
+          {indiBalance && indiBalance['expense'] && Object.keys(indiBalance['expense']).map((userId:string, index) => {
               return(
               <ListItem
                 key={index}
