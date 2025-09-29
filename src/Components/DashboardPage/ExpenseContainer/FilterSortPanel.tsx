@@ -122,9 +122,11 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
     boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
     textTransform: 'none',
     fontSize: isMobile ? '10px' : '14px',
-    minWidth: isMobile ? '65px' : '80px',
+    minWidth: isMobile ? '60px' : '70px',
+    maxWidth: isMobile ? '80px' : '100px',
     height: isMobile ? '40px' : '40px',
-    padding: isMobile ? '0 8px' : '0 12px',
+    padding: isMobile ? '0 6px' : '0 8px',
+    whiteSpace: 'nowrap',
     '&:hover': { 
       backgroundColor: getActiveFilterCount() > 0 ? '#1565c0' : '#e3f2fd' 
     },
@@ -149,50 +151,23 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
       justifyContent="center"
       p={isMobile ? '8px 12px' : '12px 16px'}
       sx={{
-        backgroundColor: 'rgba(255, 255, 255, 0.6)',
-        backdropFilter: 'blur(10px)',
-        borderRadius: '12px',
-        margin: '8px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+        backgroundColor: 'transparent',
+        margin: '8px auto',
+        maxWidth: '600px',
+        width: '100%',
       }}
     >
       <Box 
         display="flex" 
-        gap={isMobile ? 1 : 1.5} 
+        gap={isMobile ? 0.5 : 1} 
         alignItems="center"
-        sx={{ maxWidth: '600px', width: '100%' }}
+        justifyContent="center"
+        sx={{ 
+          width: '100%',
+          maxWidth: '400px',
+          flexWrap: 'nowrap',
+        }}
       >
-      {/* Quick Search */}
-      <TextField
-        size="small"
-        placeholder={isMobile ? "Search..." : "Search expenses..."}
-        value={currentFilters.description}
-        onChange={(e) => onFilterChange({ ...currentFilters, description: e.target.value })}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon fontSize={isMobile ? "small" : "medium"} />
-            </InputAdornment>
-          ),
-          endAdornment: currentFilters.description ? (
-            <InputAdornment position="end">
-              <IconButton
-                size="small"
-                onClick={() => onFilterChange({ ...currentFilters, description: '' })}
-              >
-                <ClearIcon fontSize="small" />
-              </IconButton>
-            </InputAdornment>
-          ) : null
-        }}
-        sx={{
-          ...searchFieldStyles,
-          minWidth: isMobile ? '120px' : '200px',
-          flexGrow: 1,
-          maxWidth: isMobile ? '150px' : '300px',
-        }}
-      />
-
       {/* Filter Button */}
       <Button
         variant={getActiveFilterCount() > 0 ? "contained" : "outlined"}
@@ -207,6 +182,7 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
           backgroundColor: getActiveFilterCount() > 0 ? '#1976d2' : '#fff',
           color: getActiveFilterCount() > 0 ? '#fff' : '#1976d2',
           border: getActiveFilterCount() > 0 ? 'none' : '1px solid #1976d2',
+          flexShrink: 0,
         }}
       >
         {isMobile ? <FilterIcon fontSize="small" /> : 'Filter'}
@@ -245,6 +221,37 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
         )}
       </Button>
 
+      {/* Search Bar - Center */}
+      <TextField
+        size="small"
+        placeholder={isMobile ? "Search..." : "Search expenses..."}
+        value={currentFilters.description}
+        onChange={(e) => onFilterChange({ ...currentFilters, description: e.target.value })}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon fontSize={isMobile ? "small" : "medium"} />
+            </InputAdornment>
+          ),
+          endAdornment: currentFilters.description ? (
+            <InputAdornment position="end">
+              <IconButton
+                size="small"
+                onClick={() => onFilterChange({ ...currentFilters, description: '' })}
+              >
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </InputAdornment>
+          ) : null
+        }}
+        sx={{
+          ...searchFieldStyles,
+          flexGrow: 1,
+          minWidth: isMobile ? '120px' : '160px',
+          maxWidth: isMobile ? '180px' : '220px',
+        }}
+      />
+
       {/* Sort Button */}
       <Button
         variant="outlined"
@@ -261,30 +268,11 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
           backgroundColor: '#fff',
           color: '#1976d2',
           border: '1px solid #1976d2',
+          flexShrink: 0,
         }}
       >
         {isMobile ? <SortIcon fontSize="small" /> : 'Sort'}
       </Button>
-
-      {/* Clear Filters Button */}
-      {getActiveFilterCount() > 0 && (
-        <Button
-          variant="outlined"
-          startIcon={!isMobile && <ClearIcon />}
-          onClick={handleClearFilters}
-          sx={{
-            ...buttonStyles,
-            backgroundColor: '#fff',
-            color: '#f44336',
-            border: '1px solid #f44336',
-            '&:hover': { 
-              backgroundColor: '#ffebee' 
-            },
-          }}
-        >
-          {isMobile ? <ClearIcon fontSize="small" /> : 'Clear'}
-        </Button>
-      )}
       </Box>
 
       {/* Filter Dialog */}
