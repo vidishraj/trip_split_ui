@@ -49,9 +49,9 @@ const Calculator: React.FC<CalculatorProps> = ({ isVisible, onClose }) => {
   const {state} = useTravel()
   useEffect(() => {
     if (isVisible && calculatorRef.current) {
-      calculatorRef.current.style.zIndex = "9999";
+      calculatorRef.current.style.zIndex = state.expenseDialogOpen ? "9999" : "1000";
     }
-  }, [isVisible]);
+  }, [isVisible, state.expenseDialogOpen]);
 
   const resetClickHandler = () => {
     setCalc({ sign: "", num: 0, res: 0 });
@@ -182,7 +182,7 @@ const Calculator: React.FC<CalculatorProps> = ({ isVisible, onClose }) => {
         maxHeight: '350px',
         display: isVisible ? 'flex' : 'none',
         justifyContent: 'flex-end',
-        zIndex: 9999,
+        zIndex: state.expenseDialogOpen ? 9999 : 1000,
         flexGrow: 1,
         padding: '0.5rem',
       }}

@@ -217,8 +217,6 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
             onClick={onOpenCalculator}
             sx={{
               ...mainButtonStylesSmall,
-              zIndex: travelCtx.state.expenseDialogOpen || tooltipOpen?0:9999, // max z-index to always be clickable
-              position: 'relative',
             }}
           >
             Calculator

@@ -31,9 +31,27 @@ const BalanceContainer = () => {
         flexDirection: 'column',
         gap: 2,
         alignItems: 'center',
-        justifyContent: 'space-evenly',
+        justifyContent: 'flex-start',
         mt: 3,
-        height: '100%',
+        paddingBottom: '100px', // Space for footer
+        maxHeight: 'calc(100vh - 200px)',
+        overflow: 'auto',
+        '&::-webkit-scrollbar': {
+          width: '6px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: 'transparent',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: 'rgba(0,0,0,0.2)',
+          borderRadius: '3px',
+        },
+        '&::-webkit-scrollbar-thumb:hover': {
+          background: 'rgba(0,0,0,0.3)',
+        },
+        // Firefox scrollbar
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(0,0,0,0.2) transparent',
       }}
     >
       {/* Total Card */}
@@ -107,7 +125,13 @@ const BalanceContainer = () => {
       </Card>
       {/* Individual Transactions */}
       {userBalances && userBalances.length > 0 ? (
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ 
+          mt: 2, 
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}>
         {userBalances.map((balance: any, index: number) => {
           const senderName = getUserName(balance.from);
           const receiverName = getUserName(balance.to);
