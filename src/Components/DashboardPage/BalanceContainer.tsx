@@ -26,113 +26,130 @@ const BalanceContainer = () => {
 
   return (
     <Box
+      id="innerBox"
+      flexGrow={1}
+      width="100%"
+      borderRadius="12px"
+      display="flex"
+      flexDirection="column"
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        mt: 3,
-        paddingBottom: '100px', // Space for footer
-        maxHeight: 'calc(100vh - 200px)',
-        overflow: 'auto',
-        '&::-webkit-scrollbar': {
-          width: '6px',
-        },
-        '&::-webkit-scrollbar-track': {
-          background: 'transparent',
-        },
-        '&::-webkit-scrollbar-thumb': {
-          background: 'rgba(0,0,0,0.2)',
-          borderRadius: '3px',
-        },
-        '&::-webkit-scrollbar-thumb:hover': {
-          background: 'rgba(0,0,0,0.3)',
-        },
-        // Firefox scrollbar
-        scrollbarWidth: 'thin',
-        scrollbarColor: 'rgba(0,0,0,0.2) transparent',
+        height: '100%',
+        backgroundColor: 'transparent',
+        position: 'relative',
       }}
     >
-      {/* Total Card */}
-      <Card
-        sx={{
-          width: '90%',
-          maxWidth: 420,
-          padding: '16px',
-          boxShadow: '0px 4px 14px rgba(0, 0, 0, 0.15)',
-          borderRadius: '12px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          backdropFilter: 'blur(10px)',
-          gap:'8px',
-          backgroundColor: 'rgba(255, 255, 255, 0.75)',
-          [theme.breakpoints.down('sm')]: {
-            padding: '12px',
-            width: '95%',
-          },
-        }}
-      >
-        <Box display="flex" alignItems="center"
-             justifyContent='space-between' width="100%">
-          <Box display="flex" alignItems="center">
-          <Avatar
+      {/* Total Card - Fixed */}
+      <Box display="flex" justifyContent="center" sx={{ mb: 2, px: 2 }}>
+        <Card
+          sx={{
+            width: '90%',
+            maxWidth: 420,
+            padding: '16px',
+            boxShadow: '0px 4px 14px rgba(0, 0, 0, 0.15)',
+            borderRadius: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            backdropFilter: 'blur(10px)',
+            gap:'8px',
+            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+            [theme.breakpoints.down('sm')]: {
+              padding: '12px',
+              width: '95%',
+            },
+          }}
+        >
+          <Box display="flex" alignItems="center"
+               justifyContent='space-between' width="100%">
+            <Box display="flex" alignItems="center">
+            <Avatar
+              sx={{
+                marginRight: '12px',
+                backgroundColor: '#ff9800',
+              }}
+            >
+              <FunctionsIcon />
+            </Avatar>
+            <Typography
+              sx={{ fontWeight: 'bold', color: '#333', fontSize: '1.1rem' }}
+            >
+              Total
+            </Typography>
+            </Box>
+          <Typography
             sx={{
-              marginRight: '12px',
-              backgroundColor: '#ff9800',
+              fontWeight: 'bold',
+              color: travelCtx.state.indiBalance['total'] && travelCtx.state.indiBalance['total'] >= 0 ? '#4caf50' : '#f44336',
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '1.2rem',
             }}
           >
-            <FunctionsIcon />
-          </Avatar>
-          <Typography
-            sx={{ fontWeight: 'bold', color: '#333', fontSize: '1.1rem' }}
-          >
-            Total
+            <CurrencyRupee sx={{ fontSize: '1rem', mr: 0.5 }} />
+            {formatNumber(travelCtx.state.indiBalance['total'])}
           </Typography>
           </Box>
-        <Typography
-          sx={{
-            fontWeight: 'bold',
-            color: travelCtx.state.indiBalance['total'] && travelCtx.state.indiBalance['total'] >= 0 ? '#4caf50' : '#f44336',
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: '1.2rem',
-          }}
-        >
-          <CurrencyRupee sx={{ fontSize: '1rem', mr: 0.5 }} />
-          {formatNumber(travelCtx.state.indiBalance['total'])}
-        </Typography>
-        </Box>
 
-        <Button
-          onClick={() => {
-            setSelfExpenseDialog(true);
-          }}
-          startIcon={<FunctionsIcon />}
-          color="primary"
-          variant="contained"
-          sx={{
-            borderRadius: '8px',
-            padding: { xs: '8px 16px', sm: '10px 20px' },
-            fontSize: { xs: '0.875rem', sm: '1rem' },
-            fontWeight: '600',
-            minHeight: '44px',
-          }}
-        >
-          Individual Expenses
-        </Button>
-      </Card>
-      {/* Individual Transactions */}
-      {userBalances && userBalances.length > 0 ? (
-        <Box sx={{ 
-          mt: 2, 
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}>
-        {userBalances.map((balance: any, index: number) => {
+          <Button
+            onClick={() => {
+              setSelfExpenseDialog(true);
+            }}
+            startIcon={<FunctionsIcon />}
+            color="primary"
+            variant="contained"
+            sx={{
+              borderRadius: '8px',
+              padding: { xs: '8px 16px', sm: '10px 20px' },
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              fontWeight: '600',
+              minHeight: '44px',
+            }}
+          >
+            Individual Expenses
+          </Button>
+        </Card>
+      </Box>
+
+      {/* Scrollable Balance Transactions Container */}
+      <Box
+        flexGrow={1}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        sx={{
+          overflowY: 'auto',
+          position: 'relative',
+        }}
+      >
+        {userBalances && userBalances.length > 0 ? (
+          <div
+            style={{ height: '100%', width: '100%', overflow: 'auto' }}
+          >
+            <Box sx={{ 
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              px: 2,
+              pb: 4,
+              '&::-webkit-scrollbar': {
+                width: '6px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'transparent',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'rgba(0,0,0,0.2)',
+                borderRadius: '3px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: 'rgba(0,0,0,0.3)',
+              },
+              // Firefox scrollbar
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(0,0,0,0.2) transparent',
+            }}>
+            {userBalances.map((balance: any, index: number) => {
           const senderName = getUserName(balance.from);
           const receiverName = getUserName(balance.to);
 
@@ -150,7 +167,7 @@ const BalanceContainer = () => {
                 minWidth: '320px',
                 width: '90%',
                 maxWidth: '550px',
-                margin: index === 0 ? '12px auto 8px auto' : '8px auto',
+                margin: index === 0 ? '0 auto 8px auto' : '8px auto',
                 transition: 'box-shadow 0.2s ease-in-out',
                 '&:hover': {
                   boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
@@ -284,12 +301,15 @@ const BalanceContainer = () => {
             </Box>
           );
         })}
-        </Box>
-      ) : (
-        <Typography sx={{ textAlign: 'center', mt: 2, color: '#666' }}>
-          No balance transactions to show
-        </Typography>
-      )}
+            </Box>
+          </div>
+        ) : (
+          <Typography sx={{ textAlign: 'center', mt: 2, color: '#666' }}>
+            No balance transactions to show
+          </Typography>
+        )}
+      </Box>
+      
       <SelfExpenseDialog
         open={selfExpenseDialog}
         onClose={() => setSelfExpenseDialog(false)}
