@@ -39,12 +39,12 @@ const BalanceContainer = () => {
       }}
     >
       {/* Total Card - Fixed */}
-      <Box display="flex" justifyContent="center" sx={{ mb: 2, px: 2 }}>
+      <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
         <Card
           sx={{
-            width: '90%',
-            maxWidth: 420,
-            padding: '16px',
+            width: { xs: '100%', sm: '90%' },
+            maxWidth: { xs: 'none', sm: 420 },
+            padding: { xs: '12px', sm: '16px' },
             boxShadow: '0px 4px 14px rgba(0, 0, 0, 0.15)',
             borderRadius: '12px',
             display: 'flex',
@@ -53,10 +53,6 @@ const BalanceContainer = () => {
             backdropFilter: 'blur(10px)',
             gap:'8px',
             backgroundColor: 'rgba(255, 255, 255, 0.75)',
-            [theme.breakpoints.down('sm')]: {
-              padding: '12px',
-              width: '95%',
-            },
           }}
         >
           <Box display="flex" alignItems="center"
@@ -117,21 +113,21 @@ const BalanceContainer = () => {
         justifyContent="center"
         alignItems="center"
         sx={{
-          overflowY: 'auto',
+          overflowY: 'auto', overflowX: 'hidden',
           position: 'relative',
         }}
       >
         {userBalances && userBalances.length > 0 ? (
           <div
-            style={{ height: '100%', width: '100%', overflow: 'auto' }}
+            style={{ height: '100%', width: '100%', overflowY: 'auto', overflowX: 'hidden' }}
           >
             <Box sx={{ 
               width: '100%',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              px: 2,
               pb: 4,
+              overflowX: 'hidden',
               '&::-webkit-scrollbar': {
                 width: '6px',
               },
@@ -159,22 +155,18 @@ const BalanceContainer = () => {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
+                justifyContent: 'center',
                 backgroundColor: '#fff',
                 boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
                 borderRadius: 3,
-                padding: { xs: '12px', sm: '16px' },
-                minWidth: '320px',
-                width: '90%',
-                maxWidth: '550px',
-                margin: index === 0 ? '0 auto 8px auto' : '8px auto',
+                padding: { xs: '4px', sm: '12px' },
+                width: { xs: '100%', sm: '100%' },
+                maxWidth: { xs: 'none', sm: '520px' },
+                margin: index === 0 ? '0 0 8px 0' : '8px 0',
                 transition: 'box-shadow 0.2s ease-in-out',
+                overflowX: 'hidden',
                 '&:hover': {
                   boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-                },
-                [theme.breakpoints.down('sm')]: {
-                  width: '95%',
-                  padding: '12px',
                 },
               }}
             >
@@ -184,15 +176,15 @@ const BalanceContainer = () => {
                 flexDirection:'column', 
                 alignItems:'center',
                 textAlign: 'center', 
-                width: { xs: '80px', sm: '90px' },
+                width: { xs: '28%', sm: '25%' },
                 flexShrink: 0,
               }}>
                 <Avatar
                   sx={{
                     bgcolor: '#f44336',
-                    width: { xs: '50px', sm: '56px' },
-                    height: { xs: '50px', sm: '56px' },
-                    fontSize: { xs: '20px', sm: '24px' },
+                    width: { xs: '40px', sm: '56px' },
+                    height: { xs: '40px', sm: '56px' },
+                    fontSize: { xs: '18px', sm: '24px' },
                     mb: 1,
                   }}
                 >
@@ -203,7 +195,7 @@ const BalanceContainer = () => {
                   sx={{
                     fontWeight: 600,
                     color: '#f44336',
-                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    fontSize: { xs: '0.65rem', sm: '0.875rem' },
                     lineHeight: 1.2,
                     wordBreak: 'break-word',
                   }}
@@ -218,9 +210,9 @@ const BalanceContainer = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: { xs: '140px', sm: '160px' },
+                width: { xs: '44%', sm: '50%' },
                 flexShrink: 0,
-                px: 1,
+                px: { xs: 0.5, sm: 1 },
               }}>
                 <Typography
                   variant="h6"
@@ -230,7 +222,7 @@ const BalanceContainer = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    fontSize: { xs: '0.75rem', sm: '1rem' },
                     mb: 1,
                     whiteSpace: 'nowrap',
                   }}
@@ -245,19 +237,19 @@ const BalanceContainer = () => {
                   width: '100%',
                 }}>
                   <Box sx={{ 
-                    width: { xs: '30px', sm: '40px' }, 
+                    width: { xs: '20px', sm: '30px' }, 
                     height: '2px', 
                     backgroundColor: '#666',
                     opacity: 0.6,
                   }} />
                   <ArrowForward sx={{ 
-                    fontSize: { xs: '20px', sm: '24px' }, 
+                    fontSize: { xs: '18px', sm: '22px' }, 
                     color: '#666',
                     opacity: 0.8,
-                    mx: 1,
+                    mx: { xs: 0.5, sm: 1 },
                   }} />
                   <Box sx={{ 
-                    width: { xs: '30px', sm: '40px' }, 
+                    width: { xs: '20px', sm: '30px' }, 
                     height: '2px', 
                     backgroundColor: '#666',
                     opacity: 0.6,
@@ -271,15 +263,15 @@ const BalanceContainer = () => {
                 flexDirection:'column', 
                 alignItems:'center', 
                 textAlign: 'center', 
-                width: { xs: '80px', sm: '90px' },
+                width: { xs: '28%', sm: '25%' },
                 flexShrink: 0,
               }}>
                 <Avatar
                   sx={{
                     bgcolor: '#4caf50',
-                    width: { xs: '50px', sm: '56px' },
-                    height: { xs: '50px', sm: '56px' },
-                    fontSize: { xs: '20px', sm: '24px' },
+                    width: { xs: '40px', sm: '56px' },
+                    height: { xs: '40px', sm: '56px' },
+                    fontSize: { xs: '18px', sm: '24px' },
                     mb: 1,
                   }}
                 >
@@ -290,7 +282,7 @@ const BalanceContainer = () => {
                   sx={{
                     fontWeight: 600,
                     color: '#4caf50',
-                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    fontSize: { xs: '0.65rem', sm: '0.875rem' },
                     lineHeight: 1.2,
                     wordBreak: 'break-word',
                   }}
