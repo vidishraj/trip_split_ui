@@ -53,14 +53,19 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
         width: '100%',
         minWidth: 320,
         maxWidth: 360,
-        margin: '8px 0',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+        margin: '4px 0',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         borderRadius: '12px',
         padding: '12px 16px',
         backdropFilter: 'blur(10px)',
-        backgroundColor: 'rgba(255, 255, 255, 0.6)',
+        backgroundColor: 'rgba(255, 255, 255, 0.75)',
+        transition: 'box-shadow 0.2s ease-in-out',
+        '&:hover': {
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        },
         [theme.breakpoints.down('sm')]: {
-          padding: '8px',
+          padding: '10px 12px',
+          margin: '3px 0',
         },
       }}
     >

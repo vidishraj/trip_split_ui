@@ -60,8 +60,11 @@ const Footer: React.FC = () => {
           color: '#fff',
           '&:hover': { backgroundColor: '#0d47a1' },
           borderRadius: '25px',
-          padding: '10px 20px',
-          fontWeight: 'bold',
+          padding: { xs: '8px 16px', sm: '10px 20px' },
+          fontSize: { xs: '0.875rem', sm: '1rem' },
+          fontWeight: '600',
+          minHeight: '44px',
+          minWidth: { xs: '80px', sm: '100px' },
           transition: 'all 0.3s ease',
         }}
       >
@@ -78,8 +81,11 @@ const Footer: React.FC = () => {
           color: '#fff',
           '&:hover': { backgroundColor: '#b71c1c' },
           borderRadius: '25px',
-          padding: '10px 20px',
-          fontWeight: 'bold',
+          padding: { xs: '8px 16px', sm: '10px 20px' },
+          fontSize: { xs: '0.875rem', sm: '1rem' },
+          fontWeight: '600',
+          minHeight: '44px',
+          minWidth: { xs: '80px', sm: '100px' },
           transition: 'all 0.3s ease',
         }}
       >

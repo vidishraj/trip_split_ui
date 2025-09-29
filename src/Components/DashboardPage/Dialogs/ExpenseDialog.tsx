@@ -241,8 +241,8 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
           borderRadius: '12px',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          gap: '16px',
+          alignItems: 'stretch',
+          gap: isMobile ? '12px' : '16px',
         }}
       >
         <IconButton 
@@ -267,6 +267,9 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
             backgroundColor: '#fff',
             borderRadius: '8px',
             boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+            '& .MuiOutlinedInput-root': {
+              height: '56px',
+            },
           }}
         />
 
@@ -280,6 +283,9 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
             backgroundColor: '#fff',
             borderRadius: '8px',
             boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+            '& .MuiOutlinedInput-root': {
+              minHeight: '56px',
+            },
           }}
         />
 
@@ -302,6 +308,9 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
               backgroundColor: '#fff',
               borderRadius: '8px',
               boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+              '& .MuiOutlinedInput-root': {
+                height: '56px',
+              },
               '& input[type=number]': {
                 MozAppearance: 'textfield',
               },
@@ -334,6 +343,9 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
             backgroundColor: '#fff',
             borderRadius: '8px',
             boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+            '& .MuiOutlinedInput-root': {
+              height: '56px',
+            },
           }}
         >
           {travelCtx.state.users.map((user) => (
@@ -412,17 +424,35 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
         />
       </DialogContent>
 
-      <DialogActions>
+      <DialogActions sx={{ justifyContent: 'space-between', padding: '16px', gap: 2 }}>
         <Button
           onClick={handleSubmit}
-          color="primary"
           variant="contained"
           startIcon={<CheckCircleIcon />}
           disabled={!isSubmitEnabled}
+          sx={{
+            backgroundColor: !isSubmitEnabled ? '#ccc' : '#1976d2',
+            color: '#fff',
+            borderRadius: '8px',
+            padding: '10px 20px',
+            fontWeight: '600',
+            '&:hover': {
+              backgroundColor: !isSubmitEnabled ? '#ccc' : '#1565c0',
+            },
+          }}
         >
           {editMode ? 'Update' : 'Submit'}
         </Button>
-        <Button onClick={onClose} color="error" startIcon={<CheckCircleIcon />}>
+        <Button 
+          onClick={onClose} 
+          variant="outlined"
+          color="error"
+          sx={{
+            borderRadius: '8px',
+            padding: '10px 20px',
+            fontWeight: '600',
+          }}
+        >
           Cancel
         </Button>
       </DialogActions>

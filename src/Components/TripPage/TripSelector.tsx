@@ -31,9 +31,25 @@ export const TripSelector: React.FC<TripSelectorProps> = ({
   return (
     <FormControl
       variant="outlined"
-      sx={{ marginBottom: '16px', width: '30%', minWidth: '200px' }}
+      sx={{ 
+        marginBottom: '20px', 
+        width: '60%', 
+        minWidth: '280px',
+        maxWidth: '400px'
+      }}
     >
-      <InputLabel id="trip-select-label">Choose Trip</InputLabel>
+      <InputLabel 
+        id="trip-select-label"
+        sx={{
+          color: '#1976d2',
+          fontWeight: '600',
+          '&.Mui-focused': {
+            color: '#1976d2',
+          }
+        }}
+      >
+        Choose Trip
+      </InputLabel>
       <Select
         labelId="trip-select-label"
         id="trip-select"
@@ -45,8 +61,22 @@ export const TripSelector: React.FC<TripSelectorProps> = ({
         sx={{
           backgroundColor: '#fff',
           borderRadius: '12px',
-          padding: isMobile ? '3px' : '5px',
+          fontSize: isMobile ? '14px' : '16px',
+          fontWeight: '500',
           boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2)',
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#1976d2',
+            borderWidth: '2px',
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#1565c0',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#1976d2',
+          },
+          '& .MuiSelect-select': {
+            padding: isMobile ? '12px 14px' : '16px 14px',
+          }
         }}
       >
         {trips.map((item) => (

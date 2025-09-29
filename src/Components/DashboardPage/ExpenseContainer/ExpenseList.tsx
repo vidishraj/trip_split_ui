@@ -13,9 +13,8 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses }) => {
       {expenses.map((expense: any, index: number) => (
         <Box
           key={index}
-          padding="16px"
-          margin="8px 0"
-          borderRadius="12px"
+          padding="8px"
+          margin="4px 0"
           display="flex"
           justifyContent="center"
           alignItems="center"

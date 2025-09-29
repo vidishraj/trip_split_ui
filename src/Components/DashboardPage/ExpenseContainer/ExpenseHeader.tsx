@@ -28,12 +28,13 @@ const ExpenseHeader: React.FC<ExpenseHeaderProps> = ({
         <Typography
           variant="body1"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '600',
             color: '#333',
             flexGrow: 1,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
+            fontSize: '1rem',
           }}
         >
           {title}

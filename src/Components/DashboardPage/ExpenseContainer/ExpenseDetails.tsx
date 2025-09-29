@@ -26,31 +26,46 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({
 
   return (
     <>
-      <Box display="flex" justifyContent="space-between" marginBottom="8px">
-        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+      <Box display="flex" justifyContent="space-between" marginBottom="8px" alignItems="center">
+        <Typography 
+          variant="h5" 
+          sx={{ 
+            fontWeight: '700', 
+            color: '#1976d2',
+            fontSize: { xs: '1.25rem', sm: '1.5rem' }
+          }}
+        >
           ₹ {formatNumber(amount)}
         </Typography>
-        <Typography variant="body2" sx={{ color: '#333' }}>
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            color: '#555',
+            fontSize: '0.875rem',
+            fontWeight: '500'
+          }}
+        >
           <strong>Paid By:</strong> {getUserName(paidBy)}
         </Typography>
       </Box>
 
-      <Box
-        display="flex"
-        flexDirection="row"
-        justifyContent="space-between"
-        sx={{ color: '#333' }}
-      >
-        <Typography variant="body2" sx={{ flexGrow: 1 }}>
-          <strong>Split Between:</strong>
+      <Box sx={{ mt: 0.5 }}>
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            fontWeight: '600',
+            fontSize: '0.875rem',
+            color: '#555',
+            mb: 0.75,
+          }}
+        >
+          Split Between:
         </Typography>
-        <Box display="flex" flexDirection="column" alignItems="flex-end">
-          <SplitDetails
-            splitBetween={splitBetween}
-            amount={amount}
-            getUserName={getUserName}
-          />
-        </Box>
+        <SplitDetails
+          splitBetween={splitBetween}
+          amount={amount}
+          getUserName={getUserName}
+        />
       </Box>
     </>
   );
@@ -70,23 +85,45 @@ const SplitDetails: React.FC<SplitDetailsProps> = ({
   getUserName,
 }) => {
   return (
-    <>
-      {Object.keys(splitBetween).map((userId: string) => (
-        <Typography
-          key={userId}
-          variant="body2"
-          sx={{
-            color: '#d32f2f',
-            fontWeight: '500',
-          }}
-        >
-          {getUserName(parseInt(userId))}: ₹{''}
-          {splitBetween[userId] >= 0
-            ? formatNumber(-1 * (amount - splitBetween[userId]))
-            : formatNumber(splitBetween[userId])}
-        </Typography>
-      ))}
-    </>
+    <Box sx={{ 
+      display: 'flex', 
+      flexWrap: 'wrap', 
+      gap: 1,
+      alignItems: 'center',
+    }}>
+      {Object.keys(splitBetween).map((userId: string, index) => {
+        const calculatedAmount = splitBetween[userId] >= 0
+          ? -1 * (amount - splitBetween[userId])
+          : splitBetween[userId];
+        
+        return (
+          <Box
+            key={userId}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#fff3e0',
+              borderRadius: '16px',
+              padding: '4px 12px',
+              border: '1px solid #ffcc02',
+              flexShrink: 0,
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#e65100',
+                fontWeight: '600',
+                fontSize: '0.75rem',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {getUserName(parseInt(userId))}: ₹{formatNumber(calculatedAmount)}
+            </Typography>
+          </Box>
+        );
+      })}
+    </Box>
   );
 };
 

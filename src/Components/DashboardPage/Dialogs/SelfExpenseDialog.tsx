@@ -75,13 +75,30 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '12px 16px 8px 16px',
+          padding: '16px 20px 12px 20px',
+          borderBottom: '1px solid #e0e0e0',
         }}
       >
-        <Typography variant="h6" fontWeight="bold">
+        <Typography 
+          variant="h5" 
+          sx={{
+            fontWeight: '700',
+            color: '#1976d2',
+            fontSize: '1.25rem'
+          }}
+        >
           Individual Expenses
         </Typography>
-        <IconButton onClick={onClose} size="small">
+        <IconButton 
+          onClick={onClose} 
+          size="small"
+          sx={{
+            backgroundColor: '#f5f5f5',
+            '&:hover': {
+              backgroundColor: '#e0e0e0',
+            }
+          }}
+        >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -91,9 +108,11 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
         {/* Individual Spending Section */}
         {individualSpending && (
           <Box sx={{ mb: 2 }}>
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-              Actual Money Spent
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="h6" fontWeight="bold">
+                Actual Money Spent
+              </Typography>
+            </Box>
             <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block', fontStyle: 'italic' }}>
               Total money each person paid during the trip
             </Typography>

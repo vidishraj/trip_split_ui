@@ -220,14 +220,31 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
           </Box>
         ) : (
           <>
-            <Box maxHeight={{ xs: '300px', sm: '400px' }} overflow="auto">
-              {notes.map((note: Note) => (
+            <Box maxHeight={{ xs: '300px', sm: '400px' }} overflow="auto" sx={{ pr: 1 }}>
+              {notes.map((note: Note, index) => (
                 <Card
                   key={note.noteId}
-                  sx={{ mb: 2, backgroundColor: '#f5f5f5' }}
+                  sx={{ 
+                    mb: index === notes.length - 1 ? 0 : 1.5,
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                    '&:hover': {
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                    },
+                    transition: 'box-shadow 0.2s ease-in-out',
+                  }}
                 >
-                  <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
-                    <Typography variant="body1" fontWeight="bold" noWrap>
+                  <CardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
+                    <Typography 
+                      variant="subtitle2" 
+                      sx={{
+                        fontWeight: '600',
+                        color: '#1976d2',
+                        fontSize: '0.875rem',
+                        mb: 1,
+                      }}
+                    >
                       {userMap[note.userId].userName}
                     </Typography>
                     {editingNoteId === note.noteId ? (
@@ -259,7 +276,16 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
                       </>
                     ) : (
                       <>
-                        <Typography variant="body2" mt={1}>
+                        <Typography 
+                          variant="body2" 
+                          sx={{
+                            color: '#555',
+                            lineHeight: 1.5,
+                            fontSize: '0.875rem',
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
+                          }}
+                        >
                           {note.note}
                         </Typography>
                         {userMap[note.userId].email === auth.currentUser?.email && (

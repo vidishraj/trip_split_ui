@@ -110,34 +110,44 @@ export const ConnectTripDialog: React.FC<ConnectTripDialogProps> = ({
       </DialogContent>
 
       {/* Button Actions */}
-      <DialogActions sx={{ justifyContent: 'space-between', padding: '16px' }}>
+      <DialogActions sx={{ justifyContent: 'space-between', padding: '16px', gap: 2 }}>
         <Button
           onClick={sendTripConnectRequest}
+          variant="contained"
           disabled={tripIdConnect.length !== 6}
           startIcon={<SendIcon />}
           sx={{
             backgroundColor:
               tripIdConnect.length !== 6
-                ? theme.palette.grey[400]
-                : theme.palette.primary.main,
+                ? '#ccc'
+                : '#1976d2',
             color: '#fff',
+            borderRadius: '8px',
+            padding: '10px 20px',
+            fontWeight: '600',
             '&:hover': {
               backgroundColor:
                 tripIdConnect.length !== 6
-                  ? theme.palette.grey[400]
-                  : theme.palette.primary.dark,
+                  ? '#ccc'
+                  : '#1565c0',
             },
-            borderRadius: '8px',
-            padding: '8px 16px',
-            transition: '0.3s',
           }}
         >
           Send Request
         </Button>
 
-        <IconButton onClick={resetAndClose} color="error">
-          <CancelIcon />
-        </IconButton>
+        <Button 
+          onClick={resetAndClose} 
+          variant="outlined"
+          color="error"
+          sx={{
+            borderRadius: '8px',
+            padding: '10px 20px',
+            fontWeight: '600',
+          }}
+        >
+          Cancel
+        </Button>
       </DialogActions>
     </Dialog>
   );

@@ -24,7 +24,7 @@ const EmptyState: React.FC = () => {
         variant="h4"
         sx={{
           fontSize: '1.5rem',
-          fontWeight: 'bold',
+          fontWeight: '600',
           color: 'rgba(0, 0, 0, 0.7)',
           textShadow: '1px 1px 5px rgba(0, 0, 0, 0.2)',
         }}

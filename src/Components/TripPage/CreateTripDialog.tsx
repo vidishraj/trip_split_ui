@@ -193,34 +193,44 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
       </DialogContent>
 
       {/* Actions: Save & Cancel */}
-      <DialogActions sx={{ justifyContent: 'space-between', padding: '16px' }}>
+      <DialogActions sx={{ justifyContent: 'space-between', padding: '16px', gap: 2 }}>
         <Button
           onClick={createTrip}
+          variant="contained"
           disabled={selectedCurrencies.length < 1 || tripTitle.length < 3}
           startIcon={<SaveIcon />}
           sx={{
             backgroundColor:
               selectedCurrencies.length < 1 || tripTitle.length < 3
-                ? theme.palette.grey[400]
-                : theme.palette.primary.main,
+                ? '#ccc'
+                : '#1976d2',
             color: '#fff',
+            borderRadius: '8px',
+            padding: '10px 20px',
+            fontWeight: '600',
             '&:hover': {
               backgroundColor:
                 selectedCurrencies.length < 1 || tripTitle.length < 3
-                  ? theme.palette.grey[400]
-                  : theme.palette.primary.dark,
+                  ? '#ccc'
+                  : '#1565c0',
             },
-            borderRadius: '8px',
-            padding: '8px 16px',
-            transition: '0.3s',
           }}
         >
           Save Trip
         </Button>
 
-        <IconButton onClick={resetAndClose} color="error">
-          <CancelIcon />
-        </IconButton>
+        <Button 
+          onClick={resetAndClose} 
+          variant="outlined"
+          color="error"
+          sx={{
+            borderRadius: '8px',
+            padding: '10px 20px',
+            fontWeight: '600',
+          }}
+        >
+          Cancel
+        </Button>
       </DialogActions>
     </Dialog>
   );

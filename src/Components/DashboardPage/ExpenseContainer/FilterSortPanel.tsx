@@ -122,8 +122,9 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
     boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
     textTransform: 'none',
     fontSize: isMobile ? '10px' : '14px',
-    minWidth: isMobile ? '60px' : '80px',
-    height: isMobile ? '32px' : '36px',
+    minWidth: isMobile ? '65px' : '80px',
+    height: isMobile ? '40px' : '40px',
+    padding: isMobile ? '0 8px' : '0 12px',
     '&:hover': { 
       backgroundColor: getActiveFilterCount() > 0 ? '#1565c0' : '#e3f2fd' 
     },
@@ -132,9 +133,13 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
   const searchFieldStyles = {
     backgroundColor: '#fff',
     borderRadius: '8px',
-    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
     '& .MuiOutlinedInput-root': {
       borderRadius: '8px',
+      height: '40px',
+    },
+    '& .MuiInputBase-input': {
+      fontSize: isMobile ? '12px' : '14px',
     },
   };
 
@@ -153,7 +158,7 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
     >
       <Box 
         display="flex" 
-        gap={isMobile ? 0.5 : 1} 
+        gap={isMobile ? 1 : 1.5} 
         alignItems="center"
         sx={{ maxWidth: '600px', width: '100%' }}
       >

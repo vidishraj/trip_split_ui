@@ -44,31 +44,50 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
 }) => {
 
   const buttonStylesSmall = {
-    flexBasis: '40%',
+    flex: 1,
     bgcolor: '#fff',
     color: '#1976d2',
-    maxWidth: isMobile?'100px':'100%',
-    fontSize: isMobile?'10px':'',
+    maxWidth: isMobile ? '110px' : '100%',
+    minWidth: isMobile ? '95px' : 'auto',
+    fontSize: isMobile ? '10px' : '0.875rem',
     borderRadius: '8px',
     boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
-    margin: '0 4px',
+    margin: 0,
     textTransform: 'none',
+    padding: isMobile ? '8px 12px' : '10px 16px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
     '&:hover': { backgroundColor: '#e3f2fd' },
   };
 
   const mainButtonStylesSmall = {
-    flexBasis: '40%',
-    maxWidth: isMobile?'110px':'100%',
-    fontSize: isMobile?'10px':'',
+    flex: 1,
+    maxWidth: isMobile ? '110px' : '100%',
+    minWidth: isMobile ? '95px' : 'auto',
+    fontSize: isMobile ? '10px' : '0.875rem',
     backgroundColor: '#1976d2',
     color: '#fff',
     borderRadius: '8px',
-    margin: '0 4px',
+    margin: 0,
     boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
     textTransform: 'none',
+    padding: isMobile ? '8px 12px' : '10px 16px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
     '&:hover': { backgroundColor: '#1565c0' },
   };
   const travelCtx = useTravel();
+
+  const tripIdButtonStyles = {
+    ...buttonStylesSmall,
+    maxWidth: isMobile ? '120px' : '100%',
+    minWidth: isMobile ? '110px' : 'auto',
+    fontSize: isMobile ? '9px' : '0.75rem',
+    fontWeight: '600',
+    letterSpacing: isMobile ? '-0.5px' : '0px',
+  };
 
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [tooltipMessage, setTooltipMessage] = useState("Share this Id with your friends to add them to the trip!");
@@ -100,11 +119,11 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
     setTooltipOpen(false);
   };
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="flex-start" padding={"1rem"}>
+    <Box display="flex" justifyContent="space-between" alignItems="flex-start" padding={isMobile ? "0.75rem" : "1rem"}>
       {/* Left side: main action buttons */}
       <Box flexGrow={1}>
         {/* Group 1: Spendings and See Balances */}
-        <Box display="flex" justifyContent="center" mb={1}>
+        <Box display="flex" justifyContent="center" mb={isMobile ? 0.75 : 1} gap={isMobile ? 0.5 : 1}>
           <Button
             variant="outlined"
             startIcon={<AttachMoney />}
@@ -134,7 +153,7 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
                 <Button
                   variant="outlined"
                   startIcon={<Grid3x3 />}
-                  sx={buttonStylesSmall}
+                  sx={tripIdButtonStyles}
                   onClick={handleTooltipClick}
                 >
                   {travelCtx.state.chosenTrip?.tripIdShared}
@@ -147,7 +166,7 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
         </Box>
 
         {/* Group 2: Users and Rates */}
-        <Box display="flex" justifyContent="center" mb={1}>
+        <Box display="flex" justifyContent="center" mb={isMobile ? 0.75 : 1} gap={isMobile ? 0.5 : 1}>
           <Button
             variant="outlined"
             startIcon={<People />}
@@ -175,7 +194,7 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
         </Box>
 
         {/* Group 3: Add Expense and Add User */}
-        <Box display="flex" justifyContent="center" mb={1}>
+        <Box display="flex" justifyContent="center" mb={isMobile ? 0.75 : 1} gap={isMobile ? 0.5 : 1}>
           <Button
             variant="contained"
             startIcon={<AttachMoney />}

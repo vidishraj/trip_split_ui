@@ -94,15 +94,21 @@ const BalanceContainer = () => {
           startIcon={<FunctionsIcon />}
           color="primary"
           variant="contained"
+          sx={{
+            borderRadius: '8px',
+            padding: { xs: '8px 16px', sm: '10px 20px' },
+            fontSize: { xs: '0.875rem', sm: '1rem' },
+            fontWeight: '600',
+            minHeight: '44px',
+          }}
         >
-          {' '}
           Individual Expenses
         </Button>
       </Card>
       {/* Individual Transactions */}
       {userBalances && userBalances.length > 0 ? (
-        <Box>
-        {userBalances.map((balance: any) => {
+        <Box sx={{ mt: 2 }}>
+        {userBalances.map((balance: any, index: number) => {
           const senderName = getUserName(balance.from);
           const receiverName = getUserName(balance.to);
 
@@ -113,29 +119,40 @@ const BalanceContainer = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: 2,
                 backgroundColor: '#fff',
-                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
                 borderRadius: 3,
-                padding: 2,
+                padding: { xs: '12px', sm: '16px' },
                 minWidth: '320px',
                 width: '90%',
-                maxWidth: '600px',
-                margin: 'auto',
+                maxWidth: '550px',
+                margin: index === 0 ? '12px auto 8px auto' : '8px auto',
+                transition: 'box-shadow 0.2s ease-in-out',
+                '&:hover': {
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
+                },
                 [theme.breakpoints.down('sm')]: {
                   width: '95%',
-                  padding: '14px',
+                  padding: '12px',
                 },
               }}
             >
               {/* Sender */}
-              <Box sx={{ display:'flex', flexDirection:'column', alignItems:'center',textAlign: 'center', minWidth: 80 }}>
+              <Box sx={{ 
+                display:'flex', 
+                flexDirection:'column', 
+                alignItems:'center',
+                textAlign: 'center', 
+                width: { xs: '80px', sm: '90px' },
+                flexShrink: 0,
+              }}>
                 <Avatar
                   sx={{
                     bgcolor: '#f44336',
-                    width: 56,
-                    height: 56,
-                    fontSize: 24,
+                    width: { xs: '50px', sm: '56px' },
+                    height: { xs: '50px', sm: '56px' },
+                    fontSize: { xs: '20px', sm: '24px' },
+                    mb: 1,
                   }}
                 >
                   {senderName[0] || <AccountCircle />}
@@ -144,9 +161,10 @@ const BalanceContainer = () => {
                   variant="subtitle1"
                   sx={{
                     fontWeight: 600,
-                    mt: 1,
                     color: '#f44336',
-                    fontSize: '0.9rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    lineHeight: 1.2,
+                    wordBreak: 'break-word',
                   }}
                 >
                   {senderName}
@@ -154,7 +172,15 @@ const BalanceContainer = () => {
               </Box>
 
               {/* Arrow with Amount */}
-              <Box sx={{ textAlign: 'center', flexGrow: 1 }}>
+              <Box sx={{ 
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: { xs: '140px', sm: '160px' },
+                flexShrink: 0,
+                px: 1,
+              }}>
                 <Typography
                   variant="h6"
                   sx={{
@@ -163,23 +189,57 @@ const BalanceContainer = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '1.1rem',
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    mb: 1,
+                    whiteSpace: 'nowrap',
                   }}
                 >
-                  <CurrencyRupee sx={{ fontSize: '1rem', mr: 0.5 }} />
+                  <CurrencyRupee sx={{ fontSize: { xs: '0.875rem', sm: '1rem' }, mr: 0.5 }} />
                   {formatNumber(balance.amount)}
                 </Typography>
-                <ArrowForward sx={{ fontSize: 32, color: '#333' }} />
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                }}>
+                  <Box sx={{ 
+                    width: { xs: '30px', sm: '40px' }, 
+                    height: '2px', 
+                    backgroundColor: '#666',
+                    opacity: 0.6,
+                  }} />
+                  <ArrowForward sx={{ 
+                    fontSize: { xs: '20px', sm: '24px' }, 
+                    color: '#666',
+                    opacity: 0.8,
+                    mx: 1,
+                  }} />
+                  <Box sx={{ 
+                    width: { xs: '30px', sm: '40px' }, 
+                    height: '2px', 
+                    backgroundColor: '#666',
+                    opacity: 0.6,
+                  }} />
+                </Box>
               </Box>
 
               {/* Receiver */}
-              <Box sx={{display:'flex', flexDirection:'column', alignItems:'center', textAlign: 'center', minWidth: 80 }}>
+              <Box sx={{ 
+                display:'flex', 
+                flexDirection:'column', 
+                alignItems:'center', 
+                textAlign: 'center', 
+                width: { xs: '80px', sm: '90px' },
+                flexShrink: 0,
+              }}>
                 <Avatar
                   sx={{
                     bgcolor: '#4caf50',
-                    width: 56,
-                    height: 56,
-                    fontSize: 24,
+                    width: { xs: '50px', sm: '56px' },
+                    height: { xs: '50px', sm: '56px' },
+                    fontSize: { xs: '20px', sm: '24px' },
+                    mb: 1,
                   }}
                 >
                   {receiverName[0] || <AccountCircle />}
@@ -188,9 +248,10 @@ const BalanceContainer = () => {
                   variant="subtitle1"
                   sx={{
                     fontWeight: 600,
-                    mt: 1,
                     color: '#4caf50',
-                    fontSize: '0.9rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    lineHeight: 1.2,
+                    wordBreak: 'break-word',
                   }}
                 >
                   {receiverName}
