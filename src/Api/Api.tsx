@@ -174,3 +174,11 @@ export async function deleteNote(tripId: string, noteId: string): Promise<any> {
 export async function fetchIndividualSpending(tripId: string): Promise<any> {
   return axios.get('/fetchIndividualSpending', { params: { tripId } });
 }
+
+export async function chatWithAgent(
+  tripId: string,
+  message: string,
+  history: Array<{ role: 'user' | 'assistant'; content: string }>
+): Promise<any> {
+  return axios.post('/chat', { tripId, message, history });
+}

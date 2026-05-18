@@ -1,6 +1,7 @@
 // Dashboard.tsx
 import React, { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, Fab, Tooltip } from '@mui/material';
+import { AutoAwesome } from '@mui/icons-material';
 import animationData from '../Assets/dashboardAnimation.json';
 import { useTheme, useMediaQuery } from '@mui/material';
 import { useTravel } from '../Contexts/TravelContext';
@@ -12,6 +13,7 @@ import DynamicContentContainer from '../Components/DashboardPage/DynamicContentC
 import DashboardDialogs from '../Components/DashboardPage/DashboardDialogs';
 import NotesModal from '../Components/DashboardPage/Dialogs/NotesDialog';
 import Calculator from '../Components/Calculator/Calculator';
+import ChatDialog from '../Components/Chat/ChatDialog';
 
 interface ActionProps {
   refreshData: () => void;
@@ -28,6 +30,7 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
   const [calcDialogOpen, setCalcDialogOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const [username, setUsername] = useState('');
   const [currencyDialogOpen, setCurrencyDialogOpen] = useState(false);
   const [activeContainer, setActiveContainer] = useState<
@@ -130,6 +133,23 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
       />
       <NotesModal open={notesDialogOpen} onClose={()=>setNotesDialogOpen(false)} />
 
+      <ChatDialog open={chatOpen} onClose={() => setChatOpen(false)} />
+      <Tooltip title="Trip assistant">
+        <Fab
+          color="primary"
+          aria-label="Trip assistant"
+          onClick={() => setChatOpen(true)}
+          sx={{
+            position: 'fixed',
+            bottom: isMobile ? 20 : 28,
+            right: isMobile ? 20 : 28,
+            background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+            zIndex: 1200,
+          }}
+        >
+          <AutoAwesome />
+        </Fab>
+      </Tooltip>
     </Box>
   );
 };
