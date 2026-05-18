@@ -274,7 +274,7 @@ const TripPage: React.FC = () => {
                       >
                         {(Array.isArray(trip.currencies)
                           ? trip.currencies
-                          : trip.currencies.toString().split(',')
+                          : String(trip.currencies).split(',')
                         ).map((c: string) => (
                           <span
                             key={c}
