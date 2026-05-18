@@ -1,21 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Box,
-  CircularProgress,
-  Dialog,
-  IconButton,
-  Slide,
-  TextField,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { Dialog, Slide, useMediaQuery, useTheme } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { Close, Send, AutoAwesome } from '@mui/icons-material';
 import { chatWithAgent } from '../../Api/Api';
 import { useTravel } from '../../Contexts/TravelContext';
 import { useMessage } from '../../Contexts/NotifContext';
+import { Perf, Stamp } from '../Design/Atoms';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -29,7 +18,7 @@ interface ChatDialogProps {
 
 const SlideUp = React.forwardRef(function SlideUp(
   props: TransitionProps & { children: React.ReactElement },
-  ref: React.Ref<unknown>
+  ref: React.Ref<unknown>,
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -61,16 +50,13 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
       const payload = res.data?.Message ?? {};
       const reply: string = payload.reply || '(no reply)';
       setMessages([...next, { role: 'assistant', content: reply }]);
-      if (payload.error) {
-        setPayload({ type: 'error', message: payload.error });
-      }
+      if (payload.error) setPayload({ type: 'error', message: payload.error });
       if (Array.isArray(payload.mutations) && payload.mutations.length > 0) {
-        // Backend told us something changed; refresh dashboard data.
         const refresh = travelCtx.state.refreshData;
         if (typeof refresh === 'function') refresh();
       }
     } catch (e: any) {
-      const msg = e?.response?.data?.Error || e?.message || 'Chat failed';
+      const msg = e?.response?.data?.Error || e?.message || 'Could not reach the clerk.';
       setMessages([...next, { role: 'assistant', content: `Error: ${msg}` }]);
       setPayload({ type: 'error', message: msg });
     } finally {
@@ -93,104 +79,200 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
       TransitionComponent={SlideUp}
       PaperProps={{
         sx: {
-          width: isMobile ? '100%' : 480,
-          height: isMobile ? '100%' : 600,
-          borderRadius: isMobile ? 0 : '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
+          width: isMobile ? '100%' : 520,
+          height: isMobile ? '100%' : 640,
+          borderRadius: 0,
+          background: 'transparent',
+          boxShadow: 'none',
+          overflow: 'visible',
         },
       }}
     >
-      <Box
-        sx={{
-          px: 2,
-          py: 1.25,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
-          color: '#fff',
-        }}
-      >
-        <AutoAwesome fontSize="small" />
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, flexGrow: 1 }}>
-          Trip assistant
-        </Typography>
-        <IconButton size="small" onClick={onClose} sx={{ color: '#fff' }}>
-          <Close />
-        </IconButton>
-      </Box>
-
-      <Box
-        ref={listRef}
-        sx={{
-          flexGrow: 1,
-          overflowY: 'auto',
-          p: 2,
+      <div
+        className="ts-paper"
+        style={{
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          gap: 1,
-          backgroundColor: '#f5f7fa',
+          padding: 0,
+          overflow: 'hidden',
         }}
       >
-        {messages.length === 0 && (
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 4 }}>
-            Try: "Add ₹500 dinner split equally between me, Alice, and Bob"
-            <br />
-            or "How much do I owe?"
-          </Typography>
-        )}
-        {messages.map((m, i) => (
-          <Box
-            key={i}
-            sx={{
-              alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: '85%',
-              px: 1.5,
-              py: 1,
-              borderRadius: '12px',
-              backgroundColor: m.role === 'user' ? '#1976d2' : '#fff',
-              color: m.role === 'user' ? '#fff' : '#1a1a1a',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-              fontSize: '0.92rem',
+        {/* Header */}
+        <div
+          style={{
+            padding: '14px 18px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background:
+              'repeating-linear-gradient(90deg, var(--ink) 0 10px, transparent 10px 12px)',
+            borderBottom: '1px solid var(--ink)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              background: 'var(--ink)',
+              color: 'var(--paper)',
+              padding: '6px 12px',
+              fontFamily: 'var(--font-mono)',
+              fontSize: 11,
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
             }}
           >
-            {m.content}
-          </Box>
-        ))}
-        {busy && (
-          <Box sx={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <CircularProgress size={14} />
-            <Typography variant="caption" color="text.secondary">
-              thinking...
-            </Typography>
-          </Box>
-        )}
-      </Box>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 600, letterSpacing: 0 }}>✦</span>
+            Telegraph desk
+          </div>
+          <button
+            className="ts-mono"
+            onClick={onClose}
+            style={{
+              background: 'var(--ink)',
+              color: 'var(--paper)',
+              padding: '6px 10px',
+              fontSize: 10,
+              letterSpacing: '0.2em',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            CLOSE
+          </button>
+        </div>
 
-      <Box sx={{ p: 1.5, display: 'flex', gap: 1, borderTop: '1px solid #e0e0e0', backgroundColor: '#fff' }}>
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Ask or describe an expense..."
-          value={input}
-          disabled={busy}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={onKey}
-          multiline
-          maxRows={4}
-        />
-        <Tooltip title="Send">
-          <span>
-            <IconButton color="primary" disabled={busy || !input.trim()} onClick={send}>
-              <Send />
-            </IconButton>
-          </span>
-        </Tooltip>
-      </Box>
+        {/* Messages */}
+        <div
+          ref={listRef}
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '20px 22px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12,
+            backgroundImage:
+              'repeating-linear-gradient(to bottom, transparent 0, transparent 30px, rgba(20,17,13,0.06) 31px)',
+          }}
+        >
+          {messages.length === 0 && (
+            <div style={{ textAlign: 'center', marginTop: 28 }}>
+              <Stamp text="OPERATOR" date="READY" tone="ledger" size={94} rotate={-7} />
+              <div className="ts-eyebrow" style={{ marginTop: 18 }}>Try a message</div>
+              <div
+                style={{
+                  marginTop: 8,
+                  fontFamily: 'var(--font-display)',
+                  fontStyle: 'italic',
+                  fontSize: 18,
+                  color: 'var(--ink-soft)',
+                  lineHeight: 1.4,
+                }}
+              >
+                "Add ₹500 dinner split equally between me and Alice."
+                <br />
+                "How much do I owe?"
+              </div>
+            </div>
+          )}
+
+          {messages.map((m, i) => (
+            <div
+              key={i}
+              style={{
+                alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
+                maxWidth: '88%',
+              }}
+            >
+              <div
+                className="ts-mono"
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: 'var(--ink-faded)',
+                  marginBottom: 4,
+                  textAlign: m.role === 'user' ? 'right' : 'left',
+                }}
+              >
+                {m.role === 'user' ? '↑ Bearer' : '↓ Operator'}
+              </div>
+              <div
+                style={{
+                  padding: '10px 14px',
+                  background: m.role === 'user' ? 'var(--ink)' : 'var(--paper)',
+                  color: m.role === 'user' ? 'var(--paper)' : 'var(--ink)',
+                  border: m.role === 'user' ? '1px solid var(--ink)' : '1px solid var(--rule-soft)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 15,
+                  lineHeight: 1.45,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  boxShadow: '0 2px 4px rgba(20,17,13,0.06)',
+                }}
+              >
+                {m.content}
+              </div>
+            </div>
+          ))}
+
+          {busy && (
+            <div
+              style={{
+                alignSelf: 'flex-start',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <span
+                className="ts-mono"
+                style={{ fontSize: 11, letterSpacing: '0.2em', color: 'var(--ink-faded)' }}
+              >
+                ··· tapping the wire ···
+              </span>
+            </div>
+          )}
+        </div>
+
+        <Perf style={{ margin: '0 18px' }} />
+
+        {/* Input */}
+        <div style={{ padding: '14px 18px', display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+          <textarea
+            placeholder="Dictate your message…"
+            value={input}
+            disabled={busy}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={onKey}
+            rows={2}
+            style={{
+              flex: 1,
+              border: '1px solid var(--ink)',
+              padding: '8px 10px',
+              background: 'transparent',
+              outline: 'none',
+              resize: 'none',
+              fontFamily: 'var(--font-body)',
+              fontSize: 15,
+              color: 'var(--ink)',
+              minHeight: 38,
+              maxHeight: 140,
+            }}
+          />
+          <button
+            className="ts-btn ts-btn-ink"
+            disabled={busy || !input.trim()}
+            onClick={send}
+            style={{ padding: '10px 14px' }}
+          >
+            Send ↗
+          </button>
+        </div>
+      </div>
     </Dialog>
   );
 };

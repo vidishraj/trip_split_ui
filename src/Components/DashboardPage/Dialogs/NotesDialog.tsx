@@ -1,21 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import {
-  Box,
-  Modal,
-  Typography,
-  Pagination,
-  Card,
-  CardContent,
-  CircularProgress,
-  IconButton,
-  Button,
-  TextField,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import AddIcon from '@mui/icons-material/Add';
+import { Modal } from '@mui/material';
 import { createNote, fetchNotes, updateNote, deleteNote } from '../../../Api/Api';
 import { useTravel } from '../../../Contexts/TravelContext';
 import { useAuth } from '../../../Contexts/AuthContext';
+import { Perf, Stamp } from '../../Design/Atoms';
 
 interface Note {
   noteId: string;
@@ -30,6 +18,7 @@ interface NotesModalProps {
 interface UserMapType {
   [key: number]: { email: string; userName: string };
 }
+
 const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
   const [notes, setNotes] = useState<Note[] | undefined>(undefined);
   const [totalPages, setTotalPages] = useState(1);
@@ -43,21 +32,25 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
   const travelCtx = useTravel();
   const auth = useAuth();
   const [userMap, setUserMap] = useState<UserMapType>({});
-  const loadNotes = useCallback(async (page: number) => {
-    try {
-      setLoading(true);
-      if (travelCtx.state.chosenTrip?.tripIdShared) {
-        const response = await fetchNotes(travelCtx.state.chosenTrip?.tripIdShared, page);
-        setNotes(response.data.Message.notes);
-        setTotalPages(response.data.Message.totalPages);
-        setCurrentPage(response.data.Message.currentPage);
+
+  const loadNotes = useCallback(
+    async (page: number) => {
+      try {
+        setLoading(true);
+        if (travelCtx.state.chosenTrip?.tripIdShared) {
+          const response = await fetchNotes(travelCtx.state.chosenTrip.tripIdShared, page);
+          setNotes(response.data.Message.notes);
+          setTotalPages(response.data.Message.totalPages);
+          setCurrentPage(response.data.Message.currentPage);
+        }
+      } catch {
+        /* surfaced via global handler elsewhere */
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Failed to fetch notes:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [travelCtx.state.chosenTrip?.tripIdShared]);
+    },
+    [travelCtx.state.chosenTrip?.tripIdShared],
+  );
 
   useEffect(() => {
     if (open) {
@@ -72,287 +65,333 @@ const NotesModal: React.FC<NotesModalProps> = ({ open, onClose }) => {
     }
   }, [open, loadNotes, travelCtx.state.users]);
 
-  const handlePageChange = (_: any, value: number) => {
-    loadNotes(value);
-  };
-
-  const handleAddNoteClick = () => {
-    setIsAddingNote(true);
-    setNewNote('');
-  };
-
-  const handleCancelAdd = () => {
-    setIsAddingNote(false);
-    setNewNote('');
-  };
-
   const handleSubmitNote = async () => {
     if (!newNote.trim()) return;
     try {
       setSubmitting(true);
-      const requestPayload = {
+      const res = await createNote({
         tripId: travelCtx.state.chosenTrip?.tripIdShared,
         note: newNote,
-      };
-      const response = await createNote(requestPayload);
-      if (response.status === 200) {
-        loadNotes(currentPage);
+      });
+      if (res.status === 200) {
+        await loadNotes(currentPage);
         setIsAddingNote(false);
         setNewNote('');
       }
-    } catch (err) {
-      console.error('Error submitting note:', err);
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleEditClick = (note: Note) => {
-    setEditingNoteId(note.noteId);
-    setEditNoteContent(note.note);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingNoteId(null);
-    setEditNoteContent('');
   };
 
   const handleUpdateNote = async () => {
     if (!editNoteContent.trim()) return;
     try {
       setSubmitting(true);
-      const payload = {
+      await updateNote({
         tripId: travelCtx.state.chosenTrip?.tripIdShared,
         noteId: editingNoteId,
         note: editNoteContent,
-      };
-      await updateNote(payload);
+      });
       await loadNotes(currentPage);
       setEditingNoteId(null);
       setEditNoteContent('');
-    } catch (err) {
-      console.error('Failed to update note:', err);
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDeleteNote = async (noteId: string) => {
-    try {
-      const tripId = travelCtx.state.chosenTrip?.tripIdShared;
-      if (tripId) {
-        await deleteNote(tripId, noteId);
-        await loadNotes(currentPage);
-      }
-    } catch (err) {
-      console.error('Failed to delete note:', err);
-    }
+    const tripId = travelCtx.state.chosenTrip?.tripIdShared;
+    if (!tripId) return;
+    await deleteNote(tripId, noteId);
+    await loadNotes(currentPage);
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box sx={modalStyle}>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
-        >
-          <Typography variant="h6">Notes</Typography>
-          <Box>
-            <Button
-              onClick={handleAddNoteClick}
-              startIcon={<AddIcon />}
-              sx={{ marginRight: 1 }}
-              variant="outlined"
-              size="small"
-              disabled={isAddingNote}
-            >
-              Add Note
-            </Button>
-            <IconButton onClick={onClose}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </Box>
-
-        {isAddingNote && (
-          <Box mb={3}>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              label="Your Note"
-              variant="outlined"
-              inputProps={{ maxLength: 1000 }}
-              value={newNote}
-              onChange={(e) => setNewNote(e.target.value)}
-            />
-            <Box display="flex" justifyContent="flex-end" mt={2} gap={1} flexWrap="wrap">
-              <Button onClick={handleCancelAdd} variant="text">
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSubmitNote}
-                variant="contained"
-                disabled={submitting || newNote.trim().length === 0}
-              >
-                {submitting ? 'Saving...' : 'Submit'}
-              </Button>
-            </Box>
-          </Box>
-        )}
-
-        {loading || notes === undefined ? (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight="200px"
+    <Modal open={open} onClose={onClose} sx={{ overflowY: 'auto' }}>
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 'min(90vw, 640px)',
+          maxHeight: '92vh',
+          overflowY: 'auto',
+        }}
+      >
+        <div className="ts-paper" style={{ padding: '28px 30px', position: 'relative' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              marginBottom: 16,
+              gap: 12,
+              flexWrap: 'wrap',
+            }}
           >
-            <CircularProgress />
-          </Box>
-        ) : notes.length === 0 ? (
-          <Box width="100%" display="flex" alignItems="center" justifyContent="center">
-            <Typography variant="h6" mt={1} textAlign="center">
-              Add a new note!
-            </Typography>
-          </Box>
-        ) : (
-          <>
-            <Box maxHeight={{ xs: '300px', sm: '400px' }} overflow="auto" sx={{ pr: 1 }}>
-              {notes.map((note: Note, index) => (
-                <Card
-                  key={note.noteId}
-                  sx={{ 
-                    mb: index === notes.length - 1 ? 0 : 1.5,
-                    backgroundColor: '#f8f9fa',
-                    borderRadius: '8px',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                    '&:hover': {
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                    },
-                    transition: 'box-shadow 0.2s ease-in-out',
+            <div>
+              <div className="ts-eyebrow">Marginalia</div>
+              <h2
+                className="ts-display"
+                style={{ margin: '6px 0 0', fontSize: 28, fontVariationSettings: '"SOFT" 30, "opsz" 144' }}
+              >
+                Notes.
+              </h2>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Stamp text="Logged" date="·" tone="ledger" size={62} rotate={-5} />
+              <button
+                className="ts-btn ts-btn-ink"
+                onClick={() => {
+                  setIsAddingNote(true);
+                  setNewNote('');
+                }}
+                disabled={isAddingNote}
+                style={{ padding: '8px 14px', fontSize: 11 }}
+              >
+                + Pen a note
+              </button>
+            </div>
+          </div>
+
+          {isAddingNote && (
+            <div
+              style={{
+                background: 'var(--paper-deep)',
+                border: '1px dashed var(--rule-soft)',
+                padding: 14,
+                marginBottom: 18,
+              }}
+            >
+              <div className="ts-label" style={{ marginBottom: 8 }}>New entry</div>
+              <textarea
+                rows={4}
+                value={newNote}
+                maxLength={1000}
+                onChange={(e) => setNewNote(e.target.value)}
+                placeholder="Inkwell open. What do you want to remember?"
+                style={{
+                  width: '100%',
+                  resize: 'vertical',
+                  border: 'none',
+                  borderBottom: '1px solid var(--ink)',
+                  background: 'transparent',
+                  outline: 'none',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 16,
+                  color: 'var(--ink)',
+                  padding: '6px 0',
+                }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
+                <button
+                  className="ts-btn"
+                  onClick={() => {
+                    setIsAddingNote(false);
+                    setNewNote('');
                   }}
                 >
-                  <CardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{
-                        fontWeight: '600',
-                        color: '#1976d2',
-                        fontSize: '0.875rem',
-                        mb: 1,
+                  Discard
+                </button>
+                <button
+                  className="ts-btn ts-btn-ink"
+                  disabled={submitting || newNote.trim().length === 0}
+                  onClick={handleSubmitNote}
+                >
+                  {submitting ? 'Saving…' : 'Pen it'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {loading || notes === undefined ? (
+            <div style={{ padding: '36px 12px', textAlign: 'center', color: 'var(--ink-faded)' }}>
+              <div className="ts-label">Fetching marginalia…</div>
+            </div>
+          ) : notes.length === 0 ? (
+            <div style={{ padding: '36px 12px', textAlign: 'center' }}>
+              <div
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontStyle: 'italic',
+                  fontSize: 22,
+                  color: 'var(--ink-soft)',
+                }}
+              >
+                The margins are blank.
+              </div>
+            </div>
+          ) : (
+            <>
+              <div style={{ maxHeight: 460, overflowY: 'auto' }}>
+                {notes.map((note: Note, index: number) => {
+                  const owner = userMap[note.userId];
+                  const editing = editingNoteId === note.noteId;
+                  const ownNote = owner?.email === auth.currentUser?.email;
+                  return (
+                    <div
+                      key={note.noteId}
+                      style={{
+                        padding: '14px 4px',
+                        borderBottom:
+                          index === notes.length - 1
+                            ? 'none'
+                            : '1px dashed var(--rule-soft)',
                       }}
                     >
-                      {userMap[note.userId].userName}
-                    </Typography>
-                    {editingNoteId === note.noteId ? (
-                      <>
-                        <TextField
-                          fullWidth
-                          multiline
-                          rows={3}
-                          variant="outlined"
-                          value={editNoteContent}
-                          onChange={(e) => setEditNoteContent(e.target.value)}
-                          inputProps={{ maxLength: 1000 }}
-                          sx={{ mt: 1 }}
-                        />
-                        <Box mt={2} display="flex" justifyContent="flex-end" gap={1} flexWrap="wrap">
-                          <Button onClick={handleCancelEdit} variant="text">
-                            Cancel
-                          </Button>
-                          <Button
-                            onClick={handleUpdateNote}
-                            variant="contained"
-                            disabled={
-                              submitting || editNoteContent.trim().length === 0
-                            }
-                          >
-                            {submitting ? 'Saving...' : 'Update'}
-                          </Button>
-                        </Box>
-                      </>
-                    ) : (
-                      <>
-                        <Typography 
-                          variant="body2" 
-                          sx={{
-                            color: '#555',
-                            lineHeight: 1.5,
-                            fontSize: '0.875rem',
-                            whiteSpace: 'pre-wrap',
-                            wordBreak: 'break-word',
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'baseline',
+                          marginBottom: 6,
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontFamily: 'var(--font-display)',
+                            fontSize: 15,
+                            fontWeight: 600,
+                            color: 'var(--ink)',
                           }}
                         >
-                          {note.note}
-                        </Typography>
-                        {userMap[note.userId].email === auth.currentUser?.email && (
-                          <Box
-                            mt={2}
-                            display="flex"
-                            justifyContent="flex-end"
-                            gap={1}
-                            flexWrap="wrap"
+                          {owner?.userName || '—'}
+                        </div>
+                        <div className="ts-label">#{note.noteId}</div>
+                      </div>
+                      {editing ? (
+                        <>
+                          <textarea
+                            rows={3}
+                            value={editNoteContent}
+                            maxLength={1000}
+                            onChange={(e) => setEditNoteContent(e.target.value)}
+                            style={{
+                              width: '100%',
+                              resize: 'vertical',
+                              border: 'none',
+                              borderBottom: '1px solid var(--ink)',
+                              background: 'transparent',
+                              outline: 'none',
+                              fontFamily: 'var(--font-body)',
+                              fontSize: 16,
+                              padding: '4px 0',
+                            }}
+                          />
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'flex-end',
+                              gap: 8,
+                              marginTop: 10,
+                            }}
                           >
-                            <Button
-                              onClick={() => handleEditClick(note)}
-                              size="small"
-                              variant="outlined"
+                            <button
+                              className="ts-btn"
+                              onClick={() => {
+                                setEditingNoteId(null);
+                                setEditNoteContent('');
+                              }}
                             >
-                              Edit
-                            </Button>
-                            <Button
-                              onClick={() => handleDeleteNote(note.noteId)}
-                              size="small"
-                              variant="outlined"
-                              color="error"
+                              Cancel
+                            </button>
+                            <button
+                              className="ts-btn ts-btn-ink"
+                              onClick={handleUpdateNote}
+                              disabled={submitting || editNoteContent.trim().length === 0}
                             >
-                              Delete
-                            </Button>
-                          </Box>
-                        )}
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </Box>
+                              {submitting ? 'Saving…' : 'Update'}
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div
+                            style={{
+                              fontFamily: 'var(--font-body)',
+                              fontSize: 16,
+                              lineHeight: 1.5,
+                              color: 'var(--ink)',
+                              whiteSpace: 'pre-wrap',
+                              wordBreak: 'break-word',
+                            }}
+                          >
+                            {note.note}
+                          </div>
+                          {ownNote && (
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                gap: 8,
+                                marginTop: 8,
+                              }}
+                            >
+                              <button
+                                className="ts-btn"
+                                style={{ padding: '4px 10px', fontSize: 10 }}
+                                onClick={() => {
+                                  setEditingNoteId(note.noteId);
+                                  setEditNoteContent(note.note);
+                                }}
+                              >
+                                Amend
+                              </button>
+                              <button
+                                className="ts-btn ts-btn-stamp"
+                                style={{ padding: '4px 10px', fontSize: 10 }}
+                                onClick={() => handleDeleteNote(note.noteId)}
+                              >
+                                Strike
+                              </button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
 
-            {totalPages > 1 && (
-              <Box mt={3} display="flex" justifyContent="center">
-                <Pagination
-                  count={totalPages}
-                  page={currentPage}
-                  onChange={handlePageChange}
-                  color="primary"
-                />
-              </Box>
-            )}
-          </>
-        )}
-      </Box>
+              {totalPages > 1 && (
+                <>
+                  <Perf style={{ margin: '16px 0' }} />
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => loadNotes(p)}
+                        className="ts-mono"
+                        style={{
+                          minWidth: 32,
+                          padding: '6px 10px',
+                          fontSize: 12,
+                          letterSpacing: '0.12em',
+                          background: p === currentPage ? 'var(--ink)' : 'transparent',
+                          color: p === currentPage ? 'var(--paper)' : 'var(--ink)',
+                          border: '1px solid var(--ink)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          <Perf style={{ marginTop: 16 }} />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
+            <button className="ts-btn" onClick={onClose}>Close</button>
+          </div>
+        </div>
+      </div>
     </Modal>
   );
-};
-
-const modalStyle = {
-  position: 'absolute' as const,
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: {
-    xs: '90vw',
-    sm: '80vw',
-    md: '600px',
-  },
-  maxHeight: '90vh',
-  overflowY: 'auto',
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  borderRadius: '12px',
-  p: 3,
 };
 
 export default NotesModal;

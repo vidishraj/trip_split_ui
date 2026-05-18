@@ -1,31 +1,10 @@
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Checkbox,
-  ListItemText,
-  Theme,
-  Typography,
-  IconButton,
-} from '@mui/material';
-import { useTheme } from '@mui/material';
+import { Dialog } from '@mui/material';
 import { useMessage } from '../../Contexts/NotifContext';
 import { insertTrip } from '../../Api/Api';
 import { currencies } from '../../Assets/currencyData';
 import { MessageContextType } from '../../Assets/types';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import CancelIcon from '@mui/icons-material/Cancel';
-import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
-import SaveIcon from '@mui/icons-material/Save';
+import { Perf, Stamp } from '../Design/Atoms';
 
 interface CreateTripDialogProps {
   open: boolean;
@@ -40,198 +19,164 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
 }) => {
   const [tripTitle, setTripTitle] = useState<string>('');
   const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>([]);
-  const theme: Theme = useTheme();
   const notif: MessageContextType = useMessage();
 
-  const handleCurrencyChange = (currency: string): void => {
+  const toggleCurrency = (label: string) => {
     setSelectedCurrencies((prev) => {
-      if (prev.includes(currency)) {
-        return prev.filter((c) => c !== currency);
-      }
-      if (prev.length < 3) {
-        return [...prev, currency];
-      }
+      if (prev.includes(label)) return prev.filter((c) => c !== label);
+      if (prev.length < 3) return [...prev, label];
       return prev;
     });
   };
 
-  const createTrip = (): void => {
-    insertTrip({
-      trip: tripTitle,
-      currencies: selectedCurrencies,
-    })
-      .then((response) => {
-        if (response.status === 200) {
-          notif.setPayload({
-            type: 'success',
-            message: 'Successfully created trip.',
-          });
-        }
-        handleClose();
-        refetchTrips();
-      })
-      .catch((error) => {
-        notif.setPayload({
-          type: 'error',
-          message: 'Error creating trip.',
-        });
-        handleClose();
-      });
-  };
-
-  const resetAndClose = (): void => {
+  const reset = () => {
     setTripTitle('');
     setSelectedCurrencies([]);
     handleClose();
   };
 
+  const create = () => {
+    insertTrip({ trip: tripTitle, currencies: selectedCurrencies })
+      .then((res) => {
+        if (res.status === 200) {
+          notif.setPayload({ type: 'success', message: 'Ticket issued.' });
+        }
+        reset();
+        refetchTrips();
+      })
+      .catch(() => {
+        notif.setPayload({ type: 'error', message: 'Could not issue ticket.' });
+        reset();
+      });
+  };
+
+  const disabled = selectedCurrencies.length < 1 || tripTitle.length < 3;
+
   return (
     <Dialog
       open={open}
-      onClose={resetAndClose}
+      onClose={reset}
       fullWidth
       maxWidth="sm"
-      sx={{
-        '& .MuiPaper-root': {
-          borderRadius: '12px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-          padding: '16px',
-        },
-      }}
+      PaperProps={{ sx: { background: 'transparent', boxShadow: 'none', overflow: 'visible' } }}
     >
-      {/* Title with an Icon */}
-      <DialogTitle
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontWeight: 'bold',
-        }}
-      >
-        <FlightTakeoffIcon color="primary" /> Create New Trip
-      </DialogTitle>
-
-      <DialogContent>
-        {/* Trip Title Input */}
-        <TextField
-          autoFocus
-          margin="dense"
-          id="trip-title"
-          label="Trip Title (min-3)"
-          type="text"
-          fullWidth
-          variant="outlined"
-          inputProps={{ maxLength: 150 }}
-          value={tripTitle}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setTripTitle(e.target.value)
-          }
-          sx={{
-            marginTop: '16px',
-            backgroundColor: '#F9FAFB',
-            borderRadius: '8px',
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '8px',
-            },
+      <div className="ts-paper" style={{ padding: '32px 32px 28px', position: 'relative' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            borderBottom: '1px solid var(--rule-soft)',
+            paddingBottom: 14,
+            marginBottom: 22,
           }}
-          InputProps={{
-            startAdornment: <AddCircleOutlineIcon color="action" />,
-          }}
-        />
-
-        {/* Currency Selection */}
-        <Box sx={{ marginTop: '16px' }}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel id="currency-select-label">
-              Select Currencies
-            </InputLabel>
-            <Select
-              labelId="currency-select-label"
-              id="currency-select"
-              multiple
-              value={selectedCurrencies}
-              renderValue={(selected: string[]) => selected.join(', ')}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 48 * 4.5 + 8,
-                    width: 250,
-                  },
-                },
-              }}
-              sx={{
-                backgroundColor: '#F9FAFB',
-                borderRadius: '8px',
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                },
+        >
+          <div>
+            <div className="ts-eyebrow">Booking · New itinerary</div>
+            <h2
+              className="ts-display"
+              style={{
+                margin: '6px 0 0',
+                fontSize: 30,
+                fontVariationSettings: '"SOFT" 30, "opsz" 144',
               }}
             >
-              {currencies.map((currency) => (
-                <MenuItem
-                  key={currency.label}
-                  value={currency.label}
-                  onClick={() => handleCurrencyChange(currency.label)}
-                >
-                  <Checkbox
-                    checked={selectedCurrencies.indexOf(currency.label) > -1}
-                  />
-                  <ListItemText primary={currency.label} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              Issue a new ticket.
+            </h2>
+          </div>
+          <Stamp text="Booking" date="·" tone="ledger" size={72} rotate={8} />
+        </div>
 
-          {/* Currency Limits */}
-          <Typography
-            variant="body2"
-            sx={{ marginTop: '8px', fontSize: '12px', color: '#666' }}
+        <div style={{ marginBottom: 22 }}>
+          <label className="ts-label">Destination / Trip title</label>
+          <input
+            className="ts-input"
+            value={tripTitle}
+            onChange={(e) => setTripTitle(e.target.value)}
+            placeholder="e.g. Kyoto autumn"
+            maxLength={150}
+          />
+          <div
+            className="ts-mono"
+            style={{
+              fontSize: 11,
+              color: 'var(--ink-faded)',
+              marginTop: 4,
+              letterSpacing: '0.12em',
+            }}
           >
-            Minimum: 1 currency | Maximum: 3 currencies
-          </Typography>
-        </Box>
-      </DialogContent>
+            Minimum 3 characters.
+          </div>
+        </div>
 
-      {/* Actions: Save & Cancel */}
-      <DialogActions sx={{ justifyContent: 'space-between', padding: '16px', gap: 2 }}>
-        <Button
-          onClick={createTrip}
-          variant="contained"
-          disabled={selectedCurrencies.length < 1 || tripTitle.length < 3}
-          startIcon={<SaveIcon />}
-          sx={{
-            backgroundColor:
-              selectedCurrencies.length < 1 || tripTitle.length < 3
-                ? '#ccc'
-                : '#1976d2',
-            color: '#fff',
-            borderRadius: '8px',
-            padding: '10px 20px',
-            fontWeight: '600',
-            '&:hover': {
-              backgroundColor:
-                selectedCurrencies.length < 1 || tripTitle.length < 3
-                  ? '#ccc'
-                  : '#1565c0',
-            },
+        <div style={{ marginBottom: 22 }}>
+          <label className="ts-label">Currencies on the trip</label>
+          <div
+            style={{
+              marginTop: 10,
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 8,
+            }}
+          >
+            {currencies.map((c) => {
+              const on = selectedCurrencies.includes(c.label);
+              return (
+                <button
+                  key={c.label}
+                  type="button"
+                  onClick={() => toggleCurrency(c.label)}
+                  className="ts-mono"
+                  style={{
+                    padding: '6px 12px',
+                    border: `1px solid ${on ? 'var(--ink)' : 'var(--rule-soft)'}`,
+                    background: on ? 'var(--ink)' : 'transparent',
+                    color: on ? 'var(--paper)' : 'var(--ink)',
+                    cursor: 'pointer',
+                    fontSize: 12,
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    transition: 'all 100ms ease',
+                  }}
+                >
+                  {c.label}
+                </button>
+              );
+            })}
+          </div>
+          <div
+            className="ts-mono"
+            style={{
+              marginTop: 8,
+              fontSize: 11,
+              color: 'var(--ink-faded)',
+              letterSpacing: '0.12em',
+            }}
+          >
+            {selectedCurrencies.length} of 3 selected.
+          </div>
+        </div>
+
+        <Perf style={{ margin: '6px 0 18px' }} />
+
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 12,
+            flexWrap: 'wrap',
           }}
         >
-          Save Trip
-        </Button>
-
-        <Button 
-          onClick={resetAndClose} 
-          variant="outlined"
-          color="error"
-          sx={{
-            borderRadius: '8px',
-            padding: '10px 20px',
-            fontWeight: '600',
-          }}
-        >
-          Cancel
-        </Button>
-      </DialogActions>
+          <button className="ts-btn" onClick={reset}>Cancel</button>
+          <button
+            className="ts-btn ts-btn-ink"
+            disabled={disabled}
+            onClick={create}
+          >
+            File the ticket ↗
+          </button>
+        </div>
+      </div>
     </Dialog>
   );
 };

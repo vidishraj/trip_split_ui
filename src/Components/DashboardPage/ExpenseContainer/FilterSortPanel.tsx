@@ -118,30 +118,42 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
   // };
 
   const buttonStyles = {
-    borderRadius: '8px',
-    boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
-    textTransform: 'none',
-    fontSize: isMobile ? '10px' : '14px',
-    minWidth: isMobile ? '60px' : '70px',
-    maxWidth: isMobile ? '80px' : '100px',
-    height: isMobile ? '40px' : '40px',
-    padding: isMobile ? '0 6px' : '0 8px',
+    borderRadius: 0,
+    boxShadow: 'none',
+    textTransform: 'uppercase' as const,
+    fontFamily: 'var(--font-mono)',
+    letterSpacing: '0.16em',
+    fontSize: isMobile ? 10 : 11,
+    minWidth: isMobile ? 64 : 78,
+    height: 36,
+    padding: isMobile ? '0 8px' : '0 12px',
     whiteSpace: 'nowrap',
-    '&:hover': { 
-      backgroundColor: getActiveFilterCount() > 0 ? '#1565c0' : '#e3f2fd' 
+    border: '1px solid var(--ink)',
+    color: getActiveFilterCount() > 0 ? 'var(--paper)' : 'var(--ink)',
+    backgroundColor: getActiveFilterCount() > 0 ? 'var(--ink)' : 'transparent',
+    '&:hover': {
+      backgroundColor: 'var(--ink)',
+      color: 'var(--paper)',
     },
   };
 
   const searchFieldStyles = {
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
+    backgroundColor: 'transparent',
     '& .MuiOutlinedInput-root': {
-      borderRadius: '8px',
-      height: '40px',
+      borderRadius: 0,
+      height: 36,
+      fontFamily: 'var(--font-body)',
+      fontSize: 14,
     },
-    '& .MuiInputBase-input': {
-      fontSize: isMobile ? '12px' : '14px',
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--ink)',
+      borderWidth: '1px',
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--ink)',
+    },
+    '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--ink)',
     },
   };
 

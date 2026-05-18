@@ -1,312 +1,205 @@
-import './BalanceContainer.scss';
+// BalanceContainer.tsx — Customs declaration / settlement view
 import React, { useState } from 'react';
-import { Avatar, Box, Typography, useTheme, Card, Button } from '@mui/material';
-import {
-  ArrowForward,
-  CurrencyRupee,
-  AccountCircle,
-} from '@mui/icons-material';
+import { motion } from 'framer-motion';
 import { useTravel } from '../../Contexts/TravelContext';
-import FunctionsIcon from '@mui/icons-material/Functions';
-import SelfExpenseDialog from './Dialogs/SelfExpenseDialog';
 import { formatNumber } from '../../Contexts/CurrencyContext';
+import SelfExpenseDialog from './Dialogs/SelfExpenseDialog';
+import { Perf, Stamp } from '../Design/Atoms';
 
-const BalanceContainer = () => {
+const BalanceContainer: React.FC = () => {
   const travelCtx = useTravel();
-  const theme = useTheme();
-  const userBalances = travelCtx.state.balances;
+  const userBalances = travelCtx.state.balances || [];
   const [selfExpenseDialog, setSelfExpenseDialog] = useState(false);
 
+  const total = travelCtx.state.indiBalance?.total ?? 0;
+  const positive = total >= 0;
 
   const getUserName = (userId: number) => {
-    const user = travelCtx.state.users.find((u) => u.userId === userId);
-    return user ? user.userName : 'Unknown';
+    const u = travelCtx.state.users.find((user) => user.userId === userId);
+    return u ? u.userName : 'Unknown';
   };
 
-
   return (
-    <Box
-      id="innerBox"
-      flexGrow={1}
-      width="100%"
-      borderRadius="12px"
-      display="flex"
-      flexDirection="column"
-      sx={{
-        height: '100%',
-        backgroundColor: 'transparent',
-        position: 'relative',
-      }}
+    <motion.div
+      key="balance"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="ts-paper"
+      style={{ padding: 0, position: 'relative', overflow: 'hidden' }}
     >
-      {/* Total Card - Fixed */}
-      <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
-        <Card
-          sx={{
-            width: { xs: '100%', sm: '90%' },
-            maxWidth: { xs: 'none', sm: 420 },
-            padding: { xs: '12px', sm: '16px' },
-            boxShadow: '0px 4px 14px rgba(0, 0, 0, 0.15)',
-            borderRadius: '12px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            backdropFilter: 'blur(10px)',
-            gap:'8px',
-            backgroundColor: 'rgba(255, 255, 255, 0.75)',
-          }}
-        >
-          <Box display="flex" alignItems="center"
-               justifyContent='space-between' width="100%">
-            <Box display="flex" alignItems="center">
-            <Avatar
-              sx={{
-                marginRight: '12px',
-                backgroundColor: '#ff9800',
-              }}
-            >
-              <FunctionsIcon />
-            </Avatar>
-            <Typography
-              sx={{ fontWeight: 'bold', color: '#333', fontSize: '1.1rem' }}
-            >
-              Total
-            </Typography>
-            </Box>
-          <Typography
-            sx={{
-              fontWeight: 'bold',
-              color: travelCtx.state.indiBalance['total'] && travelCtx.state.indiBalance['total'] >= 0 ? '#4caf50' : '#f44336',
-              display: 'flex',
-              alignItems: 'center',
-              fontSize: '1.2rem',
-            }}
-          >
-            <CurrencyRupee sx={{ fontSize: '1rem', mr: 0.5 }} />
-            {formatNumber(travelCtx.state.indiBalance['total'])}
-          </Typography>
-          </Box>
-
-          <Button
-            onClick={() => {
-              setSelfExpenseDialog(true);
-            }}
-            startIcon={<FunctionsIcon />}
-            color="primary"
-            variant="contained"
-            sx={{
-              borderRadius: '8px',
-              padding: { xs: '8px 16px', sm: '10px 20px' },
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              fontWeight: '600',
-              minHeight: '44px',
-            }}
-          >
-            Individual Expenses
-          </Button>
-        </Card>
-      </Box>
-
-      {/* Scrollable Balance Transactions Container */}
-      <Box
-        flexGrow={1}
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        sx={{
-          overflowY: 'auto', overflowX: 'hidden',
-          position: 'relative',
+      {/* Heading band */}
+      <div
+        style={{
+          padding: '20px 24px 12px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 16,
+          flexWrap: 'wrap',
         }}
       >
-        {userBalances && userBalances.length > 0 ? (
-          <div
-            style={{ height: '100%', width: '100%', overflowY: 'auto', overflowX: 'hidden' }}
+        <div>
+          <div className="ts-eyebrow">Folio III</div>
+          <h3
+            className="ts-display"
+            style={{
+              margin: '6px 0 0',
+              fontSize: 28,
+              fontVariationSettings: '"SOFT" 30, "opsz" 144',
+            }}
           >
-            <Box sx={{ 
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              pb: 4,
-              overflowX: 'hidden',
-              '&::-webkit-scrollbar': {
-                width: '6px',
-              },
-              '&::-webkit-scrollbar-track': {
-                background: 'transparent',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: 'rgba(0,0,0,0.2)',
-                borderRadius: '3px',
-              },
-              '&::-webkit-scrollbar-thumb:hover': {
-                background: 'rgba(0,0,0,0.3)',
-              },
-              // Firefox scrollbar
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'rgba(0,0,0,0.2) transparent',
-            }}>
-            {userBalances.map((balance: any, index: number) => {
-          const senderName = getUserName(balance.from);
-          const receiverName = getUserName(balance.to);
+            Customs declaration.
+          </h3>
+          <div
+            className="ts-mono"
+            style={{ marginTop: 6, fontSize: 12, color: 'var(--ink-faded)', letterSpacing: '0.18em' }}
+          >
+            Settlement plan · minimum transactions
+          </div>
+        </div>
 
-          return (
-            <Box
-              key={`${balance.from}-${balance.to}`}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#fff',
-                boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
-                borderRadius: 3,
-                padding: { xs: '4px', sm: '12px' },
-                width: { xs: '100%', sm: '100%' },
-                maxWidth: { xs: 'none', sm: '520px' },
-                margin: index === 0 ? '0 0 8px 0' : '8px 0',
-                transition: 'box-shadow 0.2s ease-in-out',
-                overflowX: 'hidden',
-                '&:hover': {
-                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-                },
+        <Stamp
+          text={positive ? 'Credit' : 'Debit'}
+          date="·"
+          tone={positive ? 'ledger' : 'stamp'}
+          size={84}
+          rotate={6}
+        />
+      </div>
+
+      {/* Total summary block */}
+      <div
+        style={{
+          background: 'var(--paper-deep)',
+          borderTop: '1px solid var(--rule-soft)',
+          borderBottom: '1px solid var(--rule-soft)',
+          padding: '18px 24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
+          <div className="ts-label">Total declared</div>
+          <div
+            className="ts-num"
+            style={{
+              fontSize: 30,
+              fontWeight: 700,
+              color: positive ? 'var(--ledger)' : 'var(--stamp)',
+              marginTop: 4,
+            }}
+          >
+            {positive ? '+' : '−'}₹{formatNumber(Math.abs(total))}
+          </div>
+        </div>
+
+        <button
+          className="ts-btn ts-btn-ink"
+          onClick={() => setSelfExpenseDialog(true)}
+        >
+          Itemised contributions ↗
+        </button>
+      </div>
+
+      {/* Transactions */}
+      <div style={{ padding: '8px 0 12px' }}>
+        {userBalances && userBalances.length > 0 ? (
+          userBalances.map((balance: any, index: number) => {
+            const sender = getUserName(balance.from);
+            const receiver = getUserName(balance.to);
+            return (
+              <motion.div
+                key={`${balance.from}-${balance.to}-${index}`}
+                initial={{ opacity: 0, x: -4 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.04 }}
+                style={{
+                  padding: '14px 24px',
+                  borderBottom: '1px dashed var(--rule-soft)',
+                  display: 'grid',
+                  gridTemplateColumns: '1fr auto 1fr',
+                  gap: 18,
+                  alignItems: 'center',
+                }}
+              >
+                {/* Debtor */}
+                <div>
+                  <div className="ts-label">From · debtor</div>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 22,
+                      fontWeight: 500,
+                      marginTop: 2,
+                      color: 'var(--ink)',
+                    }}
+                  >
+                    {sender}
+                  </div>
+                </div>
+
+                {/* Amount */}
+                <div style={{ textAlign: 'center', minWidth: 200 }}>
+                  <Perf style={{ width: 80, margin: '0 auto 8px' }} />
+                  <div
+                    className="ts-num"
+                    style={{
+                      fontSize: 22,
+                      fontWeight: 700,
+                      color: 'var(--stamp)',
+                    }}
+                  >
+                    ₹{formatNumber(balance.amount)}
+                  </div>
+                  <Perf style={{ width: 80, margin: '8px auto 0' }} />
+                </div>
+
+                {/* Creditor */}
+                <div style={{ textAlign: 'right' }}>
+                  <div className="ts-label">To · creditor</div>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 22,
+                      fontWeight: 500,
+                      marginTop: 2,
+                      color: 'var(--ledger)',
+                    }}
+                  >
+                    {receiver}
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })
+        ) : (
+          <div style={{ padding: '54px 24px', textAlign: 'center' }}>
+            <div className="ts-label" style={{ marginBottom: 6 }}>
+              All accounts square
+            </div>
+            <div
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontStyle: 'italic',
+                fontSize: 26,
+                color: 'var(--ink-soft)',
               }}
             >
-              {/* Sender */}
-              <Box sx={{ 
-                display:'flex', 
-                flexDirection:'column', 
-                alignItems:'center',
-                textAlign: 'center', 
-                width: { xs: '28%', sm: '25%' },
-                flexShrink: 0,
-              }}>
-                <Avatar
-                  sx={{
-                    bgcolor: '#f44336',
-                    width: { xs: '40px', sm: '56px' },
-                    height: { xs: '40px', sm: '56px' },
-                    fontSize: { xs: '18px', sm: '24px' },
-                    mb: 1,
-                  }}
-                >
-                  {senderName[0] || <AccountCircle />}
-                </Avatar>
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    fontWeight: 600,
-                    color: '#f44336',
-                    fontSize: { xs: '0.65rem', sm: '0.875rem' },
-                    lineHeight: 1.2,
-                    wordBreak: 'break-word',
-                  }}
-                >
-                  {senderName}
-                </Typography>
-              </Box>
-
-              {/* Arrow with Amount */}
-              <Box sx={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: { xs: '44%', sm: '50%' },
-                flexShrink: 0,
-                px: { xs: 0.5, sm: 1 },
-              }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 'bold',
-                    color: '#4caf50',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: { xs: '0.75rem', sm: '1rem' },
-                    mb: 1,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  <CurrencyRupee sx={{ fontSize: { xs: '0.875rem', sm: '1rem' }, mr: 0.5 }} />
-                  {formatNumber(balance.amount)}
-                </Typography>
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '100%',
-                }}>
-                  <Box sx={{ 
-                    width: { xs: '20px', sm: '30px' }, 
-                    height: '2px', 
-                    backgroundColor: '#666',
-                    opacity: 0.6,
-                  }} />
-                  <ArrowForward sx={{ 
-                    fontSize: { xs: '18px', sm: '22px' }, 
-                    color: '#666',
-                    opacity: 0.8,
-                    mx: { xs: 0.5, sm: 1 },
-                  }} />
-                  <Box sx={{ 
-                    width: { xs: '20px', sm: '30px' }, 
-                    height: '2px', 
-                    backgroundColor: '#666',
-                    opacity: 0.6,
-                  }} />
-                </Box>
-              </Box>
-
-              {/* Receiver */}
-              <Box sx={{ 
-                display:'flex', 
-                flexDirection:'column', 
-                alignItems:'center', 
-                textAlign: 'center', 
-                width: { xs: '28%', sm: '25%' },
-                flexShrink: 0,
-              }}>
-                <Avatar
-                  sx={{
-                    bgcolor: '#4caf50',
-                    width: { xs: '40px', sm: '56px' },
-                    height: { xs: '40px', sm: '56px' },
-                    fontSize: { xs: '18px', sm: '24px' },
-                    mb: 1,
-                  }}
-                >
-                  {receiverName[0] || <AccountCircle />}
-                </Avatar>
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    fontWeight: 600,
-                    color: '#4caf50',
-                    fontSize: { xs: '0.65rem', sm: '0.875rem' },
-                    lineHeight: 1.2,
-                    wordBreak: 'break-word',
-                  }}
-                >
-                  {receiverName}
-                </Typography>
-              </Box>
-            </Box>
-          );
-        })}
-            </Box>
+              No debts to declare.
+            </div>
           </div>
-        ) : (
-          <Typography sx={{ textAlign: 'center', mt: 2, color: '#666' }}>
-            No balance transactions to show
-          </Typography>
         )}
-      </Box>
-      
+      </div>
+
       <SelfExpenseDialog
         open={selfExpenseDialog}
         onClose={() => setSelfExpenseDialog(false)}
       />
-    </Box>
+    </motion.div>
   );
 };
 

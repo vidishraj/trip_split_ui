@@ -1,218 +1,189 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItem,
-  ListItemAvatar,
-  Avatar,
-  ListItemText,
-  Typography,
-  IconButton, 
-  Box,
-  Divider,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import { Dialog } from '@mui/material';
 import { useTravel } from '../../../Contexts/TravelContext';
 import { formatNumber } from '../../../Contexts/CurrencyContext';
 import { fetchIndividualSpending } from '../../../Api/Api';
+import { Perf, Stamp } from '../../Design/Atoms';
 
 interface SelfExpenseDialogProps {
   open: boolean;
   onClose: () => void;
 }
-const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({
-  open,
-  onClose,
-}) => {
-  const {indiBalance, users, chosenTrip} = useTravel().state;
-  const [individualSpending, setIndividualSpending] = useState<any>(null);
-  const [loadingSpending, setLoadingSpending] = useState(false);
+
+const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({ open, onClose }) => {
+  const { indiBalance, users, chosenTrip } = useTravel().state;
+  const [spending, setSpending] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
   const getUserName = (userId: number) => {
-    const user = users.find((u) => u.userId === userId);
-    return user ? user.userName : 'Unknown';
+    const u = users.find((user) => user.userId === userId);
+    return u ? u.userName : 'Unknown';
   };
 
   useEffect(() => {
     if (open && chosenTrip?.tripIdShared) {
-      setLoadingSpending(true);
+      setLoading(true);
       fetchIndividualSpending(chosenTrip.tripIdShared)
-        .then((response) => {
-          setIndividualSpending(response.data);
-        })
-        .catch((error) => {
-          console.error('Failed to fetch individual spending:', error);
-        })
-        .finally(() => {
-          setLoadingSpending(false);
-        });
+        .then((response) => setSpending(response.data))
+        .catch(() => {})
+        .finally(() => setLoading(false));
     }
   }, [open, chosenTrip?.tripIdShared]);
+
+  const spendingData = spending?.Message?.individualSpending || {};
+  const total = spending?.Message?.totalTripCost ?? 0;
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="xs"
+      maxWidth="sm"
       fullWidth
-      sx={{
-        '& .MuiPaper-root': {
-          borderRadius: '12px',
-          padding: '8px',
-          boxShadow: '0px 6px 20px rgba(0, 0, 0, 0.2)',
-          margin: '16px',
-        },
-      }}
+      PaperProps={{ sx: { background: 'transparent', boxShadow: 'none', overflow: 'visible' } }}
     >
-      {/* Header */}
-      <DialogTitle
-        component="div"
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '16px 20px 12px 20px',
-          borderBottom: '1px solid #e0e0e0',
-        }}
-      >
-        <Typography 
-          variant="h5" 
-          sx={{
-            fontWeight: '700',
-            color: '#1976d2',
-            fontSize: '1.25rem'
+      <div className="ts-paper" style={{ padding: '28px 30px' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            marginBottom: 12,
           }}
         >
-          Individual Expenses
-        </Typography>
-        <IconButton 
-          onClick={onClose} 
-          size="small"
-          sx={{
-            backgroundColor: '#f5f5f5',
-            '&:hover': {
-              backgroundColor: '#e0e0e0',
-            }
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
+          <div>
+            <div className="ts-eyebrow">Itemised contributions</div>
+            <h2
+              className="ts-display"
+              style={{ margin: '6px 0 0', fontSize: 28, fontVariationSettings: '"SOFT" 30, "opsz" 144' }}
+            >
+              What each bearer paid.
+            </h2>
+          </div>
+          <Stamp text="Audit" date="·" tone="gold" size={72} rotate={-7} />
+        </div>
 
-      {/* Content */}
-      <DialogContent dividers>
-        {/* Individual Spending Section */}
-        {individualSpending && (
-          <Box sx={{ mb: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-              <Typography variant="h6" fontWeight="bold">
-                Actual Money Spent
-              </Typography>
-            </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block', fontStyle: 'italic' }}>
-              Total money each person paid during the trip
-            </Typography>
-            <List>
-              {individualSpending.Message?.individualSpending && Object.entries(individualSpending.Message.individualSpending).map(([userId, amount]) => (
-                <ListItem
-                  key={userId}
-                  sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 0.5, px: 0 }}
-                >
-                  <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: '#4caf50' }}>
-                      <AccountCircleIcon />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      <Typography fontWeight="bold" fontSize="1rem">
-                        {getUserName(Number(userId))}
-                      </Typography>
-                    }
-                    secondary={
-                      <span style={{ display: 'flex', alignItems: 'center', color: '#4caf50', fontWeight: 'bold' }}>
-                        <CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
-                        {formatNumber(Number(amount))}
-                      </span>
-                    }
-                  />
-                </ListItem>
-              ))}
-              <Divider sx={{ my: 1.5 }} />
-              <ListItem sx={{ bgcolor: '#f5f5f5', borderRadius: '8px', py: 1, px: 1.5 }}>
-                <ListItemText
-                  primary={
-                    <Typography fontWeight="bold" fontSize="1.1rem">
-                      Total Trip Cost
-                    </Typography>
-                  }
-                  secondary={
-                    <span style={{ display: 'flex', alignItems: 'center', color: '#1976d2', fontWeight: 'bold', fontSize: '1.1rem' }}>
-                      <CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
-                      {individualSpending.Message?.totalTripCost ? formatNumber(individualSpending.Message.totalTripCost) : '0'}
-                    </span>
-                  }
-                />
-              </ListItem>
-            </List>
-            <Divider sx={{ my: 2 }} />
-          </Box>
-        )}
-        
-        {loadingSpending && (
-          <Box sx={{ textAlign: 'center', py: 1.5 }}>
-            <Typography>Loading spending data...</Typography>
-          </Box>
+        <Perf style={{ margin: '10px 0' }} />
+
+        {/* Actual money spent */}
+        <div className="ts-label" style={{ marginBottom: 8 }}>
+          Money disbursed · out of pocket
+        </div>
+
+        {loading && (
+          <div className="ts-mono" style={{ fontSize: 12, color: 'var(--ink-faded)', padding: '12px 0' }}>
+            Tallying receipts…
+          </div>
         )}
 
-        {/* Existing Balance Section */}
-        <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-          Balance Details
-        </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block', fontStyle: 'italic' }}>
-          Net balance (what you owe/are owed) and personal expenses (in brackets)
-        </Typography>
-        <List>
-          {indiBalance && indiBalance['expense'] && Object.keys(indiBalance['expense']).map((userId:string, index) => {
-              return(
-              <ListItem
-                key={index}
-                sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 0.5, px: 0 }}
+        <div>
+          {Object.entries(spendingData).map(([userId, amount]) => (
+            <div
+              key={userId}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                gap: 14,
+                alignItems: 'center',
+                padding: '10px 4px',
+                borderBottom: '1px dashed var(--rule-soft)',
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 17,
+                  fontWeight: 500,
+                }}
               >
-                <ListItemAvatar>
-                  <Avatar sx={{ bgcolor: '#1976d2' }}>
-                    <AccountCircleIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary={
-                    <Typography fontWeight="bold" fontSize="1rem">
-                      {getUserName(Number(userId))}
-                    </Typography>
-                  }
-                  secondary={
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'green' }}>
-                      <span style={{ display: 'flex', alignItems: 'center' }}>
-                        <CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
-                        {formatNumber(indiBalance['expense'][userId])}
-                      </span>
-                      <span style={{ display: 'flex', alignItems: 'center' }}>
-                        (<CurrencyRupeeIcon fontSize="small" sx={{ mr: 0 }} />
-                        {formatNumber(indiBalance['selfExpense'] &&
-                        indiBalance['selfExpense'][userId]?indiBalance['selfExpense'][userId]:0)})
-                      </span>
-                    </span>
-                  }
-                />
-              </ListItem>)
+                {getUserName(Number(userId))}
+              </div>
+              <div className="ts-num" style={{ fontSize: 16, fontWeight: 600, color: 'var(--ledger)' }}>
+                ₹{formatNumber(Number(amount))}
+              </div>
+            </div>
+          ))}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr auto',
+              alignItems: 'center',
+              padding: '12px 8px',
+              background: 'var(--ink)',
+              color: 'var(--paper)',
+              marginTop: 6,
+            }}
+          >
+            <div className="ts-mono" style={{ letterSpacing: '0.2em', fontSize: 11, textTransform: 'uppercase' }}>
+              Total trip cost
+            </div>
+            <div className="ts-num" style={{ fontSize: 19, fontWeight: 700 }}>
+              ₹{formatNumber(total)}
+            </div>
+          </div>
+        </div>
 
-          })}
-        </List>
-      </DialogContent>
+        <Perf style={{ margin: '18px 0 12px' }} />
+
+        {/* Net balances */}
+        <div className="ts-label" style={{ marginBottom: 8 }}>
+          Net balance · per bearer
+        </div>
+        <div className="ts-mono" style={{ fontSize: 11, color: 'var(--ink-faded)', marginBottom: 12, letterSpacing: '0.04em' }}>
+          Positive ⇒ owed money. Negative ⇒ owes money. (Personal spend in brackets.)
+        </div>
+
+        <div>
+          {indiBalance &&
+            indiBalance['expense'] &&
+            Object.keys(indiBalance['expense']).map((userId: string) => {
+              const net = indiBalance['expense'][userId];
+              const personal =
+                (indiBalance['selfExpense'] && indiBalance['selfExpense'][userId]) || 0;
+              return (
+                <div
+                  key={userId}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr auto',
+                    gap: 14,
+                    alignItems: 'baseline',
+                    padding: '10px 4px',
+                    borderBottom: '1px dashed var(--rule-soft)',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 17,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {getUserName(Number(userId))}
+                  </div>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'baseline' }}>
+                    <div
+                      className="ts-num"
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 600,
+                        color: net >= 0 ? 'var(--ledger)' : 'var(--stamp)',
+                      }}
+                    >
+                      {net >= 0 ? '+' : '−'}₹{formatNumber(Math.abs(net))}
+                    </div>
+                    <div className="ts-mono" style={{ fontSize: 11, color: 'var(--ink-faded)' }}>
+                      (₹{formatNumber(personal)})
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 18 }}>
+          <button className="ts-btn" onClick={onClose}>Close</button>
+        </div>
+      </div>
     </Dialog>
   );
 };

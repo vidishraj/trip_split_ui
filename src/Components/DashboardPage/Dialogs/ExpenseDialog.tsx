@@ -1,28 +1,21 @@
-import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   Dialog,
-  DialogContent,
   DialogActions,
-  Button,
-  TextField,
-  MenuItem,
-  InputAdornment,
-  Checkbox,
-  FormControlLabel,
-  Box,
+  DialogContent,
   IconButton,
+  useMediaQuery,
   useTheme,
-  useMediaQuery
 } from '@mui/material';
+import { Calculate } from '@mui/icons-material';
 import { insertExpense, updateExpense } from '../../../Api/Api';
 import { useTravel } from '../../../Contexts/TravelContext';
 import { AmountSplitDialog } from './AmountSplitDialog';
 import { CurrencyContext } from '../../../Contexts/CurrencyContext';
 import { currencies } from '../../../Assets/currencyData';
 import { useMessage } from '../../../Contexts/NotifContext';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { Calculate } from '@mui/icons-material';
 import Calculator from '../../Calculator/Calculator';
+import { Perf, Stamp } from '../../Design/Atoms';
 
 interface ExpenseDialogProps {
   editMode?: boolean;
@@ -36,11 +29,7 @@ interface FormState {
   currencyAmounts: { [key: string]: number };
   paidBy: { userId?: number; userName: string };
   selfExpense: boolean;
-  userDivision?: Array<{
-    userId: any;
-    userName: string;
-    amount: number;
-  }>;
+  userDivision?: Array<{ userId: any; userName: string; amount: number }>;
 }
 
 interface SplitItem {
@@ -49,11 +38,7 @@ interface SplitItem {
   [key: string]: any;
 }
 
-const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
-  onClose,
-  editMode,
-  editData,
-}) => {
+const ExpenseDialog: React.FC<ExpenseDialogProps> = ({ onClose, editMode, editData }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const travelCtx = useTravel();
@@ -61,93 +46,87 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
   const { state: currencyState } = useContext(CurrencyContext);
   const [calcState, setCalcState] = useState(false);
   const [amountSetter, setAmountSetter] = useState(false);
-  
-  // Consolidate form state into a single object
-  const [formState, setFormState] = useState<FormState>(() => {
-    const initialState: FormState = {
-      date: editMode && editData ? new Date(editData.date).toISOString().substr(0, 10) : new Date().toISOString().substr(0, 10),
-      description: editMode && editData ? editData.expenseDesc : '',
-      currencyAmounts: {},
-      paidBy: editMode && editData ? {
-        userId: editData.paidBy,
-        userName: travelCtx.state.users.find(user => user.userId === editData.paidBy)?.userName || ''
-      } : { userId: undefined, userName: '' },
-      selfExpense: editMode && editData ? editData.selfExpense : false,
-      userDivision: undefined
-    };
-      
-    return initialState;
-  });   
-  // Memoize enabled currency
+
+  const [formState, setFormState] = useState<FormState>(() => ({
+    date:
+      editMode && editData
+        ? new Date(editData.date).toISOString().substr(0, 10)
+        : new Date().toISOString().substr(0, 10),
+    description: editMode && editData ? editData.expenseDesc : '',
+    currencyAmounts: {},
+    paidBy:
+      editMode && editData
+        ? {
+            userId: editData.paidBy,
+            userName:
+              travelCtx.state.users.find((user) => user.userId === editData.paidBy)?.userName ||
+              '',
+          }
+        : { userId: undefined, userName: '' },
+    selfExpense: editMode && editData ? editData.selfExpense : false,
+    userDivision: undefined,
+  }));
+
   const enabledCurrency = useMemo(() => 'inr', []);
 
-  // Initialize currency amounts once when dialog opens or edit data changes
   useEffect(() => {
     const chosenTrip = travelCtx.state.chosenTrip;
-    if (chosenTrip?.currencies && chosenTrip.currencies.length > 0) {
-      const curr = chosenTrip.currencies;
-      const init: { [key: string]: number } = {};
-      
-      curr.forEach((cur: string) => {
-        const abr = currencies.find((c) => c.label === cur)?.abr;
-        if (abr) {
-          init[abr] = editMode && editData
+    if (!chosenTrip?.currencies || chosenTrip.currencies.length === 0) return;
+    const init: { [key: string]: number } = {};
+    chosenTrip.currencies.forEach((cur: string) => {
+      const abr = currencies.find((c) => c.label === cur)?.abr;
+      if (abr) {
+        init[abr] =
+          editMode && editData
             ? round(editData.amount * currencyState.currencies['inr'][abr], 1)
             : 0;
-        }
-      });
-
-      // In edit mode, initialize user division
-      if (editMode && editData) {
-        const userDiv = Object.keys(editData.splitBetween).map(userId => {
-          const userIdInt = parseInt(userId);
-          const isPayingUser = userIdInt === editData.paidBy;
-          return {
-            userId: userIdInt,
-            userName: '',
-            amount: isPayingUser 
-              ? editData.amount - editData.splitBetween[userIdInt]
-              : -1 * editData.splitBetween[userIdInt]
-          };
-        });
-        setFormState(prev => ({
-          ...prev,
-          description: editData.expenseDesc,
-          date:  new Date(editData.date).toISOString().substr(0, 10),
-          paidBy: {
-            userId: editData.paidBy,
-            userName: travelCtx.state.users.find(user => user.userId === editData.paidBy)?.userName || ''
-          },
-          selfExpense: editData.selfExpense,
-          currencyAmounts: init,
-          userDivision: userDiv
-        }));
-      } else {
-        setFormState(prev => ({
-          ...prev,
-          currencyAmounts: init
-        }));
       }
+    });
+
+    if (editMode && editData) {
+      const userDiv = Object.keys(editData.splitBetween).map((userId) => {
+        const userIdInt = parseInt(userId);
+        const isPayer = userIdInt === editData.paidBy;
+        return {
+          userId: userIdInt,
+          userName: '',
+          amount: isPayer
+            ? editData.amount - editData.splitBetween[userIdInt]
+            : -1 * editData.splitBetween[userIdInt],
+        };
+      });
+      setFormState((prev) => ({
+        ...prev,
+        description: editData.expenseDesc,
+        date: new Date(editData.date).toISOString().substr(0, 10),
+        paidBy: {
+          userId: editData.paidBy,
+          userName:
+            travelCtx.state.users.find((user) => user.userId === editData.paidBy)?.userName || '',
+        },
+        selfExpense: editData.selfExpense,
+        currencyAmounts: init,
+        userDivision: userDiv,
+      }));
+    } else {
+      setFormState((prev) => ({ ...prev, currencyAmounts: init }));
     }
   }, [travelCtx.state.chosenTrip, travelCtx.state.users, editMode, editData, currencyState.currencies]);
-  // Memoize currency amount change handler
-  const handleCurrencyAmountChange = useCallback((currency: string, amount: number) => {
-    const abr = currencies.find((c) => c.label === currency)?.abr;
-    if (!abr) return;
 
-    const valInRs = round(amount / currencyState.currencies['inr'][abr], 1);
-    const newAmounts = Object.keys(formState.currencyAmounts).reduce((acc, key) => {
-      acc[key] = round(valInRs * currencyState.currencies['inr'][key], 1);
-      return acc;
-    }, {} as { [key: string]: number });
+  const handleCurrencyAmountChange = useCallback(
+    (currency: string, amount: number) => {
+      const abr = currencies.find((c) => c.label === currency)?.abr;
+      if (!abr) return;
+      const valInRs = round(amount / currencyState.currencies['inr'][abr], 1);
+      const newAmounts = Object.keys(formState.currencyAmounts).reduce((acc, key) => {
+        acc[key] = round(valInRs * currencyState.currencies['inr'][key], 1);
+        return acc;
+      }, {} as { [key: string]: number });
+      setFormState((prev) => ({ ...prev, currencyAmounts: newAmounts }));
+    },
+    [formState.currencyAmounts, currencyState.currencies],
+  );
 
-    setFormState(prev => ({
-      ...prev,
-      currencyAmounts: newAmounts
-    }));
-  }, [formState.currencyAmounts, currencyState.currencies]);
-
-  // Memoize submit handler
   const handleSubmit = useCallback(() => {
     const payload = {
       tripId: travelCtx?.state?.chosenTrip?.tripIdShared,
@@ -155,313 +134,340 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
       description: formState.description,
       amount: formState.currencyAmounts[enabledCurrency],
       paidBy: formState.paidBy.userId,
-      splitbw: formState.userDivision?.map(item => ({
+      splitbw: formState.userDivision?.map((item) => ({
         userId: item.userId,
         amount: item.amount,
       })),
       selfExpense: formState.selfExpense,
     };
-
-    const apiCall = editMode 
+    const apiCall = editMode
       ? () => updateExpense(editData.expenseId, payload)
       : () => insertExpense(payload);
 
     apiCall()
-      .then(response => {
+      .then((response) => {
         if (response.data.Message) {
           setPayload({
             type: 'success',
-            message: `Expense ${editMode ? 'updated' : 'inserted'} successfully`,
+            message: `Entry ${editMode ? 'amended' : 'recorded'}.`,
           });
           travelCtx.state.refreshData();
           onClose();
         } else {
-          setPayload({
-            type: 'error',
-            message: `Failed to ${editMode ? 'update' : 'insert'}`,
-          });
+          setPayload({ type: 'error', message: 'Could not save entry.' });
         }
       })
-      .catch(error => {
-        console.error(error);
-        setPayload({
-          type: 'error',
-          message: `Failed to ${editMode ? 'update' : 'insert'}.`,
-        });
-      });
+      .catch(() => setPayload({ type: 'error', message: 'Could not save entry.' }));
   }, [formState, editMode, editData?.expenseId, travelCtx, enabledCurrency, setPayload, onClose]);
 
-  // Memoize form validation
   const isSubmitEnabled = useMemo(() => {
     const { date, description, currencyAmounts, paidBy, selfExpense, userDivision } = formState;
     const amount = currencyAmounts[enabledCurrency];
-
     let userDivisionSum = 0;
     if (Array.isArray(userDivision)) {
-      userDivisionSum = userDivision.reduce((sum, item) => sum + item.amount, 0);
-      userDivisionSum = round(userDivisionSum, 1);
+      userDivisionSum = round(
+        userDivision.reduce((sum, item) => sum + item.amount, 0),
+        1,
+      );
     }
-
     const selfExpenseCheck = selfExpense
       ? amount > 0
       : userDivision && userDivision.length > 0 && userDivisionSum === amount;
-
     const isFormComplete = date && description && amount > 0 && paidBy.userId && selfExpenseCheck;
-
     if (!editMode) return isFormComplete;
-
-    // Check for changes in edit mode
-    const hasChanges = 
+    const hasChanges =
       description !== editData.expenseDesc ||
       new Date(date).toUTCString() !== editData.date ||
       currencyAmounts[enabledCurrency] !== editData.amount ||
       paidBy.userId !== editData.paidBy ||
-      (userDivision?.some(element => {
+      (userDivision?.some((element) => {
         const userIdInt = parseInt(element.userId);
-        const amount = userIdInt === editData.paidBy
-          ? editData.amount - editData.splitBetween[userIdInt]
-          : -1 * editData.splitBetween[userIdInt];
-        return amount !== element.amount;
+        const amt =
+          userIdInt === editData.paidBy
+            ? editData.amount - editData.splitBetween[userIdInt]
+            : -1 * editData.splitBetween[userIdInt];
+        return amt !== element.amount;
       }) ?? false);
-
     return hasChanges && isFormComplete;
   }, [formState, editMode, editData, enabledCurrency]);
 
   return (
-    <Dialog 
-      open={travelCtx.state.expenseDialogOpen} 
-      onClose={onClose} 
-      fullWidth 
+    <Dialog
+      open={travelCtx.state.expenseDialogOpen}
+      onClose={onClose}
+      fullWidth
       maxWidth="sm"
+      PaperProps={{ sx: { background: 'transparent', boxShadow: 'none', overflow: 'visible' } }}
     >
-      <DialogContent
-        sx={{
-          padding: isMobile ? '16px' : '24px',
-          backgroundColor: '#f0f4f8',
-          borderRadius: '12px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          gap: isMobile ? '12px' : '16px',
-        }}
-      >
-        <IconButton 
-          onClick={() => setCalcState(true)} 
-          sx={{
-            borderRadius: '50%',
-            alignSelf: 'flex-end',
-            border: 'grey 0.5px solid'
-          }}
-        >
-          <Calculate />
-        </IconButton>
-        <Calculator isVisible={calcState} onClose={() => setCalcState(false)}/>
-
-        <TextField
-          label="Date"
-          type="date"
-          fullWidth
-          value={formState.date}
-          onChange={(e) => setFormState(prev => ({ ...prev, date: e.target.value }))}
-          sx={{
-            backgroundColor: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-            '& .MuiOutlinedInput-root': {
-              height: '56px',
-            },
-          }}
-        />
-
-        <TextField
-          label="Description"
-          fullWidth
-          variant="outlined"
-          value={formState.description}
-          onChange={(e) => setFormState(prev => ({ ...prev, description: e.target.value }))}
-          sx={{
-            backgroundColor: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-            '& .MuiOutlinedInput-root': {
-              minHeight: '56px',
-            },
-          }}
-        />
-
-        {travelCtx.state.chosenTrip?.currencies.map((currency) => (
-          <TextField
-            key={currency}
-            label={`Amount (${currency.toUpperCase()})`}
-            type="number"
-            fullWidth
-            value={formState.currencyAmounts[currencies.find((c) => c.label === currency)?.abr || ''] || ''}
-            onChange={(e) => handleCurrencyAmountChange(currency, parseFloat(e.target.value))}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  {currencies.find((it) => it.label === currency)?.icon}
-                </InputAdornment>
-              ),
+      <div className="ts-paper" style={{ padding: '24px 26px', position: 'relative' }}>
+        <DialogContent sx={{ padding: 0 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              gap: 16,
+              marginBottom: 14,
             }}
-            sx={{
-              backgroundColor: '#fff',
-              borderRadius: '8px',
-              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-              '& .MuiOutlinedInput-root': {
-                height: '56px',
-              },
-              '& input[type=number]': {
-                MozAppearance: 'textfield',
-              },
-              '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                WebkitAppearance: 'none',
-                margin: 0,
-              },
+          >
+            <div>
+              <div className="ts-eyebrow">{editMode ? 'Amend entry' : 'New entry'}</div>
+              <h2
+                className="ts-display"
+                style={{
+                  margin: '6px 0 0',
+                  fontSize: 28,
+                  fontVariationSettings: '"SOFT" 30, "opsz" 144',
+                }}
+              >
+                {editMode ? 'Edit expense.' : 'Record an expense.'}
+              </h2>
+            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <IconButton
+                onClick={() => setCalcState(true)}
+                sx={{
+                  border: '1px solid var(--ink)',
+                  borderRadius: 0,
+                  color: 'var(--ink)',
+                  width: 38,
+                  height: 38,
+                  '&:hover': { background: 'var(--ink)', color: 'var(--paper)' },
+                }}
+              >
+                <Calculate fontSize="small" />
+              </IconButton>
+              <Stamp text="Entry" date="·" tone={editMode ? 'gold' : 'ledger'} size={60} rotate={editMode ? 7 : -8} />
+            </div>
+          </div>
+
+          <Calculator isVisible={calcState} onClose={() => setCalcState(false)} />
+
+          <Perf style={{ margin: '6px 0 14px' }} />
+
+          {/* Date + description */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : '160px 1fr',
+              gap: 14,
+              marginBottom: 14,
             }}
-          />
-        ))}
+          >
+            <div>
+              <label className="ts-label">Date</label>
+              <input
+                type="date"
+                className="ts-input ts-mono"
+                value={formState.date}
+                onChange={(e) => setFormState((prev) => ({ ...prev, date: e.target.value }))}
+                style={{ fontSize: 14 }}
+              />
+            </div>
+            <div>
+              <label className="ts-label">Description</label>
+              <input
+                className="ts-input"
+                value={formState.description}
+                onChange={(e) =>
+                  setFormState((prev) => ({ ...prev, description: e.target.value }))
+                }
+                placeholder="What was the expense for?"
+              />
+            </div>
+          </div>
 
-        <TextField
-          label="Paid By"
-          select
-          fullWidth
-          value={formState.paidBy.userId?.toString() || ''}
-          onChange={(e) => {
-            const selectedUser = travelCtx.state.users.find(
-              (item) => item.userId === parseInt(e.target.value)
-            );
-            setFormState(prev => ({
-              ...prev,
-              paidBy: {
-                userId: selectedUser?.userId,
-                userName: selectedUser?.userName || '',
-              }
-            }));
-          }}
-          sx={{
-            backgroundColor: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-            '& .MuiOutlinedInput-root': {
-              height: '56px',
-            },
-          }}
-        >
-          {travelCtx.state.users.map((user) => (
-            <MenuItem key={user.userId} value={user.userId.toString()}>
-              {user.userName}
-            </MenuItem>
-          ))}
-        </TextField>
+          {/* Currency amounts */}
+          <div style={{ marginBottom: 14 }}>
+            <label className="ts-label">Amount</label>
+            <div
+              style={{
+                marginTop: 8,
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                gap: 10,
+              }}
+            >
+              {travelCtx.state.chosenTrip?.currencies.map((currency) => {
+                const abr = currencies.find((c) => c.label === currency)?.abr || '';
+                return (
+                  <div key={currency} style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div className="ts-mono" style={{ fontSize: 10, letterSpacing: '0.18em', color: 'var(--ink-faded)', marginBottom: 2 }}>
+                      {currency.toUpperCase()}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                      <span style={{ color: 'var(--ink-faded)' }}>
+                        {currencies.find((it) => it.label === currency)?.icon}
+                      </span>
+                      <input
+                        type="number"
+                        className="ts-input ts-num"
+                        value={formState.currencyAmounts[abr] || ''}
+                        onChange={(e) =>
+                          handleCurrencyAmountChange(currency, parseFloat(e.target.value))
+                        }
+                        style={{ fontSize: 18 }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
-        <Box
-          display="flex"
-          justifyContent="space-evenly"
-          width="100%"
-          gap="5px"
-        >
-          <FormControlLabel
-            sx={{ textWrap: 'nowrap' }}
-            control={
-              <Checkbox
+          {/* Paid by */}
+          <div style={{ marginBottom: 14 }}>
+            <label className="ts-label">Paid by</label>
+            <select
+              className="ts-input ts-mono"
+              value={formState.paidBy.userId?.toString() || ''}
+              onChange={(e) => {
+                const selected = travelCtx.state.users.find(
+                  (item) => item.userId === parseInt(e.target.value),
+                );
+                setFormState((prev) => ({
+                  ...prev,
+                  paidBy: { userId: selected?.userId, userName: selected?.userName || '' },
+                }));
+              }}
+              style={{
+                fontSize: 14,
+                letterSpacing: '0.04em',
+                background: 'transparent',
+              }}
+            >
+              <option value="">Choose payer</option>
+              {travelCtx.state.users.map((user) => (
+                <option key={user.userId} value={user.userId.toString()}>
+                  {user.userName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Self vs split */}
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 8 }}>
+            <label
+              style={{
+                display: 'flex',
+                gap: 8,
+                alignItems: 'center',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 12,
+                textTransform: 'uppercase',
+                letterSpacing: '0.16em',
+                color: 'var(--ink)',
+                cursor: 'pointer',
+              }}
+            >
+              <input
+                type="checkbox"
                 checked={formState.selfExpense}
-                onChange={(_, checked) => {
-                  setFormState(prev => {
-                    const newState = { ...prev, selfExpense: checked };
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setFormState((prev) => {
+                    const next = { ...prev, selfExpense: checked };
                     if (checked && prev.paidBy.userId) {
-                      newState.userDivision = [{
-                        userId: prev.paidBy.userId,
-                        userName: '',
-                        amount: prev.currencyAmounts[enabledCurrency]
-                      }];
+                      next.userDivision = [
+                        { userId: prev.paidBy.userId, userName: '', amount: prev.currencyAmounts[enabledCurrency] },
+                      ];
                     }
-                    return newState;
+                    return next;
                   });
                 }}
               />
-            }
-            label="Self-Expense"
-          />
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={() => setAmountSetter(true)}
-            disabled={!formState.paidBy.userId || !formState.currencyAmounts[enabledCurrency] || formState.selfExpense}
-            sx={{
-              padding: isMobile ? '10px' : '12px',
-              backgroundColor: '#1976d2',
-              color: '#fff',
-              borderRadius: '8px',
-              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-              '&:hover': {
-                backgroundColor: '#155a8a',
-              },
-            }}
-          >
-            Split Amount
-          </Button>
-        </Box>
+              Personal · do not split
+            </label>
+
+            <button
+              type="button"
+              className="ts-btn ts-btn-ink"
+              onClick={() => setAmountSetter(true)}
+              disabled={
+                !formState.paidBy.userId ||
+                !formState.currencyAmounts[enabledCurrency] ||
+                formState.selfExpense
+              }
+              style={{ padding: '8px 14px', fontSize: 11 }}
+            >
+              Apportion among bearers
+            </button>
+          </div>
+
+          {formState.userDivision && formState.userDivision.length > 0 && !formState.selfExpense && (
+            <div
+              style={{
+                background: 'var(--paper-deep)',
+                border: '1px dashed var(--rule-soft)',
+                padding: 10,
+                marginTop: 8,
+              }}
+            >
+              <div className="ts-label" style={{ marginBottom: 6 }}>Current apportionment</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {formState.userDivision.map((u) => {
+                  const userName =
+                    travelCtx.state.users.find((x) => x.userId === u.userId)?.userName || `#${u.userId}`;
+                  return (
+                    <div
+                      key={u.userId}
+                      style={{
+                        border: '1px solid var(--rule-soft)',
+                        padding: '4px 10px',
+                        display: 'flex',
+                        alignItems: 'baseline',
+                        gap: 6,
+                      }}
+                    >
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: 13 }}>{userName}</span>
+                      <span className="ts-num" style={{ fontSize: 12, color: 'var(--ink-soft)' }}>
+                        ₹{Math.abs(u.amount).toFixed(2)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </DialogContent>
 
         <AmountSplitDialog
           amount={formState.currencyAmounts}
           open={amountSetter}
           onSubmit={(items: SplitItem[]) => {
-            const userDiv = items.map(item => ({
+            const userDiv = items.map((item) => ({
               userId: item.userId,
               userName: item.userName,
               amount: item[enabledCurrency],
             }));
-            setFormState(prev => ({
-              ...prev,
-              userDivision: userDiv
-            }));
+            setFormState((prev) => ({ ...prev, userDivision: userDiv }));
             setAmountSetter(false);
           }}
           onCancel={() => setAmountSetter(false)}
           editMode={editMode}
           editValues={formState.userDivision}
         />
-      </DialogContent>
 
-      <DialogActions sx={{ justifyContent: 'space-between', padding: '16px', gap: 2 }}>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          startIcon={<CheckCircleIcon />}
-          disabled={!isSubmitEnabled}
-          sx={{
-            backgroundColor: !isSubmitEnabled ? '#ccc' : '#1976d2',
-            color: '#fff',
-            borderRadius: '8px',
-            padding: '10px 20px',
-            fontWeight: '600',
-            '&:hover': {
-              backgroundColor: !isSubmitEnabled ? '#ccc' : '#1565c0',
-            },
-          }}
-        >
-          {editMode ? 'Update' : 'Submit'}
-        </Button>
-        <Button 
-          onClick={onClose} 
-          variant="outlined"
-          color="error"
-          sx={{
-            borderRadius: '8px',
-            padding: '10px 20px',
-            fontWeight: '600',
-          }}
-        >
-          Cancel
-        </Button>
-      </DialogActions>
+        <Perf style={{ margin: '20px 0 16px' }} />
+
+        <DialogActions sx={{ padding: 0, justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+          <button type="button" className="ts-btn" onClick={onClose}>Cancel</button>
+          <button
+            type="button"
+            className="ts-btn ts-btn-ink"
+            onClick={handleSubmit}
+            disabled={!isSubmitEnabled}
+          >
+            {editMode ? 'File amendment ↗' : 'Record entry ↗'}
+          </button>
+        </DialogActions>
+      </div>
     </Dialog>
   );
 };
 
 export function round(value: any, precision: any) {
-  var multiplier = Math.pow(10, precision || 0);
+  const multiplier = Math.pow(10, precision || 0);
   return Math.round(value * multiplier) / multiplier;
 }
 

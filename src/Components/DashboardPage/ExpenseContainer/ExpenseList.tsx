@@ -1,29 +1,17 @@
-// ExpenseComponents/ExpenseList.tsx
+// ExpenseList.tsx
 import React from 'react';
-import { Box } from '@mui/material';
 import ExpenseItem from './ExpenseItem';
 
 interface ExpenseListProps {
   expenses: any[];
 }
 
-const ExpenseList: React.FC<ExpenseListProps> = ({ expenses }) => {
-  return (
-    <>
-      {expenses.map((expense: any, index: number) => (
-        <Box
-          key={index}
-          padding="8px"
-          margin="4px 0"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <ExpenseItem expense={expense} />
-        </Box>
-      ))}
-    </>
-  );
-};
+const ExpenseList: React.FC<ExpenseListProps> = ({ expenses }) => (
+  <div>
+    {expenses.map((expense: any) => (
+      <ExpenseItem key={expense.expenseId} expense={expense} />
+    ))}
+  </div>
+);
 
 export default ExpenseList;

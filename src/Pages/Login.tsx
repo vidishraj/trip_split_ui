@@ -1,45 +1,13 @@
-// src/Login.tsx
 import React, { useEffect, useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  Box,
-  Button,
-  Container,
-  TextField,
-  CircularProgress,
-} from '@mui/material';
-import { styled } from '@mui/system';
-import Lottie from 'lottie-react';
-import loginAnimation from '../Assets/loginAnimation.json';
-import { useUser } from '../Contexts/GlobalContext';
+import { motion } from 'framer-motion';
 import { auth } from '../Api/FirebaseConfig';
-import SignupDialog from '../Components/Signup';
+import { useUser } from '../Contexts/GlobalContext';
 import { useAuth } from '../Contexts/AuthContext';
 import { useMessage } from '../Contexts/NotifContext';
-// import { useTravel } from '../Contexts/TravelContext';
-// import { fetchTrips } from '../Api/Api';
-
-const LoginContainer = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '100vh',
-  padding: '16px',
-  backgroundColor: '#f5f5f5',
-}));
-
-const LoginBox = styled(Box)(({ theme }) => ({
-  backgroundColor: '#ffffff',
-  borderRadius: '8px',
-  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-  padding: '32px',
-  maxWidth: '400px',
-  [theme.breakpoints.down('sm')]: {
-    boxShadow: 'none',
-  },
-}));
+import SignupDialog from '../Components/Signup';
+import { Cropmarks, Perf, Stamp } from '../Components/Design/Atoms';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -51,90 +19,197 @@ const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { currentUser } = useAuth();
   const notif = useMessage();
-  // const travelCtx = useTravel();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // Navigation happens in the currentUser effect below once Firebase
-      // notifies AuthContext — keeping a single source of truth avoids the
-      // race where both this handler and the effect tried to navigate.
     } catch (error) {
       notif.setPayload({
         type: 'error',
-        message: 'Error occurred while logging in.',
+        message: 'Could not authenticate. Check your credentials.',
       });
-      console.error('Error logging in:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleOpenSignup = () => {
-    setOpenSignup(true);
-  };
-
-  const handleCloseSignup = () => {
-    setOpenSignup(false);
-  };
-
   useEffect(() => {
     if (currentUser) {
       setUser(currentUser);
-      const returnTo = searchParams.get('returnTo');    
+      const returnTo = searchParams.get('returnTo');
       navigate(returnTo || '/trip');
     }
   }, [currentUser, navigate, searchParams, setUser]);
 
   return (
-    <LoginContainer>
-      <Container maxWidth="sm">
-        <Lottie animationData={loginAnimation} style={{ height: 200 }} />
-        <LoginBox>
-          <form onSubmit={handleLogin} style={{}}>
-            <TextField
-              label="Email"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-              label="Password"
-              type="password"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              disabled={loading}
-              style={{ marginTop: '16px' }}
-            >
-              {loading ? <CircularProgress size={24} /> : 'Login'}
-            </Button>
-          </form>
-          <Button
-            variant="text"
-            color="secondary"
-            fullWidth
-            onClick={handleOpenSignup}
-            style={{ marginTop: '8px' }}
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '40px 20px',
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.2, 0.7, 0.2, 1] }}
+        style={{
+          width: '100%',
+          maxWidth: 560,
+          position: 'relative',
+        }}
+      >
+        <Cropmarks inset={-8} />
+
+        <div
+          className="ts-paper"
+          style={{ padding: '40px 36px 36px', position: 'relative' }}
+        >
+          {/* Header band */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'baseline',
+              borderBottom: '1px solid var(--rule-soft)',
+              paddingBottom: 14,
+              marginBottom: 22,
+            }}
           >
-            Don't have an account? Sign Up
-          </Button>
-        </LoginBox>
-      </Container>
-      <SignupDialog open={openSignup} onClose={handleCloseSignup} />
-    </LoginContainer>
+            <div>
+              <div className="ts-eyebrow">Document of admission</div>
+              <h1
+                className="ts-display"
+                style={{
+                  fontSize: 42,
+                  margin: '6px 0 0',
+                  fontVariationSettings: '"SOFT" 30, "opsz" 144',
+                }}
+              >
+                Sign in.
+              </h1>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div className="ts-label">Form A · I</div>
+              <div className="ts-mono" style={{ fontSize: 12, marginTop: 4, color: 'var(--ink-faded)' }}>
+                rev. MMXXVI
+              </div>
+            </div>
+          </div>
+
+          {/* Big number — the airline-stub aesthetic */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr auto',
+              alignItems: 'center',
+              gap: 18,
+              marginBottom: 28,
+            }}
+          >
+            <div>
+              <div className="ts-label">Bearer's email</div>
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 16,
+                  color: 'var(--ink-faded)',
+                  marginTop: 4,
+                }}
+              >
+                Present credentials to the clerk
+              </div>
+            </div>
+            <Stamp
+              text="Auth"
+              date="ENTRY"
+              tone="ledger"
+              size={84}
+              rotate={6}
+            />
+          </div>
+
+          <form onSubmit={handleLogin}>
+            <div style={{ marginBottom: 22 }}>
+              <label className="ts-label" htmlFor="email">Email address</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@somewhere.world"
+                className="ts-input"
+                required
+              />
+            </div>
+
+            <div style={{ marginBottom: 28 }}>
+              <label className="ts-label" htmlFor="password">Passphrase</label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="•••••••••"
+                className="ts-input"
+                required
+              />
+            </div>
+
+            <Perf style={{ margin: '6px 0 22px' }} />
+
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 12,
+                flexWrap: 'wrap',
+              }}
+            >
+              <button
+                type="submit"
+                className="ts-btn ts-btn-ink"
+                disabled={loading}
+                style={{ minWidth: 180 }}
+              >
+                {loading ? 'Stamping…' : 'Admit me ↗'}
+              </button>
+              <button
+                type="button"
+                className="ts-btn ts-btn-stamp"
+                onClick={() => setOpenSignup(true)}
+              >
+                Register a new bearer
+              </button>
+            </div>
+          </form>
+
+          {/* Bottom serial */}
+          <div
+            style={{
+              marginTop: 30,
+              paddingTop: 14,
+              borderTop: '1px dashed var(--rule-soft)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: 8,
+            }}
+          >
+            <div className="ts-mono" style={{ fontSize: 11, color: 'var(--ink-faded)', letterSpacing: '0.16em' }}>
+              SER · {Math.random().toString(36).slice(2, 10).toUpperCase()}
+            </div>
+            <div className="ts-label">Issued under no jurisdiction</div>
+          </div>
+        </div>
+      </motion.div>
+
+      <SignupDialog open={openSignup} onClose={() => setOpenSignup(false)} />
+    </div>
   );
 };
 

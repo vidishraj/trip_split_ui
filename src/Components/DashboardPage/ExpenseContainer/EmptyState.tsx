@@ -1,38 +1,26 @@
-// ExpenseComponents/EmptyState.tsx
+// EmptyState.tsx
 import React from 'react';
-import { Box, Typography } from '@mui/material';
 
-const EmptyState: React.FC = () => {
-  return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        borderRadius: '12px',
-        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-        transition: 'all 0.3s ease-in-out',
-        '&:hover': {
-          backgroundColor: 'rgba(255, 255, 255, 0.4)',
-        },
+const EmptyState: React.FC = () => (
+  <div
+    style={{
+      padding: '64px 24px',
+      textAlign: 'center',
+      color: 'var(--ink-faded)',
+    }}
+  >
+    <div className="ts-label" style={{ marginBottom: 6 }}>No entries yet</div>
+    <div
+      style={{
+        fontFamily: 'var(--font-display)',
+        fontStyle: 'italic',
+        fontSize: 26,
+        color: 'var(--ink-soft)',
       }}
     >
-      <Typography
-        variant="h4"
-        sx={{
-          fontSize: '1.5rem',
-          fontWeight: '600',
-          color: 'rgba(0, 0, 0, 0.7)',
-          textShadow: '1px 1px 5px rgba(0, 0, 0, 0.2)',
-        }}
-      >
-        Nothing to see!
-      </Typography>
-    </Box>
-  );
-};
+      The ledger awaits its first scribble.
+    </div>
+  </div>
+);
 
 export default EmptyState;

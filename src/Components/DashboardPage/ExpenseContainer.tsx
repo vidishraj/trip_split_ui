@@ -1,16 +1,17 @@
-// ExpenseContainer.tsx
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { Box } from '@mui/material';
+// ExpenseContainer.tsx — The ledger view
+import React, { useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useTravel } from '../../Contexts/TravelContext';
-import './ExpenseContainer.scss';
 import ExpenseList from './ExpenseContainer/ExpenseList';
 import EmptyExpenseState from './ExpenseContainer/EmptyState';
-import FilterSortPanel, { FilterOptions, SortOptions } from './ExpenseContainer/FilterSortPanel';
-import { motion, useScroll } from 'framer-motion';
+import FilterSortPanel, {
+  FilterOptions,
+  SortOptions,
+} from './ExpenseContainer/FilterSortPanel';
 
-const ExpenseContainer = () => {
+const ExpenseContainer: React.FC = () => {
   const travelCtx = useTravel();
-  
+
   const [filters, setFilters] = useState<FilterOptions>({
     paidBy: '',
     minAmount: '',
@@ -19,164 +20,137 @@ const ExpenseContainer = () => {
     dateTo: '',
     selfExpenseOnly: false,
     sharedExpenseOnly: false,
-    description: ''
+    description: '',
   });
 
   const [sort, setSort] = useState<SortOptions>({
     field: 'date',
-    direction: 'desc'
+    direction: 'desc',
   });
 
-  useEffect(() => {
-    fetchMoreData();
-  }, []);
-
-  const fetchMoreData = () => {
-    // Implementation here
-  };
-
-  const filteredAndSortedExpenses = useMemo(() => {
-    let filtered = [...travelCtx.state.expenses];
-
-    // Apply filters
-    if (filters.paidBy !== '') {
-      filtered = filtered.filter(expense => expense.paidBy === filters.paidBy);
-    }
-
-    if (filters.minAmount !== '') {
-      filtered = filtered.filter(expense => expense.amount >= filters.minAmount);
-    }
-
-    if (filters.maxAmount !== '') {
-      filtered = filtered.filter(expense => expense.amount <= filters.maxAmount);
-    }
-
-    if (filters.dateFrom) {
-      filtered = filtered.filter(expense => 
-        new Date(expense.date) >= new Date(filters.dateFrom)
+  const expenses = useMemo(() => {
+    let filtered = [...(travelCtx.state.expenses || [])];
+    if (filters.paidBy !== '')
+      filtered = filtered.filter((e) => e.paidBy === filters.paidBy);
+    if (filters.minAmount !== '')
+      filtered = filtered.filter((e) => e.amount >= filters.minAmount);
+    if (filters.maxAmount !== '')
+      filtered = filtered.filter((e) => e.amount <= filters.maxAmount);
+    if (filters.dateFrom)
+      filtered = filtered.filter(
+        (e) => new Date(e.date) >= new Date(filters.dateFrom),
       );
-    }
-
-    if (filters.dateTo) {
-      filtered = filtered.filter(expense => 
-        new Date(expense.date) <= new Date(filters.dateTo)
+    if (filters.dateTo)
+      filtered = filtered.filter(
+        (e) => new Date(e.date) <= new Date(filters.dateTo),
       );
-    }
-
-    if (filters.selfExpenseOnly) {
-      filtered = filtered.filter(expense => expense.selfExpense === true);
-    }
-
-    if (filters.sharedExpenseOnly) {
-      filtered = filtered.filter(expense => expense.selfExpense === false);
-    }
-
-    if (filters.description) {
-      filtered = filtered.filter(expense => 
-        expense.expenseDesc.toLowerCase().includes(filters.description.toLowerCase())
+    if (filters.selfExpenseOnly)
+      filtered = filtered.filter((e) => e.selfExpense === true);
+    if (filters.sharedExpenseOnly)
+      filtered = filtered.filter((e) => e.selfExpense === false);
+    if (filters.description)
+      filtered = filtered.filter((e) =>
+        e.expenseDesc.toLowerCase().includes(filters.description.toLowerCase()),
       );
-    }
 
-    // Apply sorting
     filtered.sort((a: any, b: any) => {
-      let aValue, bValue;
-
+      let aValue: any, bValue: any;
       switch (sort.field) {
-        case 'date':
-          aValue = new Date(a.date).getTime();
-          bValue = new Date(b.date).getTime();
-          break;
         case 'amount':
-          aValue = a.amount;
-          bValue = b.amount;
-          break;
+          aValue = a.amount; bValue = b.amount; break;
         case 'description':
-          aValue = a.expenseDesc.toLowerCase();
-          bValue = b.expenseDesc.toLowerCase();
+          aValue = a.expenseDesc.toLowerCase(); bValue = b.expenseDesc.toLowerCase(); break;
+        case 'paidBy': {
+          const uA = travelCtx.state.users.find((u) => u.userId === a.paidBy);
+          const uB = travelCtx.state.users.find((u) => u.userId === b.paidBy);
+          aValue = uA?.userName.toLowerCase() || '';
+          bValue = uB?.userName.toLowerCase() || '';
           break;
-        case 'paidBy':
-          const userA = travelCtx.state.users.find(u => u.userId === a.paidBy);
-          const userB = travelCtx.state.users.find(u => u.userId === b.paidBy);
-          aValue = userA?.userName.toLowerCase() || '';
-          bValue = userB?.userName.toLowerCase() || '';
-          break;
+        }
         default:
           aValue = new Date(a.date).getTime();
           bValue = new Date(b.date).getTime();
       }
-
-      if (sort.direction === 'asc') {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-      }
+      if (sort.direction === 'asc') return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
     });
 
     return filtered;
   }, [travelCtx.state.expenses, travelCtx.state.users, filters, sort]);
-  const scrollRef: any = useRef();
-  const { scrollYProgress } = useScroll({
-    container: scrollRef,
-    offset: ['start end', 'end end'],
-  });
 
   return (
-    <Box
-      id="innerBox"
-      flexGrow={1}
-      width="100%"
-      borderRadius="12px"
-      display="flex"
-      flexDirection="column"
-      sx={{
-        height: '100%',
-        backgroundColor: 'transparent',
-        position: 'relative',
-      }}
+    <motion.div
+      key="ledger"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="ts-paper"
+      style={{ padding: 0, position: 'relative', overflow: 'hidden' }}
     >
-      <FilterSortPanel
-        onFilterChange={setFilters}
-        onSortChange={setSort}
-        currentFilters={filters}
-        currentSort={sort}
-      />
-      
-      <Box
-        flexGrow={1}
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        sx={{
-          overflowY: 'auto',
-          position: 'relative',
+      {/* Ledger heading band */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          padding: '20px 24px 6px',
+          gap: 12,
+          flexWrap: 'wrap',
         }}
       >
-        <motion.div
-          id="scroll-indicator"
-          style={{
-            scaleX: scrollYProgress,
-            position: 'absolute',
-            zIndex: 2,
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 10,
-            originX: 0,
-            backgroundColor: '#1976d2',
-          }}
-        />
-        {filteredAndSortedExpenses && filteredAndSortedExpenses.length > 0 ? (
-          <div
-            ref={scrollRef}
-            style={{ height: '100%', width: '100%', overflow: 'auto' }}
+        <div>
+          <div className="ts-eyebrow">Folio II</div>
+          <h3
+            className="ts-display"
+            style={{
+              margin: '6px 0 0',
+              fontSize: 28,
+              fontVariationSettings: '"SOFT" 30, "opsz" 144',
+            }}
           >
-            <ExpenseList expenses={filteredAndSortedExpenses} />
-          </div>
+            The ledger.
+          </h3>
+        </div>
+        <div className="ts-mono" style={{ fontSize: 12, color: 'var(--ink-faded)', letterSpacing: '0.18em' }}>
+          {expenses.length.toString().padStart(3, '0')} entries on file
+        </div>
+      </div>
+
+      <div style={{ padding: '0 24px 16px' }}>
+        <FilterSortPanel
+          onFilterChange={setFilters}
+          onSortChange={setSort}
+          currentFilters={filters}
+          currentSort={sort}
+        />
+      </div>
+
+      {/* Column header */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '92px 1fr auto',
+          gap: 18,
+          padding: '8px 24px',
+          background: 'var(--paper-deep)',
+          borderTop: '1px solid var(--rule-soft)',
+          borderBottom: '1px solid var(--rule-soft)',
+        }}
+      >
+        <div className="ts-label">Date</div>
+        <div className="ts-label">Description / Paid by</div>
+        <div className="ts-label" style={{ textAlign: 'right' }}>Amount · INR</div>
+      </div>
+
+      {/* Rows */}
+      <div style={{ maxHeight: 560, overflowY: 'auto', padding: '0 8px' }}>
+        {expenses.length > 0 ? (
+          <ExpenseList expenses={expenses} />
         ) : (
           <EmptyExpenseState />
         )}
-      </Box>
-    </Box>
+      </div>
+    </motion.div>
   );
 };
 

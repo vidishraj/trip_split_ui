@@ -1,29 +1,76 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import { motion } from 'framer-motion';
 import { useLoading } from '../Contexts/LoadingContext';
-import Lottie from 'lottie-react';
-import loginAnimation from '../Assets/loaderAnimation.json';
+
 const Loader: React.FC = () => {
   const { loading } = useLoading();
+  if (!loading) return null;
 
-  return loading ? (
-    <Box
-      sx={{
+  return (
+    <div
+      style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
+        inset: 0,
+        background: 'rgba(243, 236, 216, 0.78)',
+        backdropFilter: 'blur(2px)',
         display: 'flex',
-        justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        justifyContent: 'center',
         zIndex: 9999,
       }}
     >
-      <Lottie animationData={loginAnimation} style={{ height: 200 }} />
-    </Box>
-  ) : null;
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {/* Rotating stamp ring */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+          style={{
+            width: 90,
+            height: 90,
+            borderRadius: '50%',
+            border: '2px dashed var(--stamp)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+          }}
+        >
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              border: '2px solid var(--stamp)',
+              color: 'var(--stamp)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: 'var(--font-mono)',
+              fontSize: 9,
+              letterSpacing: '0.2em',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+            }}
+          >
+            ✦
+          </div>
+        </motion.div>
+
+        <div
+          className="ts-mono"
+          style={{
+            marginTop: 14,
+            fontSize: 11,
+            color: 'var(--ink-soft)',
+            letterSpacing: '0.3em',
+            textTransform: 'uppercase',
+          }}
+        >
+          Stamping…
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Loader;

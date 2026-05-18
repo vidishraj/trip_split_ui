@@ -1,20 +1,9 @@
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  IconButton,
-} from '@mui/material';
-import { useTheme } from '@mui/material';
+import { Dialog } from '@mui/material';
 import { useMessage } from '../../Contexts/NotifContext';
 import { sendTripRequest } from '../../Api/Api';
 import { MessageContextType } from '../../Assets/types';
-import TravelExploreIcon from '@mui/icons-material/TravelExplore';
-import SendIcon from '@mui/icons-material/Send';
-import CancelIcon from '@mui/icons-material/Cancel';
+import { Perf, Stamp } from '../Design/Atoms';
 
 interface ConnectTripDialogProps {
   open: boolean;
@@ -25,130 +14,95 @@ export const ConnectTripDialog: React.FC<ConnectTripDialogProps> = ({
   open,
   handleClose,
 }) => {
-  const [tripIdConnect, setTripIdConnect] = useState<string>('');
-  const theme = useTheme();
+  const [tripId, setTripId] = useState<string>('');
   const notif: MessageContextType = useMessage();
 
-  const sendTripConnectRequest = (): void => {
-    if (tripIdConnect.length !== 6) {
+  const reset = () => {
+    setTripId('');
+    handleClose();
+  };
+
+  const submit = () => {
+    if (tripId.length !== 6) {
       notif.setPayload({
         type: 'error',
-        message: 'Trip ID should be exactly 6 characters long',
+        message: 'Trip ID must be exactly 6 characters.',
       });
       return;
     }
-
-    sendTripRequest(tripIdConnect)
+    sendTripRequest(tripId)
       .then(() => {
         notif.setPayload({
           type: 'success',
-          message: 'Request sent successfully. Ask your friend to add you!',
+          message: 'Request dispatched. The trip owner must admit you.',
         });
-        resetAndClose();
+        reset();
       })
-      .catch(() => {
-        notif.setPayload({
-          type: 'error',
-          message: 'Error occurred while sending request',
-        });
-      });
-  };
-
-  const resetAndClose = (): void => {
-    setTripIdConnect('');
-    handleClose();
+      .catch(() =>
+        notif.setPayload({ type: 'error', message: 'Could not send request.' }),
+      );
   };
 
   return (
     <Dialog
       open={open}
-      onClose={resetAndClose}
+      onClose={reset}
       fullWidth
       maxWidth="xs"
-      sx={{
-        '& .MuiPaper-root': {
-          borderRadius: '12px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-          padding: '16px',
-        },
-      }}
+      PaperProps={{ sx: { background: 'transparent', boxShadow: 'none', overflow: 'visible' } }}
     >
-      {/* Title with Icon */}
-      <DialogTitle
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontWeight: 'bold',
-        }}
-      >
-        <TravelExploreIcon color="primary" /> Connect Trip
-      </DialogTitle>
-
-      <DialogContent>
-        {/* Trip ID Input */}
-        <TextField
-          autoFocus
-          margin="dense"
-          id="trip-id"
-          label="Trip ID (6 characters)"
-          type="text"
-          fullWidth
-          variant="outlined"
-          inputProps={{ maxLength: 6, minLength: 6 }}
-          value={tripIdConnect}
-          onChange={(e) => setTripIdConnect(e.target.value)}
-          sx={{
-            marginTop: '16px',
-            backgroundColor: '#F9FAFB',
-            borderRadius: '8px',
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '8px',
-            },
-          }}
-        />
-      </DialogContent>
-
-      {/* Button Actions */}
-      <DialogActions sx={{ justifyContent: 'space-between', padding: '16px', gap: 2 }}>
-        <Button
-          onClick={sendTripConnectRequest}
-          variant="contained"
-          disabled={tripIdConnect.length !== 6}
-          startIcon={<SendIcon />}
-          sx={{
-            backgroundColor:
-              tripIdConnect.length !== 6
-                ? '#ccc'
-                : '#1976d2',
-            color: '#fff',
-            borderRadius: '8px',
-            padding: '10px 20px',
-            fontWeight: '600',
-            '&:hover': {
-              backgroundColor:
-                tripIdConnect.length !== 6
-                  ? '#ccc'
-                  : '#1565c0',
-            },
+      <div className="ts-paper" style={{ padding: '30px 30px 26px', position: 'relative' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            borderBottom: '1px solid var(--rule-soft)',
+            paddingBottom: 14,
+            marginBottom: 18,
           }}
         >
-          Send Request
-        </Button>
+          <div>
+            <div className="ts-eyebrow">Request transit</div>
+            <h2
+              className="ts-display"
+              style={{
+                margin: '6px 0 0',
+                fontSize: 28,
+                fontVariationSettings: '"SOFT" 30, "opsz" 144',
+              }}
+            >
+              Join a trip.
+            </h2>
+          </div>
+          <Stamp text="Petition" date="·" tone="teal" size={68} rotate={-7} />
+        </div>
 
-        <Button 
-          onClick={resetAndClose} 
-          variant="outlined"
-          color="error"
-          sx={{
-            borderRadius: '8px',
-            padding: '10px 20px',
-            fontWeight: '600',
-          }}
-        >
-          Cancel
-        </Button>
-      </DialogActions>
+        <div style={{ marginBottom: 18 }}>
+          <label className="ts-label">Trip ID — six characters</label>
+          <input
+            className="ts-input ts-mono"
+            value={tripId}
+            onChange={(e) => setTripId(e.target.value)}
+            maxLength={6}
+            placeholder="abc·123"
+            style={{ fontSize: 22, letterSpacing: '0.18em', textAlign: 'center' }}
+          />
+        </div>
+
+        <Perf style={{ margin: '6px 0 16px' }} />
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <button className="ts-btn" onClick={reset}>Cancel</button>
+          <button
+            className="ts-btn ts-btn-ink"
+            onClick={submit}
+            disabled={tripId.length !== 6}
+          >
+            Dispatch request ↗
+          </button>
+        </div>
+      </div>
     </Dialog>
   );
 };

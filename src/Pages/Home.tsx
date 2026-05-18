@@ -1,307 +1,309 @@
 import React from 'react';
-import { Box, Container, Typography, Button, useTheme, useMediaQuery, Stack, Paper } from '@mui/material';
-import { styled } from '@mui/system';
-import Lottie from 'lottie-react';
 import { useNavigate } from 'react-router-dom';
-import dashboardAnimation from '../Assets/heroAnimation1.json';
-import tripAnimation from '../Assets/heroAnimation2.json';
-import './Home.scss';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
-import CalculateIcon from '@mui/icons-material/Calculate';
-import GroupsIcon from '@mui/icons-material/Groups';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import LaunchIcon from '@mui/icons-material/Launch';
-import NewspaperIcon from '@mui/icons-material/Newspaper';
-const HeroContainer = styled(Box)(({ theme }) => ({
-  minHeight: '100vh',
-  background: 'linear-gradient(135deg, #f5f5f5 0%, #e3f2fd 100%)',
-  position: 'relative',
-  overflow: 'hidden',
-//   color: '#fff',
-}));
+import { motion } from 'framer-motion';
+import { Cropmarks, Perf, RouteLine, Stamp } from '../Components/Design/Atoms';
 
-const BackgroundAnimation = styled(Box)(({ theme }) => ({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  opacity: 0.25,
-  pointerEvents: 'none',
-  zIndex: 1,
-  '& > div': {
-    width: '100%',
-    height: '100%',
-  },
-  [theme.breakpoints.down('sm')]: {
-    // display: 'none',
-  },
-}));
+const SERIAL = (() => {
+  // A deterministic-looking pseudo-random "control number" so the page
+  // feels like a printed document, not a Figma export.
+  const n = Math.floor(Math.random() * 9000 + 1000);
+  return `№ TS-${n}-A`;
+})();
 
-const ContentContainer = styled(Container)(({ theme }) => ({
-  position: 'relative',
-  zIndex: 3,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  minHeight: '100vh',
-  textAlign: 'center',
-  padding: theme.spacing(4),
-}));
-
-const AnimationWrapper = styled(Box)(({ theme }) => ({
-  position: 'absolute',
-  width: '100%',
-  height: '100%',
-  top: 0,
-  left: 0,
-  zIndex: 2,
-  pointerEvents: 'none',
-}));
-
-const FeatureGrid = styled(Box)(({ theme }) => ({
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-  gap: theme.spacing(4),
-  width: '100%',
-  marginTop: theme.spacing(8),
-  [theme.breakpoints.down('sm')]: {
-    gridTemplateColumns: '1fr',
-    gap: theme.spacing(3),
+const FEATURES: { kind: string; title: string; body: string }[] = [
+  {
+    kind: 'Cl. 01',
+    title: 'Currency in transit',
+    body:
+      'Choose up to three currencies per trip. Amounts are converted live so receipts stay legible no matter the dateline you cross.',
   },
-}));
-
-const FeatureCard = styled(Paper)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.95)',
-  borderRadius: theme.spacing(3),
-  padding: theme.spacing(4),
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-  backdropFilter: 'blur(10px)',
-  transition: 'all 0.3s ease',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: theme.spacing(2),
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: '0 12px 48px rgba(0, 0, 0, 0.12)',
+  {
+    kind: 'Cl. 02',
+    title: 'A fair split, settled.',
+    body:
+      'Every expense is divided exactly the way it happened. We collapse a tangled ledger into the smallest number of payments.',
   },
-}));
-
-const IconWrapper = styled(Box)(({ theme }) => ({
-  background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
-  borderRadius: '50%',
-  padding: theme.spacing(2),
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  marginBottom: theme.spacing(1),
-  transition: 'transform 0.3s ease',
-  '& svg': {
-    fontSize: '2rem',
-    color: '#fff',
+  {
+    kind: 'Cl. 03',
+    title: 'One trip, many hands.',
+    body:
+      'Invite the companions. Each member writes into the same book. Notes, expenses, balances — kept in one shared dossier.',
   },
-  '.feature-card:hover &': {
-    transform: 'scale(1.1) rotate(5deg)',
+  {
+    kind: 'Cl. 04',
+    title: 'An assistant on call.',
+    body:
+      'Speak in plain English: "₹500 dinner, split equally." The trip’s clerk parses, files, and confirms — instantly.',
   },
-}));
-
-const ButtonGroup = styled(Stack)(({ theme }) => ({
-  flexDirection: 'row',
-  gap: theme.spacing(2),
-  marginTop: theme.spacing(4),
-  [theme.breakpoints.down('sm')]: {
-    flexDirection: 'column',
-    width: '100%',
-    maxWidth: '300px',
-  },
-}));
+];
 
 const Home: React.FC = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
 
-  const features = [
-    {
-      title: 'Multi-Currency Support',
-      description: 'Select up to 3 currencies per trip with real-time conversion rates',
-      icon: <CurrencyExchangeIcon />,
-    },
-    {
-      title: 'Smart Expense Splitting',
-      description: 'Split expenses between specific users with automatic calculations',
-      icon: <CalculateIcon />,
-    },
-    {
-      title: 'Trip Management',
-      description: 'Create and manage multiple trips with different groups of friends',
-      icon: <GroupsIcon />,
-    },
-    {
-      title: 'Balance Tracking',
-      description: 'Keep track of who owes what with detailed balance summaries',
-      icon: <AccountBalanceWalletIcon />,
-    },
-    {
-      title: 'Other Features',
-      description: 'Add notes for a trip and use the embedded calculator for added convenience',
-      icon: <NewspaperIcon />,
-    }
-  ];
-
   return (
-    <HeroContainer className="hero-container">
-      <BackgroundAnimation>
-        <Lottie 
-          animationData={dashboardAnimation}
-          className="background-animation"
-        />
-      </BackgroundAnimation>
+    <div
+      style={{
+        minHeight: '100vh',
+        position: 'relative',
+        paddingTop: 56,
+        paddingBottom: 96,
+      }}
+    >
+      {/* Top printed header — control number, ledger code */}
+      <div
+        style={{
+          maxWidth: 1180,
+          margin: '0 auto',
+          padding: '0 32px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: 16,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div className="ts-label">{SERIAL} · Series MMXX·VI</div>
+        <div className="ts-label">A traveller&apos;s ledger</div>
+      </div>
 
-      <AnimationWrapper className="animation-wrapper">
-        {isMobile ? (
-          <Box 
-            sx={{ 
-              position: 'absolute', 
-              top: '14%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '90%',
+      {/* Hero block — paper sheet with cropmarks */}
+      <div style={{ maxWidth: 1180, margin: '36px auto 0', padding: '0 32px' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
+          style={{ position: 'relative', padding: '64px 32px 80px' }}
+        >
+          <Cropmarks inset={-6} />
+
+          <div className="ts-eyebrow" style={{ marginBottom: 18 }}>
+            Issued for one bearer · transferable among trusted parties
+          </div>
+
+          <h1
+            className="ts-display"
+            style={{
+              fontSize: 'clamp(56px, 11vw, 168px)',
+              margin: 0,
+              fontVariationSettings: '"SOFT" 30, "WONK" 1, "opsz" 144',
+              lineHeight: 0.86,
             }}
           >
-            <Lottie 
-              animationData={tripAnimation} 
-              className="lottie-animation"
+            Trip&nbsp;Split.
+            <span
+              style={{
+                fontStyle: 'italic',
+                fontWeight: 400,
+                fontVariationSettings: '"SOFT" 100, "WONK" 1, "opsz" 144',
+                display: 'block',
+                fontSize: '0.62em',
+                color: 'var(--ink-soft)',
+                marginTop: 12,
+              }}
+            >
+              A ledger for the road.
+            </span>
+          </h1>
+
+          {/* Stamp pinned over the type */}
+          <div
+            style={{
+              position: 'absolute',
+              right: 'clamp(20px, 6vw, 80px)',
+              top: 30,
+              pointerEvents: 'none',
+            }}
+          >
+            <Stamp
+              text="Cleared"
+              date="MMXXVI·V"
+              tone="stamp"
+              size={120}
+              rotate={-9}
             />
-          </Box>
-        ):(<Box 
-          sx={{ 
-            position: 'absolute', 
-            bottom: isMobile ? '5%' : '70%',
-            right: isMobile ? '50%' : '5%',
-            transform: isMobile ? 'translate(50%, 0)' : 'translate(0, 50%)',
-            width: isMobile ? '90%' : '30%',
-            display: isMobile ? 'none' : 'block',
-            zIndex: 2,
-          }}
-        >
-          <Lottie 
-            animationData={tripAnimation} 
-            className="lottie-animation"
-          />
-        </Box>
-        )}
-      </AnimationWrapper>
+          </div>
 
-      <ContentContainer maxWidth="lg">
-        <Typography
-          variant={isMobile ? 'h3' : 'h2'}
-          component="h1"
-          className="gradient-text"
-          sx={{
-            fontWeight: 800,
-            mb: 2,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          TripSplit
-        </Typography>
-
-        <Typography
-          variant={isMobile ? 'h5' : 'h4'}
-          sx={{
-            mb: 3,
-            maxWidth: '800px',
-            color: 'text.secondary',
-            px: isMobile ? 2 : 0,
-            fontWeight: 500,
-          }}
-        >
-          Split expenses effortlessly with friends while traveling
-        </Typography>
-
-        <ButtonGroup>
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            onClick={() => navigate('/login')}
-            sx={{
-              py: 1.5,
-              px: 4,
-              borderRadius: 3,
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              marginTop: isMobile ? '100px' : '0px',
-              textTransform: 'none',
-              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
-              background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
-              '&:hover': {
-                background: 'linear-gradient(45deg, #1565c0, #1976d2)',
-              },
+          {/* Subhead + route */}
+          <div
+            style={{
+              marginTop: 44,
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1fr) auto',
+              gap: 24,
+              alignItems: 'end',
             }}
           >
-            Get Started
-          </Button>
-          <Button
-            variant="outlined"
-            color="primary"
-            size="large"
-            endIcon={<LaunchIcon />}
-            onClick={() => window.open('https://docs.vidish.space/search/?q=tripsplit', '_blank')}
-            sx={{
-              py: 1.5,
-              px: 4,
-              borderRadius: 3,
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              textTransform: 'none',
-              borderWidth: 2,
-              '&:hover': {
-                borderWidth: 2,
-                background: 'rgba(25, 118, 210, 0.04)',
-              },
+            <p
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 'clamp(18px, 1.7vw, 22px)',
+                lineHeight: 1.5,
+                color: 'var(--ink-soft)',
+                maxWidth: 640,
+                margin: 0,
+              }}
+            >
+              An expense book for trips. Live currencies, fair splits, kept honest
+              between you and your companions — and now, with an assistant who
+              listens to plain English and files the numbers for you.
+            </p>
+
+            <div
+              style={{
+                display: 'flex',
+                gap: 12,
+                flexWrap: 'wrap',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <button
+                className="ts-btn ts-btn-ink"
+                onClick={() => navigate('/login')}
+              >
+                Begin a trip ↗
+              </button>
+              <button
+                className="ts-btn"
+                onClick={() =>
+                  window.open(
+                    'https://docs.vidish.space/search/?q=tripsplit',
+                    '_blank',
+                  )
+                }
+              >
+                Read the dossier
+              </button>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 60 }}>
+            <RouteLine />
+          </div>
+
+          {/* Origin / destination boarding-pass strip */}
+          <div
+            style={{
+              marginTop: 8,
+              display: 'grid',
+              gridTemplateColumns: '1fr auto 1fr auto 1fr',
+              alignItems: 'center',
+              gap: 16,
+              fontFamily: 'var(--font-mono)',
+              fontSize: 12,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              color: 'var(--ink-faded)',
             }}
           >
-            Learn More
-          </Button>
-        </ButtonGroup>
+            <div>From&nbsp;·&nbsp;HOME</div>
+            <Perf style={{ width: 24 }} />
+            <div style={{ textAlign: 'center' }}>Via&nbsp;·&nbsp;THE ROAD</div>
+            <Perf style={{ width: 24 }} />
+            <div style={{ textAlign: 'right' }}>To&nbsp;·&nbsp;A FAIR SPLIT</div>
+          </div>
+        </motion.div>
+      </div>
 
-        <FeatureGrid>
-          {features.map((feature, index) => (
-            <FeatureCard key={index} className="feature-card" elevation={0}>
-              <IconWrapper>
-                {feature.icon}
-              </IconWrapper>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  color: 'primary.main',
-                  fontSize: isMobile ? '1.2rem' : '1.3rem',
-                  fontWeight: 600,
-                  mb: 1,
+      {/* Feature cards as ledger entries */}
+      <div
+        style={{
+          maxWidth: 1180,
+          margin: '72px auto 0',
+          padding: '0 32px',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'baseline',
+            marginBottom: 18,
+          }}
+        >
+          <div className="ts-eyebrow">Inventory of services</div>
+          <div className="ts-eyebrow">Sec. II</div>
+        </div>
+        <div className="ts-rule" />
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: 0,
+            marginTop: 0,
+          }}
+        >
+          {FEATURES.map((f, i) => (
+            <motion.div
+              key={f.kind}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.5, delay: i * 0.06 }}
+              style={{
+                padding: '28px 22px 32px',
+                borderRight: '1px dashed var(--rule-soft)',
+                borderBottom: '1px dashed var(--rule-soft)',
+              }}
+            >
+              <div className="ts-label" style={{ marginBottom: 12 }}>
+                {f.kind}
+              </div>
+              <h3
+                className="ts-display"
+                style={{
+                  fontSize: 26,
+                  margin: 0,
+                  marginBottom: 12,
+                  fontVariationSettings: '"SOFT" 30, "opsz" 144',
                 }}
               >
-                {feature.title}
-              </Typography>
-              <Typography 
-                variant="body1" 
-                color="text.secondary"
-                sx={{
-                  fontSize: isMobile ? '0.95rem' : '1rem',
-                  lineHeight: 1.6,
+                {f.title}
+              </h3>
+              <p
+                style={{
+                  margin: 0,
+                  color: 'var(--ink-soft)',
+                  lineHeight: 1.5,
+                  fontSize: 16.5,
                 }}
               >
-                {feature.description}
-              </Typography>
-            </FeatureCard>
+                {f.body}
+              </p>
+            </motion.div>
           ))}
-        </FeatureGrid>
-      </ContentContainer>
-    </HeroContainer>
+        </div>
+      </div>
+
+      {/* Footer band */}
+      <div
+        style={{
+          maxWidth: 1180,
+          margin: '64px auto 0',
+          padding: '0 32px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 16,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div className="ts-label">
+          Issued by — the bearer themselves · No fee · No tracking
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            gap: 14,
+            alignItems: 'center',
+          }}
+        >
+          <span className="ts-stamp">Volume I</span>
+          <span className="ts-label">·</span>
+          <span className="ts-stamp">Edition MMXXVI</span>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default Home; 
+export default Home;

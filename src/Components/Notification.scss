@@ -1,30 +1,32 @@
-.notification-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999 !important;
-}
-#toast-container {
-  z-index: 9999999;
-}
-.notification-message {
-  padding: 10px 20px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  font-weight: bold;
+/* react-toastify overrides — paper-aesthetic toasts. */
+.Toastify__toast {
+  font-family: var(--font-body, 'Crimson Pro', Georgia, serif);
+  font-size: 15px;
+  color: var(--ink, #14110d);
+  background: var(--paper, #f3ecd8);
+  border: 1px solid var(--ink, #14110d);
+  border-radius: 0;
+  box-shadow: 0 12px 26px -14px rgba(20, 17, 13, 0.4);
 }
 
-.success {
-  background-color: #4caf50;
-  color: white;
+.Toastify__toast-body {
+  padding: 6px 4px;
+  line-height: 1.4;
 }
 
-.warning {
-  background-color: #ff9800;
-  color: white;
+.Toastify__toast--success { border-color: var(--ledger, #1d4030); }
+.Toastify__toast--error   { border-color: var(--stamp,  #b32a17); }
+.Toastify__toast--warning { border-color: var(--gold,   #9f7e1c); }
+
+.Toastify__close-button {
+  color: var(--ink, #14110d);
+  opacity: 0.7;
 }
 
-.error {
-  background-color: #f44336;
-  color: white;
+.Toastify__progress-bar {
+  background: var(--ink, #14110d);
+  opacity: 0.55;
 }
+.Toastify__progress-bar--success { background: var(--ledger, #1d4030); }
+.Toastify__progress-bar--error   { background: var(--stamp,  #b32a17); }
+.Toastify__progress-bar--warning { background: var(--gold,   #9f7e1c); }
