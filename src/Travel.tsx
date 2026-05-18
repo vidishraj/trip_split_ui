@@ -1,12 +1,13 @@
 import {
   fetchBalances,
-  fetchExpenseForTrip, fetchIndividualBalance,
+  fetchExpenseForTrip,
+  fetchIndividualBalance,
   fetchTrips,
   fetchUsersForATrip,
 } from './Api/Api';
 import Dashboard from './Pages/Dashboard';
 import TripPage from './Pages/Trip';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useTravel } from './Contexts/TravelContext';
 import { useMessage } from './Contexts/NotifContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -18,185 +19,89 @@ export const TravelPage = () => {
   const { setPayload } = useMessage();
   const travelCtx = useTravel();
   const { user } = useUser();
-  // eslint-disable-next-line
-  let [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  function refreshData() {
-    if (travelCtx.state.chosenTrip) {
-      fetchUsersForATrip(true, travelCtx.state.chosenTrip.tripIdShared)
-        .then((response) => {
-          const users = response.data.Message;
-          travelCtx.dispatch({
-            type: 'SET_USERS',
-            payload: users,
-          });
-          travelCtx.dispatch({
-            type: 'SET_SUMMARY',
-            payload: {
-              ...travelCtx.state.summary,
-              userCount: Object.keys(users).length,
-            },
-          });
-        })
-        .catch((error) => {
-          setPayload({
-            type: 'error',
-            message: 'Error fetching users for trip',
-          });
-        });
-      fetchExpenseForTrip(true, travelCtx.state.chosenTrip.tripIdShared)
-        .then((response) => {
-          travelCtx.dispatch({
-            type: 'SET_EXPENSES',
-            payload: response.data.Message,
-          });
-        })
-        .catch((error) => {
-          setPayload({
-            type: 'error',
-            message: 'Error fetching expenses for trip',
-          });
-        });
-      fetchBalances(true, travelCtx.state.chosenTrip.tripIdShared)
-        .then((response) => {
-          travelCtx.dispatch({
-            type: 'SET_BALANCES',
-            payload: response.data.Message,
-          });
-        })
-        .catch((error) => {
-          setPayload({
-            type: 'error',
-            message: 'Error fetching balances for trip',
-          });
-        });
-      fetchIndividualBalance(true, travelCtx.state.chosenTrip.tripIdShared)
-        .then((response) => {
-          travelCtx.dispatch({
-            type: 'SET_INDIVIDUAL_BALANCES',
-            payload: response.data.Message,
-          });
-        })
-        .catch((error) => {
-          setPayload({
-            type: 'error',
-            message: 'Error fetching individual balances for trip',
-          });
-        });
-    }
-  }
+  const refreshData = useCallback(() => {
+    const trip = travelCtx.state.chosenTrip;
+    if (!trip) return;
+    const tripId = trip.tripIdShared;
 
-  useEffect(() => {
-    // eslint-disable-next-line
-    const tripIdShared = searchParams.get('tripIdShared');
-    if (tripIdShared && user) {
-      fetchTrips(true)
-        .then((response) => {
-          travelCtx.dispatch({
-            type: 'SET_TRIP',
-            payload: response.data.Message,
-          });
-          if (Array.isArray(response.data.Message)) {
-            const items: [] = response.data.Message;
-            response.data.Message.forEach((item: any) => {
-              item['currencies'] = item['currencies'].toString()?.split(',');
-            });
-            const trip: any = items.find(
-              (item) => item['tripIdShared'] === parseInt(tripIdShared)
-            );
-            if (trip !== 'undefined' && trip) {
-              travelCtx.dispatch({
-                type: 'SET_CHOSEN_TRIP',
-                payload: trip,
-              });
-            }
-          }
-        })
-        .catch((error) => {
-          setPayload({
-            type: 'error',
-            message: 'Error fetching trips.',
-          });
-        })
-        .finally(() => {});
-      refreshData();
-    } else if (user) {
-      fetchTrips(true)
-        .then((response) => {
-          if (Array.isArray(response.data.Message)) {
-            response.data.Message.forEach((item: any) => {
-              item['currencies'] = item['currencies'].toString().split(',');
-            });
-            travelCtx.dispatch({
-              type: 'SET_TRIP',
-              payload: response.data.Message,
-            });
-          }
-        })
-        .catch((error) => {
-          setPayload({
-            type: 'error',
-            message: 'Error fetching trips',
-          });
-        })
-        .finally(() => {});
-    } // eslint-disable-next-line
-  }, [navigate, user]);
+    fetchUsersForATrip(true, tripId)
+      .then((response) => {
+        const users = response.data.Message;
+        travelCtx.dispatch({ type: 'SET_USERS', payload: users });
+        travelCtx.dispatch({
+          type: 'SET_SUMMARY',
+          payload: { ...travelCtx.state.summary, userCount: Object.keys(users).length },
+        });
+      })
+      .catch(() => setPayload({ type: 'error', message: 'Error fetching users for trip' }));
 
-  useEffect(() => {
-    if (travelCtx.state.chosenTrip) {
-      navigate(
-        `/trip?tripIdShared=${travelCtx.state.chosenTrip.tripIdShared}`,
-        {
-          replace: true,
-        }
+    fetchExpenseForTrip(true, tripId)
+      .then((response) =>
+        travelCtx.dispatch({ type: 'SET_EXPENSES', payload: response.data.Message })
+      )
+      .catch(() => setPayload({ type: 'error', message: 'Error fetching expenses for trip' }));
+
+    fetchBalances(true, tripId)
+      .then((response) =>
+        travelCtx.dispatch({ type: 'SET_BALANCES', payload: response.data.Message })
+      )
+      .catch(() => setPayload({ type: 'error', message: 'Error fetching balances for trip' }));
+
+    fetchIndividualBalance(true, tripId)
+      .then((response) =>
+        travelCtx.dispatch({ type: 'SET_INDIVIDUAL_BALANCES', payload: response.data.Message })
+      )
+      .catch(() =>
+        setPayload({ type: 'error', message: 'Error fetching individual balances for trip' })
       );
-      refreshData();
-    }
-    const tripIdMatch = searchParams.get('tripIdShared');
-    const trips = travelCtx.state.trip;
-      if (tripIdMatch && trips) {
-        // Extract tripIdShared from the returnTo URL
-          // Fetch trips and set the chosen trip
-            trips.forEach((item: any) => {
-              item.currencies = item.currencies.toString().split(',');
-            });
-            travelCtx.dispatch({
-              type: 'SET_TRIP',
-              payload: trips
-            });
-            const targetTrip = trips.find((item: any) => item.tripIdShared === tripIdMatch);
-            if (targetTrip) {
-              travelCtx.dispatch({
-                type: 'SET_CHOSEN_TRIP',
-                payload: targetTrip
-              });
-            }
-          
-      }
-    travelCtx.dispatch({
-      type: 'SET_REFRESHER',
-      payload: refreshData,
-    }); // eslint-disable-next-line
-  }, [travelCtx.state.chosenTrip, navigate, searchParams, travelCtx.state.trip]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [travelCtx.state.chosenTrip]);
+
+  // Load the trip list whenever the user changes. Also handle deep-link
+  // `?tripIdShared=XXXXXX` by picking the matching trip once trips are loaded.
+  useEffect(() => {
+    if (!user) return;
+    const deepLinkTripId = searchParams.get('tripIdShared');
+
+    fetchTrips(true)
+      .then((response) => {
+        const trips = response.data.Message;
+        if (!Array.isArray(trips)) return;
+        trips.forEach((item: any) => {
+          item.currencies = item.currencies.toString().split(',');
+        });
+        travelCtx.dispatch({ type: 'SET_TRIP', payload: trips });
+        if (deepLinkTripId) {
+          const match = trips.find((t: any) => t.tripIdShared === deepLinkTripId);
+          if (match) travelCtx.dispatch({ type: 'SET_CHOSEN_TRIP', payload: match });
+        }
+      })
+      .catch(() => setPayload({ type: 'error', message: 'Error fetching trips.' }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  // When a trip is chosen (manually or via deep link), sync URL and fetch data.
+  useEffect(() => {
+    if (!travelCtx.state.chosenTrip) return;
+    navigate(`/trip?tripIdShared=${travelCtx.state.chosenTrip.tripIdShared}`, { replace: true });
+    refreshData();
+    travelCtx.dispatch({ type: 'SET_REFRESHER', payload: refreshData });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [travelCtx.state.chosenTrip, refreshData]);
+
+  if (user === null) return <Login />;
 
   return (
-    <>
-      {user !== null ? (
-        <div>
-          {travelCtx.state.chosenTrip === undefined ? (
-            <TripPage></TripPage>
-          ) : (
-            <>
-              <Dashboard refreshData={refreshData}></Dashboard>
-            </>
-          )}
-          <Footer />
-        </div>
+    <div>
+      {travelCtx.state.chosenTrip === undefined ? (
+        <TripPage />
       ) : (
-        <Login />
+        <Dashboard refreshData={refreshData} />
       )}
-    </>
+      <Footer />
+    </div>
   );
 };

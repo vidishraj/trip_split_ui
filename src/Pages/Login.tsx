@@ -57,14 +57,10 @@ const Login: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      setUser(userCredential.user);
-      
-      navigate('/trip');
+      await signInWithEmailAndPassword(auth, email, password);
+      // Navigation happens in the currentUser effect below once Firebase
+      // notifies AuthContext — keeping a single source of truth avoids the
+      // race where both this handler and the effect tried to navigate.
     } catch (error) {
       notif.setPayload({
         type: 'error',

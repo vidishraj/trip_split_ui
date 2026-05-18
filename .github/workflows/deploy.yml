@@ -1,30 +1,73 @@
-name: Deploy to Linux Server
+name: Deploy frontend
 
 on:
   push:
     branches:
-      - master  # or your deployment branch
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: frontend-deploy
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.8.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
 
-    - name: Pull latest changes and restart service
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
-          cd /home/opc/React/trip_split_ui
-          sudo git pull
-          sudo npm i
-          npm run build
-          sudo rm -r /var/www/trip/
-          sudo mv build/ /var/www/trip/
-        EOF
+      - name: Build on server and atomically swap deploy dir
+        env:
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+        run: |
+          ssh "$SERVER_USER@$SERVER_HOST" bash -s <<'EOF'
+          set -euo pipefail
+
+          REPO_DIR=/home/opc/React/trip_split_ui
+          DEPLOY_DIR=/var/www/trip
+          STAGE_DIR=/var/www/trip.new
+          BACKUP_DIR=/var/www/trip.bak
+
+          cd "$REPO_DIR"
+
+          echo "==> Pulling latest"
+          sudo git fetch --all --prune
+          sudo git reset --hard origin/master
+
+          echo "==> Installing deps"
+          sudo npm ci --no-audit --no-fund || sudo npm install --no-audit --no-fund
+
+          echo "==> Building"
+          sudo rm -rf build
+          sudo npm run build
+
+          echo "==> Staging into $STAGE_DIR"
+          sudo rm -rf "$STAGE_DIR"
+          sudo cp -a build "$STAGE_DIR"
+
+          echo "==> Atomic swap"
+          sudo rm -rf "$BACKUP_DIR"
+          if [ -d "$DEPLOY_DIR" ]; then
+            sudo mv "$DEPLOY_DIR" "$BACKUP_DIR"
+          fi
+          sudo mv "$STAGE_DIR" "$DEPLOY_DIR"
+
+          echo "==> Smoke test"
+          if ! curl -fsSk -o /dev/null https://tripsplit.vidish.online/; then
+            echo "Smoke test failed, rolling back"
+            sudo rm -rf "$DEPLOY_DIR"
+            sudo mv "$BACKUP_DIR" "$DEPLOY_DIR"
+            exit 1
+          fi
+          echo "Frontend deployed"
+          EOF

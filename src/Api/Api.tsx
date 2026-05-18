@@ -2,362 +2,175 @@ import Axios from 'axios';
 import { setupCache } from 'axios-cache-interceptor';
 import { useLoading } from '../Contexts/LoadingContext';
 import { auth } from './FirebaseConfig';
-const instance = Axios.create();
+
+const instance = Axios.create({ baseURL: process.env.REACT_APP_BACKENDURL });
 const axios = setupCache(instance);
 
-let requestQueue: (() => void)[] = [];
+// Count in-flight requests so the global loader only clears when truly idle.
+let inFlight = 0;
+
 export const useAxiosSetup = () => {
   const { setLoading } = useLoading();
 
   axios.interceptors.request.use(
     async (config) => {
+      inFlight += 1;
       setLoading(true);
-      let user = auth.currentUser; // Get currently signed-in user
+      const user = auth.currentUser;
       if (user) {
         const token = await user.getIdToken();
-        config['headers'].setAuthorization(`Bearer ${token}`);
+        config.headers.setAuthorization(`Bearer ${token}`);
       }
       return config;
     },
     (error) => {
-      setLoading(false);
+      inFlight = Math.max(0, inFlight - 1);
+      if (inFlight === 0) setLoading(false);
       return Promise.reject(error);
     }
   );
 
   axios.interceptors.response.use(
     (response) => {
-      if (requestQueue.length === 0) {
-        setLoading(false);
-      }
+      inFlight = Math.max(0, inFlight - 1);
+      if (inFlight === 0) setLoading(false);
       return response;
     },
     (error) => {
-      if (requestQueue.length === 0) {
-        setLoading(false);
-      }
+      inFlight = Math.max(0, inFlight - 1);
+      if (inFlight === 0) setLoading(false);
       return Promise.reject(error);
     }
   );
 };
 
-let isRequestPending = false;
-const delayBetweenRequests = 100;
+// Cache key constants — single source of truth so invalidations stay in sync.
+const CACHE_KEYS = {
+  trips: 'fetch-trip',
+  users: 'summary',
+  expenses: 'expense',
+  balances: 'balances',
+  indiBalances: 'IndiBalances',
+  notes: 'fetch-notes',
+} as const;
 
-const processNextRequest = () => {
-  if (requestQueue.length > 0 && !isRequestPending) {
-    isRequestPending = true;
-    const nextRequest = requestQueue.shift();
-    if (nextRequest) {
-      nextRequest();
-    }
-  }
-};
-
-const queueRequest = (requestFunc: () => Promise<any>) => {
-  return new Promise((resolve, reject) => {
-    const executeRequest = () => {
-      requestFunc()
-        .then(resolve)
-        .catch(reject)
-        .finally(() => {
-          setTimeout(() => {
-            isRequestPending = false;
-            processNextRequest();
-          }, delayBetweenRequests);
-        });
-    };
-    requestQueue.push(executeRequest);
-    processNextRequest();
-  });
+const invalidate = (...keys: string[]) => {
+  keys.forEach((k) => axios.storage.remove(k));
 };
 
 export async function fetchTrips(userCalled: boolean): Promise<any> {
-  let cacheInstance = {};
-  if (userCalled) {
-    axios.storage.remove('fetch-trip');
-  }
-  return queueRequest(() =>
-    axios
-      .get(process.env.REACT_APP_BACKENDURL + '/fetchTrips', {
-        id: 'fetch-trip',
-        cache: cacheInstance,
-      })
-      .then((response) => response)
-  );
+  if (userCalled) invalidate(CACHE_KEYS.trips);
+  return axios.get('/fetchTrips', { id: CACHE_KEYS.trips, cache: {} });
 }
-export async function deleteTrip(
-  userCalled: boolean,
-  tripId: string
-): Promise<any> {
-  if (userCalled) {
-    axios.storage.remove('fetch');
-  }
-  return queueRequest(() =>
-    axios
-      .get(process.env.REACT_APP_BACKENDURL + '/deleteTrip', {
-        params: { tripId: tripId },
-      })
-      .then((response) => response)
-  );
+
+export async function deleteTrip(_userCalled: boolean, tripId: string): Promise<any> {
+  invalidate(CACHE_KEYS.trips);
+  return axios.get('/deleteTrip', { params: { tripId } });
 }
 
 export async function insertTrip(body: any): Promise<any> {
-  axios.storage.remove('fetch-trip');
-  return queueRequest(() =>
-    axios
-      .post(process.env.REACT_APP_BACKENDURL + '/createTrip', body)
-      .then((response) => response)
-  );
+  invalidate(CACHE_KEYS.trips);
+  return axios.post('/createTrip', body);
 }
 
-export async function fetchUsersForATrip(
-  userCalled: boolean,
-  tripId: string
-): Promise<any> {
-  let cacheInstance = {};
-  if (userCalled) {
-    axios.storage.remove('summary');
-  }
-  return queueRequest(() =>
-    axios
-      .get(process.env.REACT_APP_BACKENDURL + '/fetchUsersForTrip', {
-        params: { trip: tripId },
-        id: 'summary',
-        cache: cacheInstance,
-      })
-      .then((response) => response)
-  );
+export async function fetchUsersForATrip(userCalled: boolean, tripId: string): Promise<any> {
+  if (userCalled) invalidate(CACHE_KEYS.users);
+  return axios.get('/fetchUsersForTrip', {
+    params: { trip: tripId },
+    id: CACHE_KEYS.users,
+    cache: {},
+  });
 }
 
 export async function insertUser(body: any): Promise<any> {
-  axios.storage.remove('summary');
-  return queueRequest(() =>
-    axios
-      .post(process.env.REACT_APP_BACKENDURL + '/createUser', body)
-      .then((response) => response)
-  );
+  invalidate(CACHE_KEYS.users);
+  return axios.post('/createUser', body);
 }
 
 export async function insertExpense(body: any): Promise<any> {
-  axios.storage.remove('summary');
-  axios.storage.remove('expense');
-  axios.storage.remove('balances');
-  return queueRequest(() =>
-    axios
-      .post(process.env.REACT_APP_BACKENDURL + '/addExpense', body)
-      .then((response) => response)
-  );
-}
-export async function updateExpense(
-  expenseId: string,
-  body: any
-): Promise<any> {
-  axios.storage.remove('summary');
-  axios.storage.remove('expense');
-  axios.storage.remove('balances');
-  return queueRequest(() =>
-    axios
-      .post(process.env.REACT_APP_BACKENDURL + '/editExpense', {
-        expenseId: expenseId,
-        body: body,
-      })
-      .then((response) => response)
-  );
-}
-export async function updateTripTitle(
-  title: string,
-  tripId: string
-): Promise<any> {
-  axios.storage.remove('fetch-trip');
-  return queueRequest(() =>
-    axios
-      .post(process.env.REACT_APP_BACKENDURL + '/editTripTitle', {
-        title: title,
-        tripId: tripId,
-      })
-      .then((response) => response)
-  );
+  invalidate(CACHE_KEYS.users, CACHE_KEYS.expenses, CACHE_KEYS.balances, CACHE_KEYS.indiBalances);
+  return axios.post('/addExpense', body);
 }
 
-export async function fetchExpenseForTrip(
-  userCalled: boolean,
-  tripId: string
-): Promise<any> {
-  let cacheInstance = {};
-  if (userCalled) {
-    axios.storage.remove('expense');
-    axios.storage.remove('balances');
-  }
-  return queueRequest(() =>
-    axios
-      .get(process.env.REACT_APP_BACKENDURL + '/fetchExpensesForTrip', {
-        params: { trip: tripId },
-        id: 'expense',
-        cache: cacheInstance,
-      })
-      .then((response) => response)
-  );
+export async function updateExpense(expenseId: string, body: any): Promise<any> {
+  invalidate(CACHE_KEYS.users, CACHE_KEYS.expenses, CACHE_KEYS.balances, CACHE_KEYS.indiBalances);
+  return axios.post('/editExpense', { expenseId, body });
 }
 
-export async function fetchBalances(
-  userCalled: boolean,
-  tripId: string
-): Promise<any> {
-  let cacheInstance = {};
-  if (userCalled) {
-    axios.storage.remove('expense');
-    axios.storage.remove('balances');
-  }
-  return queueRequest(() =>
-    axios
-      .get(process.env.REACT_APP_BACKENDURL + '/fetchBalances', {
-        params: { trip: tripId },
-        id: 'balances',
-        cache: cacheInstance,
-      })
-      .then((response) => response)
-  );
-}
-export async function fetchIndividualBalance(
-  userCalled: boolean,
-  tripId: string
-): Promise<any> {
-  let cacheInstance = {};
-  if (userCalled) {
-    axios.storage.remove('expense');
-    axios.storage.remove('balances');
-    axios.storage.remove('IndiBalances');
-  }
-  return queueRequest(() =>
-    axios
-      .get(process.env.REACT_APP_BACKENDURL + '/fetchIndividualBalance', {
-        params: { trip: tripId },
-        id: 'IndiBalances',
-        cache: cacheInstance,
-      })
-      .then((response) => response)
-  );
+export async function updateTripTitle(title: string, tripId: string): Promise<any> {
+  invalidate(CACHE_KEYS.trips);
+  return axios.post('/editTripTitle', { title, tripId });
 }
 
-export async function deleteExpense(
-  userCalled: boolean,
-  expenseId: number,
-  tripId: string
-): Promise<any> {
-  if (userCalled) {
-    axios.storage.remove('expense');
-    axios.storage.remove('summary');
-    axios.storage.remove('balances');
-  }
-  return queueRequest(() =>
-    axios
-      .get(process.env.REACT_APP_BACKENDURL + '/deleteExpenses', {
-        params: { expenseId: expenseId, tripId: tripId },
-      })
-      .then((response) => response)
-  );
+export async function fetchExpenseForTrip(userCalled: boolean, tripId: string): Promise<any> {
+  if (userCalled) invalidate(CACHE_KEYS.expenses, CACHE_KEYS.balances);
+  return axios.get('/fetchExpensesForTrip', {
+    params: { trip: tripId },
+    id: CACHE_KEYS.expenses,
+    cache: {},
+  });
+}
+
+export async function fetchBalances(userCalled: boolean, tripId: string): Promise<any> {
+  if (userCalled) invalidate(CACHE_KEYS.expenses, CACHE_KEYS.balances);
+  return axios.get('/fetchBalances', {
+    params: { trip: tripId },
+    id: CACHE_KEYS.balances,
+    cache: {},
+  });
+}
+
+export async function fetchIndividualBalance(userCalled: boolean, tripId: string): Promise<any> {
+  if (userCalled) invalidate(CACHE_KEYS.expenses, CACHE_KEYS.balances, CACHE_KEYS.indiBalances);
+  return axios.get('/fetchIndividualBalance', {
+    params: { trip: tripId },
+    id: CACHE_KEYS.indiBalances,
+    cache: {},
+  });
+}
+
+export async function deleteExpense(_userCalled: boolean, expenseId: number, tripId: string): Promise<any> {
+  invalidate(CACHE_KEYS.users, CACHE_KEYS.expenses, CACHE_KEYS.balances, CACHE_KEYS.indiBalances);
+  return axios.get('/deleteExpenses', { params: { expenseId, tripId } });
 }
 
 export async function deleteUser(userId: string, tripId: string): Promise<any> {
-  axios.storage.remove('summary');
-  axios.storage.remove('expense');
-  return queueRequest(() =>
-    axios
-      .get(process.env.REACT_APP_BACKENDURL + '/deleteUser', {
-        params: { userId: userId, tripId: tripId },
-      })
-      .then((response) => response)
-  );
+  invalidate(CACHE_KEYS.users, CACHE_KEYS.expenses);
+  return axios.get('/deleteUser', { params: { userId, tripId } });
 }
+
 export async function sendTripRequest(tripId: string): Promise<any> {
-  return queueRequest(() =>
-    axios
-      .post(process.env.REACT_APP_BACKENDURL + '/sendTripUserRequest', {
-        tripId: tripId,
-      })
-      .then((response) => response)
-  );
+  return axios.post('/sendTripUserRequest', { tripId });
 }
+
 export async function fetchTripRequestsForTrip(tripId: string): Promise<any> {
-  return queueRequest(() =>
-    axios
-      .get(process.env.REACT_APP_BACKENDURL + '/fetchTripRequestForTrip', {
-        params: { trip: tripId },
-      })
-      .then((response) => response)
-  );
+  return axios.get('/fetchTripRequestForTrip', { params: { trip: tripId } });
 }
+
 export async function sendResponseForTripRequest(body: any): Promise<any> {
-  return queueRequest(() =>
-    axios
-      .post(
-        process.env.REACT_APP_BACKENDURL + '/registerResponseForTripRequest',
-        body
-      )
-      .then((response) => response)
-  );
+  return axios.post('/registerResponseForTripRequest', body);
 }
 
 export async function fetchNotes(tripId: string, page: number): Promise<any> {
-  axios.storage.remove('fetch-notes');
-  return queueRequest(() =>
-    axios
-      .get(
-        process.env.REACT_APP_BACKENDURL + '/getNotes',
-        {
-          id: 'fetch-notes',
-          params: { tripId: tripId, page: page },
-        }
-      )
-      .then((response) => response)
-  );
+  invalidate(CACHE_KEYS.notes);
+  return axios.get('/getNotes', { id: CACHE_KEYS.notes, params: { tripId, page } });
 }
 
 export async function createNote(body: any): Promise<any> {
-  axios.storage.remove('fetch-notes');
-
-  return queueRequest(() =>
-    axios
-      .post(
-        process.env.REACT_APP_BACKENDURL + '/createNote',
-        body
-      )
-      .then((response) => response)
-  );
+  invalidate(CACHE_KEYS.notes);
+  return axios.post('/createNote', body);
 }
 
 export async function updateNote(body: any): Promise<any> {
-  axios.storage.remove('fetch-notes');
-
-  return queueRequest(() =>
-    axios
-      .put(
-        process.env.REACT_APP_BACKENDURL + '/editNote',
-        body
-      )
-      .then((response) => response)
-  );
+  invalidate(CACHE_KEYS.notes);
+  return axios.put('/editNote', body);
 }
-export async function deleteNote(tripId: string, noteId: string): Promise<any> {
-  axios.storage.remove('fetch-notes');
 
-  return queueRequest(() =>
-    axios
-      .delete(
-        process.env.REACT_APP_BACKENDURL + '/deleteNote',
-        {params:{tripId: tripId, noteId: noteId }}
-      )
-      .then((response) => response)
-  );
+export async function deleteNote(tripId: string, noteId: string): Promise<any> {
+  invalidate(CACHE_KEYS.notes);
+  return axios.delete('/deleteNote', { params: { tripId, noteId } });
 }
 
 export async function fetchIndividualSpending(tripId: string): Promise<any> {
-  return queueRequest(() =>
-    axios
-      .get(process.env.REACT_APP_BACKENDURL + '/fetchIndividualSpending', {
-        params: { tripId: tripId },
-      })
-      .then((response) => response)
-  );
+  return axios.get('/fetchIndividualSpending', { params: { tripId } });
 }
