@@ -38,18 +38,23 @@ jobs:
           STAGE_DIR=/var/www/trip.new
           BACKUP_DIR=/var/www/trip.bak
 
+          # nvm-managed node (v22) — system /bin/node is v10 and can't parse modern bundlers.
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          nvm use --silent 22 || nvm use --silent default
+
           cd "$REPO_DIR"
 
           echo "==> Pulling latest"
-          sudo git fetch --all --prune
-          sudo git reset --hard origin/master
+          git fetch --all --prune
+          git reset --hard origin/master
 
           echo "==> Installing deps"
-          sudo npm ci --no-audit --no-fund || sudo npm install --no-audit --no-fund
+          npm ci --no-audit --no-fund
 
           echo "==> Building"
-          sudo rm -rf build
-          sudo npm run build
+          rm -rf build
+          npm run build
 
           echo "==> Staging into $STAGE_DIR"
           sudo rm -rf "$STAGE_DIR"
