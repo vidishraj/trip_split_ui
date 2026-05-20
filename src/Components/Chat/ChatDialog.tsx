@@ -73,8 +73,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
 
   const onKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // Don't intercept Enter mid-IME composition (Japanese, Chinese, etc.).
-    // @ts-expect-error nativeEvent.isComposing exists at runtime
-    if (e.nativeEvent?.isComposing) return;
+    if (e.nativeEvent.isComposing) return;
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       send();
