@@ -15,6 +15,8 @@ export const Cropmarks: React.FC<{ inset?: number; size?: number }> = ({
     height: size,
     pointerEvents: 'none',
   };
+  // All decorative; never read aloud.
+  const wrapperProps = { 'aria-hidden': true as const };
   const line: React.CSSProperties = {
     position: 'absolute',
     background: 'var(--ink)',
@@ -49,12 +51,12 @@ export const Cropmarks: React.FC<{ inset?: number; size?: number }> = ({
     </div>
   );
   return (
-    <>
+    <span {...wrapperProps}>
       {make({ left: inset, top: inset }, 0, 0, undefined as any, undefined as any, 0, 0, undefined as any, undefined as any)}
       {make({ right: inset, top: inset }, undefined as any, 0, 0, undefined as any, undefined as any, 0, 0, undefined as any)}
       {make({ left: inset, bottom: inset }, 0, undefined as any, undefined as any, 0, 0, undefined as any, undefined as any, 0)}
       {make({ right: inset, bottom: inset }, undefined as any, undefined as any, 0, 0, undefined as any, undefined as any, 0, 0)}
-    </>
+    </span>
   );
 };
 
@@ -67,6 +69,7 @@ export const Perf: React.FC<{ vertical?: boolean; opacity?: number; style?: Reac
   style,
 }) => (
   <div
+    aria-hidden
     className={vertical ? 'ts-perf-v' : 'ts-perf-h'}
     style={{ opacity, ...style }}
   />
@@ -101,6 +104,7 @@ export const Stamp: React.FC<StampProps> = ({
   const color = toneToColor[tone];
   return (
     <motion.div
+      aria-hidden
       initial={{ opacity: 0, scale: 0.6, rotate: rotate - 18 }}
       animate={{ opacity: 1, scale: 1, rotate }}
       transition={{ type: 'spring', stiffness: 220, damping: 14, delay: 0.2 }}

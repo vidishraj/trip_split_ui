@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dialog, Slide, useMediaQuery, useTheme } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { chatWithAgent } from '../../Api/Api';
+import { chatWithAgent, invalidateAll } from '../../Api/Api';
 import { useTravel } from '../../Contexts/TravelContext';
 import { useMessage } from '../../Contexts/NotifContext';
 import { Perf, Stamp } from '../Design/Atoms';
@@ -42,29 +42,39 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
     const tripId = travelCtx.state.chosenTrip?.tripIdShared;
     if (!text || !tripId || busy) return;
     setInput('');
-    const next: ChatMessage[] = [...messages, { role: 'user', content: text }];
-    setMessages(next);
+    // Functional setState so a quick second send doesn't clobber the first.
+    setMessages((prev) => [...prev, { role: 'user', content: text }]);
     setBusy(true);
+    let priorHistory: ChatMessage[] = [];
+    setMessages((prev) => {
+      priorHistory = prev.slice(0, -1); // exclude the just-pushed user message
+      return prev;
+    });
     try {
-      const res = await chatWithAgent(tripId, text, messages);
+      const res = await chatWithAgent(tripId, text, priorHistory);
       const payload = res.data?.Message ?? {};
       const reply: string = payload.reply || '(no reply)';
-      setMessages([...next, { role: 'assistant', content: reply }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
       if (payload.error) setPayload({ type: 'error', message: payload.error });
       if (Array.isArray(payload.mutations) && payload.mutations.length > 0) {
+        invalidateAll();
         const refresh = travelCtx.state.refreshData;
         if (typeof refresh === 'function') refresh();
       }
     } catch (e: any) {
-      const msg = e?.response?.data?.Error || e?.message || 'Could not reach the clerk.';
-      setMessages([...next, { role: 'assistant', content: `Error: ${msg}` }]);
+      const msg =
+        e?.response?.data?.Error || e?.message || 'Could not reach the clerk.';
+      setMessages((prev) => [...prev, { role: 'assistant', content: `Error: ${msg}` }]);
       setPayload({ type: 'error', message: msg });
     } finally {
       setBusy(false);
     }
-  }, [input, messages, busy, travelCtx, setPayload]);
+  }, [input, busy, travelCtx, setPayload]);
 
-  const onKey = (e: React.KeyboardEvent) => {
+  const onKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Don't intercept Enter mid-IME composition (Japanese, Chinese, etc.).
+    // @ts-expect-error nativeEvent.isComposing exists at runtime
+    if (e.nativeEvent?.isComposing) return;
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       send();
@@ -147,6 +157,9 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
         {/* Messages */}
         <div
           ref={listRef}
+          role="log"
+          aria-live="polite"
+          aria-label="Assistant conversation"
           style={{
             flex: 1,
             overflowY: 'auto',
@@ -249,6 +262,8 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKey}
             rows={2}
+            autoFocus
+            aria-label="Message the trip assistant"
             style={{
               flex: 1,
               border: '1px solid var(--ink)',

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -19,6 +19,10 @@ const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { currentUser } = useAuth();
   const notif = useMessage();
+  const serial = useMemo(
+    () => Math.random().toString(36).slice(2, 10).toUpperCase(),
+    [],
+  );
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,7 +205,7 @@ const Login: React.FC = () => {
             }}
           >
             <div className="ts-mono" style={{ fontSize: 11, color: 'var(--ink-faded)', letterSpacing: '0.16em' }}>
-              SER · {Math.random().toString(36).slice(2, 10).toUpperCase()}
+              SER · {serial}
             </div>
             <div className="ts-label">Issued under no jurisdiction</div>
           </div>

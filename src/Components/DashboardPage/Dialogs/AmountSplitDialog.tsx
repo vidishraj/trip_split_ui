@@ -34,8 +34,14 @@ export const AmountSplitDialog: React.FC<AmountSplitDialogProps> = ({
   const currencyCtx = useContext(CurrencyContext);
   const users = travelCtx.state.users;
 
+  // Deep clone so adding currency-keyed amount fields doesn't mutate
+  // the shared travelCtx.state.users objects.
   const [checkedUsers, setCheckedUsers] = useState<User[]>(
-    users.map((user) => ({ ...user, isChecked: true })),
+    users.map((user) => ({
+      userId: user.userId,
+      userName: user.userName,
+      isChecked: true,
+    })),
   );
   const [isEqual, setIsEqual] = useState(true);
   const [currentTotal, setCurrentTotal] = useState<Record<string, any>>(amount);

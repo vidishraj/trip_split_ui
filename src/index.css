@@ -13,7 +13,8 @@
   /* Ink */
   --ink:          #14110d;
   --ink-soft:     #3a3327;
-  --ink-faded:    #6b614e;
+  /* Darkened from #6b614e for WCAG AA on small mono labels against paper. */
+  --ink-faded:    #5a513e;
   --rule:         #2a241c;
   --rule-soft:    rgba(20, 17, 13, 0.18);
 
