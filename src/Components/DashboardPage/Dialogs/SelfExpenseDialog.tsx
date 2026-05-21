@@ -135,10 +135,12 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({ open, onClose }) 
         <div>
           {indiBalance &&
             indiBalance['expense'] &&
-            Object.keys(indiBalance['expense']).map((userId: string) => {
-              const net = indiBalance['expense'][userId];
-              const personal =
-                (indiBalance['selfExpense'] && indiBalance['selfExpense'][userId]) || 0;
+            (() => {
+              const expenseMap = indiBalance['expense'] as Record<string, number>;
+              const selfMap = (indiBalance['selfExpense'] as Record<string, number> | undefined) || {};
+              return Object.keys(expenseMap).map((userId: string) => {
+              const net = expenseMap[userId];
+              const personal = selfMap[userId] || 0;
               return (
                 <div
                   key={userId}
@@ -177,7 +179,8 @@ const SelfExpenseDialog: React.FC<SelfExpenseDialogProps> = ({ open, onClose }) 
                   </div>
                 </div>
               );
-            })}
+            });
+            })()}
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 18 }}>
