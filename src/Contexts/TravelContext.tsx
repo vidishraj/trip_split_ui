@@ -6,7 +6,7 @@ export interface TripResponse {
   currencies: string[];
 }
 
-interface UserResponse {
+export interface UserResponse {
   tripId: string;
   userId: number;
   userName: string;
@@ -14,27 +14,57 @@ interface UserResponse {
   deletable: boolean;
 }
 
-interface TripRequest {
+export interface TripRequest {
   userId: number;
   email: string;
   userName: string;
 }
-interface TravelContextType {
-  trip: TripResponse[] | undefined;
-  expenses: any;
-  users: UserResponse[];
-  balances: any;
-  indiBalance: any;
-  tripRequests: undefined | TripRequest[];
-  chosenTrip: TripResponse | undefined;
-  summary: CurrentTripInterface | undefined;
-  refreshData: any;
-  expenseDialogOpen: boolean;
-  selectedExpense: any | null;
+
+/** Single expense row as the backend serves it back from
+ *  /fetchExpensesForTrip — the split is flattened into a map of
+ *  userId -> share-as-stored. */
+export interface ExpenseResponse {
+  expenseId: number;
+  date: string;
+  expenseDesc: string;
+  amount: number;
+  paidBy: number;
+  selfExpense: boolean;
+  tripId: string;
+  splitBetween: Record<string, number>;
+}
+
+/** One leg of the simplified settlement plan from /fetchBalances. */
+export interface BalanceTransaction {
+  from: number;
+  to: number;
+  amount: number;
+}
+
+/** The shape of /fetchIndividualBalance: per-user net + per-user self-expense
+ *  totals + the overall trip total. */
+export interface IndividualBalance {
+  expense?: Record<string, number>;
+  selfExpense?: Record<string, number>;
+  total?: number;
 }
 
 interface CurrentTripInterface {
   userCount: number | undefined;
+}
+
+interface TravelContextType {
+  trip: TripResponse[] | undefined;
+  expenses: ExpenseResponse[];
+  users: UserResponse[];
+  balances: BalanceTransaction[];
+  indiBalance: IndividualBalance;
+  tripRequests: undefined | TripRequest[];
+  chosenTrip: TripResponse | undefined;
+  summary: CurrentTripInterface | undefined;
+  refreshData: () => void;
+  expenseDialogOpen: boolean;
+  selectedExpense: ExpenseResponse | null;
 }
 
 const initialState: TravelContextType = {
@@ -46,29 +76,25 @@ const initialState: TravelContextType = {
   tripRequests: undefined,
   chosenTrip: undefined,
   summary: { userCount: undefined },
-  refreshData: () => {
-  },
+  refreshData: () => {},
   expenseDialogOpen: false,
-  selectedExpense: null
+  selectedExpense: null,
 };
 
 type Action =
-  | { type: 'SET_TRIP'; payload: any }
-  | { type: 'SET_EXPENSES'; payload: any[] }
-  | { type: 'SET_USERS'; payload: any[] }
-  | { type: 'SET_BALANCES'; payload: any[] }
-  | { type: 'SET_INDIVIDUAL_BALANCES'; payload: any }
-  | { type: 'SET_TRIP_REQ'; payload: any[] }
-  | { type: 'SET_REFRESHER'; payload: any }
+  | { type: 'SET_TRIP'; payload: TripResponse[] }
+  | { type: 'SET_EXPENSES'; payload: ExpenseResponse[] }
+  | { type: 'SET_USERS'; payload: UserResponse[] }
+  | { type: 'SET_BALANCES'; payload: BalanceTransaction[] }
+  | { type: 'SET_INDIVIDUAL_BALANCES'; payload: IndividualBalance }
+  | { type: 'SET_TRIP_REQ'; payload: TripRequest[] }
+  | { type: 'SET_REFRESHER'; payload: () => void }
   | { type: 'SET_CHOSEN_TRIP'; payload: TripResponse | undefined }
   | { type: 'SET_EXPENSE_DIALOG_STATE'; payload: boolean }
   | { type: 'SET_SUMMARY'; payload: CurrentTripInterface }
-  | { type: 'SET_SELECTED_EXPENSE'; payload: any }
+  | { type: 'SET_SELECTED_EXPENSE'; payload: ExpenseResponse | null };
 
-const reducer = (
-  state: TravelContextType,
-  action: Action
-): TravelContextType => {
+const reducer = (state: TravelContextType, action: Action): TravelContextType => {
   switch (action.type) {
     case 'SET_TRIP':
       return { ...state, trip: action.payload };

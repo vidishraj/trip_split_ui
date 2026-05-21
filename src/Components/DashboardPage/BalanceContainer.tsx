@@ -4,12 +4,26 @@ import { motion } from 'framer-motion';
 import { useTravel } from '../../Contexts/TravelContext';
 import { formatNumber } from '../../Contexts/CurrencyContext';
 import SelfExpenseDialog from './Dialogs/SelfExpenseDialog';
+import ConfirmationDialog from '../ConfirmationDialog';
+import { insertExpense } from '../../Api/Api';
+import { useMessage } from '../../Contexts/NotifContext';
 import { Perf, Stamp } from '../Design/Atoms';
+
+interface PendingSettlement {
+  fromId: number;
+  toId: number;
+  amount: number;
+  fromName: string;
+  toName: string;
+}
 
 const BalanceContainer: React.FC = () => {
   const travelCtx = useTravel();
+  const { setPayload } = useMessage();
   const userBalances = travelCtx.state.balances || [];
   const [selfExpenseDialog, setSelfExpenseDialog] = useState(false);
+  const [pending, setPending] = useState<PendingSettlement | null>(null);
+  const [settling, setSettling] = useState(false);
 
   const total = travelCtx.state.indiBalance?.total ?? 0;
   const positive = total >= 0;
@@ -17,6 +31,31 @@ const BalanceContainer: React.FC = () => {
   const getUserName = (userId: number) => {
     const u = travelCtx.state.users.find((user) => user.userId === userId);
     return u ? u.userName : 'Unknown';
+  };
+
+  const recordSettlement = async () => {
+    if (!pending || settling) return;
+    const tripId = travelCtx.state.chosenTrip?.tripIdShared;
+    if (!tripId) return;
+    setSettling(true);
+    try {
+      await insertExpense({
+        tripId,
+        date: new Date().toISOString().slice(0, 10),
+        description: `Settlement: ${pending.fromName} → ${pending.toName}`,
+        amount: pending.amount,
+        paidBy: pending.fromId,
+        splitbw: [{ userId: pending.toId, amount: pending.amount }],
+        selfExpense: false,
+      });
+      setPayload({ type: 'success', message: 'Settlement logged. Balance cleared.' });
+      travelCtx.state.refreshData?.();
+      setPending(null);
+    } catch {
+      setPayload({ type: 'error', message: 'Could not record settlement.' });
+    } finally {
+      setSettling(false);
+    }
   };
 
   return (
@@ -142,7 +181,7 @@ const BalanceContainer: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Amount */}
+                {/* Amount + settle action */}
                 <div style={{ textAlign: 'center', minWidth: 200 }}>
                   <Perf style={{ width: 80, margin: '0 auto 8px' }} />
                   <div
@@ -155,7 +194,22 @@ const BalanceContainer: React.FC = () => {
                   >
                     ₹{formatNumber(balance.amount)}
                   </div>
-                  <Perf style={{ width: 80, margin: '8px auto 0' }} />
+                  <Perf style={{ width: 80, margin: '8px auto 6px' }} />
+                  <button
+                    className="ts-btn"
+                    style={{ padding: '4px 10px', fontSize: 9 }}
+                    onClick={() =>
+                      setPending({
+                        fromId: balance.from,
+                        toId: balance.to,
+                        amount: balance.amount,
+                        fromName: sender,
+                        toName: receiver,
+                      })
+                    }
+                  >
+                    Mark as settled
+                  </button>
                 </div>
 
                 {/* Creditor */}
@@ -198,6 +252,19 @@ const BalanceContainer: React.FC = () => {
       <SelfExpenseDialog
         open={selfExpenseDialog}
         onClose={() => setSelfExpenseDialog(false)}
+      />
+
+      <ConfirmationDialog
+        open={pending !== null}
+        message={
+          pending
+            ? `Record that ${pending.fromName} paid ${pending.toName} ₹${formatNumber(
+                pending.amount,
+              )} to settle up?`
+            : ''
+        }
+        onSubmit={recordSettlement}
+        onCancel={() => setPending(null)}
       />
     </motion.div>
   );
