@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   Dialog,
-  DialogActions,
   DialogContent,
   IconButton,
   useMediaQuery,
@@ -197,16 +196,36 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({ onClose, editMode, editDa
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{ sx: { background: 'transparent', boxShadow: 'none', overflow: 'visible' } }}
+      // Outer Paper carries the height cap and a single scroll axis; the
+      // ts-paper inside is a flex column so the form scrolls and the
+      // action row stays pinned at the bottom.
+      PaperProps={{
+        sx: {
+          background: 'transparent',
+          boxShadow: 'none',
+          overflow: 'visible',
+          maxHeight: 'calc(100vh - 32px)',
+          margin: '16px',
+        },
+      }}
     >
       <div
         className="ts-paper"
         style={{
-          padding: isMobile ? '20px 18px' : '24px 26px',
+          padding: 0,
           position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          maxHeight: 'calc(100vh - 32px)',
         }}
       >
-        <DialogContent sx={{ padding: 0 }}>
+        <DialogContent
+          sx={{
+            padding: isMobile ? '20px 18px 0' : '24px 26px 0',
+            overflowY: 'auto',
+            flex: 1,
+          }}
+        >
           <div
             style={{
               display: 'flex',
@@ -462,9 +481,20 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({ onClose, editMode, editDa
           editValues={formState.userDivision}
         />
 
-        <Perf style={{ margin: '20px 0 16px' }} />
-
-        <DialogActions sx={{ padding: 0, justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+        {/* Sticky footer — sits outside the scroll area so users always see
+            Submit/Cancel even when the form is long. */}
+        <div
+          style={{
+            flexShrink: 0,
+            padding: isMobile ? '14px 18px 18px' : '16px 26px 22px',
+            background: 'var(--paper-deep)',
+            borderTop: '1px dashed var(--rule-soft)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 10,
+          }}
+        >
           <button type="button" className="ts-btn" onClick={onClose}>Cancel</button>
           <button
             type="button"
@@ -474,7 +504,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({ onClose, editMode, editDa
           >
             {editMode ? 'File amendment ↗' : 'Record entry ↗'}
           </button>
-        </DialogActions>
+        </div>
       </div>
     </Dialog>
   );
