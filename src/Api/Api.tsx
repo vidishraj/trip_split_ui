@@ -207,10 +207,16 @@ export async function fetchIndividualSpending(tripId: string): Promise<any> {
   return axios.get('/fetchIndividualSpending', { params: { tripId } });
 }
 
+export interface ChatImage {
+  data: string;        // base64 (no data: prefix)
+  media_type: string;  // e.g. "image/png"
+}
+
 export async function chatWithAgent(
   tripId: string,
   message: string,
   history: Array<{ role: 'user' | 'assistant'; content: string }>,
+  images?: ChatImage[],
 ): Promise<any> {
-  return axios.post('/chat', { tripId, message, history });
+  return axios.post('/chat', { tripId, message, history, images: images ?? [] });
 }
