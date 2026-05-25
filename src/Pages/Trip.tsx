@@ -1,6 +1,7 @@
 // TripPage.tsx — Departures board
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { useTravel } from '../Contexts/TravelContext';
 import { useMessage } from '../Contexts/NotifContext';
 import { fetchTrips, deleteTrip } from '../Api/Api';
@@ -25,6 +26,8 @@ const TripPage: React.FC = () => {
   const notif = useMessage();
   const travelCtx = useTravel();
   const { user } = useUser();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const refetchTrips = (): void => {
     fetchTrips(true)
@@ -78,10 +81,11 @@ const TripPage: React.FC = () => {
     <div
       style={{
         minHeight: '100vh',
-        padding: '36px 20px 80px',
+        padding: isMobile ? '24px 14px 60px' : '36px 20px 80px',
         maxWidth: 1200,
         margin: '0 auto',
         position: 'relative',
+        overflowX: 'hidden',
       }}
     >
       {/* Header band */}
@@ -95,20 +99,21 @@ const TripPage: React.FC = () => {
           marginBottom: 28,
         }}
       >
-        <div>
+        <div style={{ minWidth: 0, maxWidth: '100%' }}>
           <div className="ts-eyebrow">Departures · The bearer is</div>
           <h1
             className="ts-display"
             style={{
               margin: '6px 0 0',
-              fontSize: 'clamp(40px, 6vw, 72px)',
+              fontSize: 'clamp(36px, 8vw, 72px)',
               fontVariationSettings: '"SOFT" 30, "WONK" 1, "opsz" 144',
+              overflowWrap: 'anywhere',
             }}
           >
             {firstName}.
           </h1>
         </div>
-        <div style={{ textAlign: 'right' }}>
+        <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
           <div className="ts-mono" style={{ fontSize: 12, letterSpacing: '0.18em', color: 'var(--ink-faded)' }}>
             {new Date().toUTCString().split(' ').slice(0, 4).join(' ')}
           </div>
@@ -163,8 +168,10 @@ const TripPage: React.FC = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: 22,
+            gridTemplateColumns: isMobile
+              ? '1fr'
+              : 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: isMobile ? 16 : 22,
           }}
         >
           {trips.map((trip: TripData, idx: number) => (

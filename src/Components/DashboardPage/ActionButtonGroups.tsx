@@ -96,29 +96,27 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 10,
-      }}
-    >
-      {/* Row 1: section switch */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {/* Row 1: section switch — full-width on mobile so taps are easy. */}
       <div
         style={{
           display: 'flex',
           gap: 0,
           border: '1px solid var(--ink)',
           padding: 0,
-          width: 'fit-content',
+          width: isMobile ? '100%' : 'fit-content',
         }}
       >
-        <Pill active={active === 'expenses'} onClick={onToggleExpenses}>
-          The Ledger
-        </Pill>
-        <Pill active={active === 'balances'} onClick={onToggleBalances}>
-          Settlement
-        </Pill>
+        <div style={{ flex: isMobile ? 1 : 'unset' }}>
+          <Pill active={active === 'expenses'} onClick={onToggleExpenses}>
+            The Ledger
+          </Pill>
+        </div>
+        <div style={{ flex: isMobile ? 1 : 'unset' }}>
+          <Pill active={active === 'balances'} onClick={onToggleBalances}>
+            Settlement
+          </Pill>
+        </div>
       </div>
 
       {/* Row 2: utilities — wraps on mobile */}
@@ -130,7 +128,7 @@ const ActionButtonGroups: React.FC<ActionButtonGroupsProps> = ({
         <Pill onClick={onOpenNotes}>Notes</Pill>
         <Pill onClick={onOpenCalculator}>Calculator</Pill>
         <Pill onClick={onOpenUserDialog} emphasis="stamp">
-          Pending requests
+          {isMobile ? 'Requests' : 'Pending requests'}
         </Pill>
         {tripId && (
           <Pill onClick={copyTripId}>

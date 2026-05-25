@@ -1,6 +1,7 @@
 // BalanceContainer.tsx — Customs declaration / settlement view
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { useTravel } from '../../Contexts/TravelContext';
 import { formatNumber } from '../../Contexts/CurrencyContext';
 import SelfExpenseDialog from './Dialogs/SelfExpenseDialog';
@@ -20,6 +21,8 @@ interface PendingSettlement {
 const BalanceContainer: React.FC = () => {
   const travelCtx = useTravel();
   const { setPayload } = useMessage();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const userBalances = travelCtx.state.balances || [];
   const [selfExpenseDialog, setSelfExpenseDialog] = useState(false);
   const [pending, setPending] = useState<PendingSettlement | null>(null);
@@ -156,72 +159,131 @@ const BalanceContainer: React.FC = () => {
                 initial={{ opacity: 0, x: -4 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.04 }}
-                style={{
-                  padding: '14px 24px',
-                  borderBottom: '1px dashed var(--rule-soft)',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr auto 1fr',
-                  gap: 18,
-                  alignItems: 'center',
-                }}
+                style={
+                  isMobile
+                    ? {
+                        padding: '14px 18px',
+                        borderBottom: '1px dashed var(--rule-soft)',
+                        display: 'grid',
+                        gridTemplateColumns: '1fr auto 1fr',
+                        gridTemplateAreas: '"from arrow to" "amount amount amount" "action action action"',
+                        rowGap: 10,
+                        columnGap: 10,
+                        alignItems: 'center',
+                      }
+                    : {
+                        padding: '14px 24px',
+                        borderBottom: '1px dashed var(--rule-soft)',
+                        display: 'grid',
+                        gridTemplateColumns: '1fr auto 1fr',
+                        gap: 18,
+                        alignItems: 'center',
+                      }
+                }
               >
                 {/* Debtor */}
-                <div>
+                <div style={isMobile ? { gridArea: 'from', minWidth: 0 } : undefined}>
                   <div className="ts-label">From · debtor</div>
                   <div
                     style={{
                       fontFamily: 'var(--font-display)',
-                      fontSize: 22,
+                      fontSize: isMobile ? 17 : 22,
                       fontWeight: 500,
                       marginTop: 2,
                       color: 'var(--ink)',
+                      overflowWrap: 'anywhere',
                     }}
                   >
                     {sender}
                   </div>
                 </div>
 
+                {/* Centre arrow on mobile (between debtor/creditor) */}
+                {isMobile && (
+                  <div style={{ gridArea: 'arrow', textAlign: 'center', color: 'var(--ink-faded)', fontSize: 18 }}>
+                    →
+                  </div>
+                )}
+
                 {/* Amount + settle action */}
-                <div style={{ textAlign: 'center', minWidth: 200 }}>
-                  <Perf style={{ width: 80, margin: '0 auto 8px' }} />
+                <div
+                  style={
+                    isMobile
+                      ? { gridArea: 'amount', textAlign: 'center' }
+                      : { textAlign: 'center', minWidth: 200 }
+                  }
+                >
+                  {!isMobile && <Perf style={{ width: 80, margin: '0 auto 8px' }} />}
                   <div
                     className="ts-num"
                     style={{
-                      fontSize: 22,
+                      fontSize: isMobile ? 20 : 22,
                       fontWeight: 700,
                       color: 'var(--stamp)',
                     }}
                   >
                     ₹{formatNumber(balance.amount)}
                   </div>
-                  <Perf style={{ width: 80, margin: '8px auto 6px' }} />
-                  <button
-                    className="ts-btn"
-                    style={{ padding: '4px 10px', fontSize: 9 }}
-                    onClick={() =>
-                      setPending({
-                        fromId: balance.from,
-                        toId: balance.to,
-                        amount: balance.amount,
-                        fromName: sender,
-                        toName: receiver,
-                      })
-                    }
-                  >
-                    Mark as settled
-                  </button>
+                  {!isMobile && (
+                    <>
+                      <Perf style={{ width: 80, margin: '8px auto 6px' }} />
+                      <button
+                        className="ts-btn"
+                        style={{ padding: '4px 10px', fontSize: 9 }}
+                        onClick={() =>
+                          setPending({
+                            fromId: balance.from,
+                            toId: balance.to,
+                            amount: balance.amount,
+                            fromName: sender,
+                            toName: receiver,
+                          })
+                        }
+                      >
+                        Mark as settled
+                      </button>
+                    </>
+                  )}
                 </div>
 
+                {/* Mobile-only settle button row */}
+                {isMobile && (
+                  <div style={{ gridArea: 'action', display: 'flex', justifyContent: 'center' }}>
+                    <button
+                      className="ts-btn"
+                      style={{ padding: '6px 12px', fontSize: 10 }}
+                      onClick={() =>
+                        setPending({
+                          fromId: balance.from,
+                          toId: balance.to,
+                          amount: balance.amount,
+                          fromName: sender,
+                          toName: receiver,
+                        })
+                      }
+                    >
+                      Mark as settled
+                    </button>
+                  </div>
+                )}
+
                 {/* Creditor */}
-                <div style={{ textAlign: 'right' }}>
+                <div
+                  style={
+                    isMobile
+                      ? { gridArea: 'to', textAlign: 'right', minWidth: 0 }
+                      : { textAlign: 'right' }
+                  }
+                >
                   <div className="ts-label">To · creditor</div>
                   <div
                     style={{
                       fontFamily: 'var(--font-display)',
-                      fontSize: 22,
+                      fontSize: isMobile ? 17 : 22,
                       fontWeight: 500,
                       marginTop: 2,
                       color: 'var(--ledger)',
+                      overflowWrap: 'anywhere',
                     }}
                   >
                     {receiver}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { Cropmarks, Perf, RouteLine, Stamp } from '../Components/Design/Atoms';
 
 const SERIAL = (() => {
@@ -39,14 +40,17 @@ const FEATURES: { kind: string; title: string; body: string }[] = [
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <div
       style={{
         minHeight: '100vh',
         position: 'relative',
-        paddingTop: 56,
-        paddingBottom: 96,
+        paddingTop: isMobile ? 32 : 56,
+        paddingBottom: isMobile ? 56 : 96,
+        overflowX: 'hidden',
       }}
     >
       {/* Top printed header — control number, ledger code */}
@@ -54,7 +58,7 @@ const Home: React.FC = () => {
         style={{
           maxWidth: 1180,
           margin: '0 auto',
-          padding: '0 32px',
+          padding: isMobile ? '0 18px' : '0 32px',
           display: 'flex',
           justifyContent: 'space-between',
           gap: 16,
@@ -66,12 +70,15 @@ const Home: React.FC = () => {
       </div>
 
       {/* Hero block — paper sheet with cropmarks */}
-      <div style={{ maxWidth: 1180, margin: '36px auto 0', padding: '0 32px' }}>
+      <div style={{ maxWidth: 1180, margin: '24px auto 0', padding: isMobile ? '0 18px' : '0 32px' }}>
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
-          style={{ position: 'relative', padding: '64px 32px 80px' }}
+          style={{
+            position: 'relative',
+            padding: isMobile ? '40px 4px 40px' : '64px 32px 80px',
+          }}
         >
           <Cropmarks inset={-6} />
 
@@ -108,8 +115,8 @@ const Home: React.FC = () => {
           <div
             style={{
               position: 'absolute',
-              right: 'clamp(20px, 6vw, 80px)',
-              top: 30,
+              right: isMobile ? 8 : 'clamp(20px, 6vw, 80px)',
+              top: isMobile ? 12 : 30,
               pointerEvents: 'none',
             }}
           >
@@ -117,7 +124,7 @@ const Home: React.FC = () => {
               text="Cleared"
               date="MMXXVI·V"
               tone="stamp"
-              size={120}
+              size={isMobile ? 72 : 120}
               rotate={-9}
             />
           </div>
@@ -125,10 +132,10 @@ const Home: React.FC = () => {
           {/* Subhead + route */}
           <div
             style={{
-              marginTop: 44,
+              marginTop: isMobile ? 32 : 44,
               display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1fr) auto',
-              gap: 24,
+              gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1fr) auto',
+              gap: isMobile ? 20 : 24,
               alignItems: 'end',
             }}
           >
@@ -150,9 +157,9 @@ const Home: React.FC = () => {
             <div
               style={{
                 display: 'flex',
-                gap: 12,
+                gap: 10,
                 flexWrap: 'wrap',
-                justifyContent: 'flex-end',
+                justifyContent: isMobile ? 'flex-start' : 'flex-end',
               }}
             >
               <button
@@ -180,26 +187,46 @@ const Home: React.FC = () => {
           </div>
 
           {/* Origin / destination boarding-pass strip */}
-          <div
-            style={{
-              marginTop: 8,
-              display: 'grid',
-              gridTemplateColumns: '1fr auto 1fr auto 1fr',
-              alignItems: 'center',
-              gap: 16,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 12,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              color: 'var(--ink-faded)',
-            }}
-          >
-            <div>From&nbsp;·&nbsp;HOME</div>
-            <Perf style={{ width: 24 }} />
-            <div style={{ textAlign: 'center' }}>Via&nbsp;·&nbsp;THE ROAD</div>
-            <Perf style={{ width: 24 }} />
-            <div style={{ textAlign: 'right' }}>To&nbsp;·&nbsp;A FAIR SPLIT</div>
-          </div>
+          {isMobile ? (
+            <div
+              style={{
+                marginTop: 8,
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: 10,
+                fontFamily: 'var(--font-mono)',
+                fontSize: 10,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'var(--ink-faded)',
+              }}
+            >
+              <div>HOME</div>
+              <div>THE ROAD</div>
+              <div>A FAIR SPLIT</div>
+            </div>
+          ) : (
+            <div
+              style={{
+                marginTop: 8,
+                display: 'grid',
+                gridTemplateColumns: '1fr auto 1fr auto 1fr',
+                alignItems: 'center',
+                gap: 16,
+                fontFamily: 'var(--font-mono)',
+                fontSize: 12,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                color: 'var(--ink-faded)',
+              }}
+            >
+              <div>From&nbsp;·&nbsp;HOME</div>
+              <Perf style={{ width: 24 }} />
+              <div style={{ textAlign: 'center' }}>Via&nbsp;·&nbsp;THE ROAD</div>
+              <Perf style={{ width: 24 }} />
+              <div style={{ textAlign: 'right' }}>To&nbsp;·&nbsp;A FAIR SPLIT</div>
+            </div>
+          )}
         </motion.div>
       </div>
 
@@ -207,8 +234,8 @@ const Home: React.FC = () => {
       <div
         style={{
           maxWidth: 1180,
-          margin: '72px auto 0',
-          padding: '0 32px',
+          margin: isMobile ? '40px auto 0' : '72px auto 0',
+          padding: isMobile ? '0 18px' : '0 32px',
         }}
       >
         <div
@@ -278,12 +305,12 @@ const Home: React.FC = () => {
       <div
         style={{
           maxWidth: 1180,
-          margin: '64px auto 0',
-          padding: '0 32px',
+          margin: isMobile ? '32px auto 0' : '64px auto 0',
+          padding: isMobile ? '0 18px' : '0 32px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: 16,
+          gap: 12,
           flexWrap: 'wrap',
         }}
       >

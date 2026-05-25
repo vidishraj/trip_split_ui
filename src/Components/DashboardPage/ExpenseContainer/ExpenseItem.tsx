@@ -1,5 +1,6 @@
 // ExpenseItem.tsx — Ledger row
 import React, { useState } from 'react';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { useTravel } from '../../../Contexts/TravelContext';
 import { useMessage } from '../../../Contexts/NotifContext';
 import ConfirmationDialog from '../../ConfirmationDialog';
@@ -13,6 +14,8 @@ interface ExpenseProps {
 const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
   const travelCtx = useTravel();
   const { setPayload } = useMessage();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [confirmDialog, setConfirmDialog] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -50,10 +53,10 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
         onClick={() => setOpen((v) => !v)}
         style={{
           display: 'grid',
-          gridTemplateColumns: '92px 1fr auto',
-          gap: 18,
+          gridTemplateColumns: isMobile ? '64px 1fr auto' : '92px 1fr auto',
+          gap: isMobile ? 12 : 18,
           alignItems: 'baseline',
-          padding: '14px 16px',
+          padding: isMobile ? '12px 12px' : '14px 16px',
           borderBottom: '1px dashed var(--rule-soft)',
           cursor: 'pointer',
           background: open ? 'var(--paper-deep)' : 'transparent',
@@ -67,21 +70,23 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
         }}
       >
         <div>
-          <div
-            className="ts-mono"
-            style={{
-              fontSize: 12,
-              color: 'var(--ink-faded)',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {dayOfWeek}
-          </div>
+          {!isMobile && (
+            <div
+              className="ts-mono"
+              style={{
+                fontSize: 12,
+                color: 'var(--ink-faded)',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+              }}
+            >
+              {dayOfWeek}
+            </div>
+          )}
           <div
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 22,
+              fontSize: isMobile ? 16 : 22,
               lineHeight: 1,
               marginTop: 2,
               fontVariationSettings: '"SOFT" 30, "opsz" 144',
@@ -91,14 +96,15 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
           </div>
         </div>
 
-        <div>
+        <div style={{ minWidth: 0 }}>
           <div
             style={{
               fontFamily: 'var(--font-display)',
               fontWeight: 500,
-              fontSize: 19,
+              fontSize: isMobile ? 16 : 19,
               lineHeight: 1.2,
               fontVariationSettings: '"SOFT" 30, "opsz" 144',
+              overflowWrap: 'anywhere',
             }}
           >
             {expense.expenseDesc}
@@ -106,7 +112,7 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
               <span
                 className="ts-mono"
                 style={{
-                  marginLeft: 10,
+                  marginLeft: 8,
                   fontSize: 9,
                   padding: '2px 6px',
                   color: 'var(--gold)',
@@ -114,26 +120,27 @@ const ExpenseItem: React.FC<ExpenseProps> = ({ expense }) => {
                   letterSpacing: '0.18em',
                   textTransform: 'uppercase',
                   verticalAlign: 'middle',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 Personal
               </span>
             )}
           </div>
-          <div className="ts-label" style={{ marginTop: 4 }}>
-            Paid by · {getUserName(expense.paidBy)}
+          <div className="ts-label" style={{ marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            Paid · {getUserName(expense.paidBy)}
           </div>
         </div>
 
         <div style={{ textAlign: 'right' }}>
           <div
             className="ts-num"
-            style={{ fontSize: 19, fontWeight: 600, color: 'var(--ink)' }}
+            style={{ fontSize: isMobile ? 16 : 19, fontWeight: 600, color: 'var(--ink)' }}
           >
             ₹{formatNumber(expense.amount)}
           </div>
           <div className="ts-label" style={{ marginTop: 4 }}>
-            {Object.keys(splitBetween).length} part{Object.keys(splitBetween).length === 1 ? '' : 's'} ↓
+            {Object.keys(splitBetween).length} part{Object.keys(splitBetween).length === 1 ? '' : 's'} {open ? '↑' : '↓'}
           </div>
         </div>
       </div>

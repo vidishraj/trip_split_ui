@@ -27,10 +27,9 @@ const Footer: React.FC = () => {
   return (
     <footer
       style={{
-        marginTop: 64,
-        padding: '24px 24px 32px',
+        padding: '20px 18px 28px',
         maxWidth: 1180,
-        margin: '64px auto 0',
+        margin: '48px auto 0',
         borderTop: '1px solid var(--rule-soft)',
       }}
     >

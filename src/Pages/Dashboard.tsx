@@ -69,7 +69,14 @@ const Dashboard: React.FC<ActionProps> = ({ refreshData }) => {
   const expenseCount = (travelCtx.state.expenses || []).length;
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '28px 18px 80px', position: 'relative' }}>
+    <div
+      style={{
+        maxWidth: 1200,
+        margin: '0 auto',
+        padding: isMobile ? '18px 12px 90px' : '28px 18px 80px',
+        position: 'relative',
+      }}
+    >
       {/* Trip banner */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}

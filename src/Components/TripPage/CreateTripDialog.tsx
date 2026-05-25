@@ -60,7 +60,7 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
       maxWidth="sm"
       PaperProps={{ sx: { background: 'transparent', boxShadow: 'none', overflow: 'visible' } }}
     >
-      <div className="ts-paper" style={{ padding: '32px 32px 28px', position: 'relative' }}>
+      <div className="ts-paper" style={{ padding: '24px 22px 22px', position: 'relative' }}>
         <div
           style={{
             display: 'flex',
@@ -71,13 +71,13 @@ export const CreateTripDialog: React.FC<CreateTripDialogProps> = ({
             marginBottom: 22,
           }}
         >
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div className="ts-eyebrow">Booking · New itinerary</div>
             <h2
               className="ts-display"
               style={{
                 margin: '6px 0 0',
-                fontSize: 30,
+                fontSize: 'clamp(22px, 6vw, 30px)',
                 fontVariationSettings: '"SOFT" 30, "opsz" 144',
               }}
             >

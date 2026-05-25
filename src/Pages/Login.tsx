@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { auth } from '../Api/FirebaseConfig';
 import { useUser } from '../Contexts/GlobalContext';
 import { useAuth } from '../Contexts/AuthContext';
@@ -19,6 +20,8 @@ const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { currentUser } = useAuth();
   const notif = useMessage();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const serial = useMemo(
     () => Math.random().toString(36).slice(2, 10).toUpperCase(),
     [],
@@ -71,7 +74,10 @@ const Login: React.FC = () => {
 
         <div
           className="ts-paper"
-          style={{ padding: '40px 36px 36px', position: 'relative' }}
+          style={{
+            padding: isMobile ? '28px 22px 24px' : '40px 36px 36px',
+            position: 'relative',
+          }}
         >
           {/* Header band */}
           <div
@@ -89,7 +95,7 @@ const Login: React.FC = () => {
               <h1
                 className="ts-display"
                 style={{
-                  fontSize: 42,
+                  fontSize: isMobile ? 32 : 42,
                   margin: '6px 0 0',
                   fontVariationSettings: '"SOFT" 30, "opsz" 144',
                 }}
@@ -111,8 +117,8 @@ const Login: React.FC = () => {
               display: 'grid',
               gridTemplateColumns: '1fr auto',
               alignItems: 'center',
-              gap: 18,
-              marginBottom: 28,
+              gap: 14,
+              marginBottom: isMobile ? 20 : 28,
             }}
           >
             <div>
@@ -120,7 +126,7 @@ const Login: React.FC = () => {
               <div
                 style={{
                   fontFamily: 'var(--font-mono)',
-                  fontSize: 16,
+                  fontSize: isMobile ? 14 : 16,
                   color: 'var(--ink-faded)',
                   marginTop: 4,
                 }}
@@ -132,7 +138,7 @@ const Login: React.FC = () => {
               text="Auth"
               date="ENTRY"
               tone="ledger"
-              size={84}
+              size={isMobile ? 62 : 84}
               rotate={6}
             />
           </div>
@@ -170,16 +176,20 @@ const Login: React.FC = () => {
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: 12,
+                alignItems: 'stretch',
+                gap: 10,
                 flexWrap: 'wrap',
+                flexDirection: isMobile ? 'column' : 'row',
               }}
             >
               <button
                 type="submit"
                 className="ts-btn ts-btn-ink"
                 disabled={loading}
-                style={{ minWidth: 180 }}
+                style={{
+                  minWidth: 180,
+                  justifyContent: isMobile ? 'center' : undefined,
+                }}
               >
                 {loading ? 'Stamping…' : 'Admit me ↗'}
               </button>
@@ -187,6 +197,7 @@ const Login: React.FC = () => {
                 type="button"
                 className="ts-btn ts-btn-stamp"
                 onClick={() => setOpenSignup(true)}
+                style={{ justifyContent: isMobile ? 'center' : undefined }}
               >
                 Register a new bearer
               </button>

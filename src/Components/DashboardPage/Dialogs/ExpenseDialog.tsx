@@ -199,7 +199,13 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({ onClose, editMode, editDa
       maxWidth="sm"
       PaperProps={{ sx: { background: 'transparent', boxShadow: 'none', overflow: 'visible' } }}
     >
-      <div className="ts-paper" style={{ padding: '24px 26px', position: 'relative' }}>
+      <div
+        className="ts-paper"
+        style={{
+          padding: isMobile ? '20px 18px' : '24px 26px',
+          position: 'relative',
+        }}
+      >
         <DialogContent sx={{ padding: 0 }}>
           <div
             style={{
@@ -216,7 +222,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({ onClose, editMode, editDa
                 className="ts-display"
                 style={{
                   margin: '6px 0 0',
-                  fontSize: 28,
+                  fontSize: isMobile ? 22 : 28,
                   fontVariationSettings: '"SOFT" 30, "opsz" 144',
                 }}
               >
@@ -237,7 +243,15 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({ onClose, editMode, editDa
               >
                 <Calculate fontSize="small" />
               </IconButton>
-              <Stamp text="Entry" date="·" tone={editMode ? 'gold' : 'ledger'} size={60} rotate={editMode ? 7 : -8} />
+              {!isMobile && (
+                <Stamp
+                  text="Entry"
+                  date="·"
+                  tone={editMode ? 'gold' : 'ledger'}
+                  size={60}
+                  rotate={editMode ? 7 : -8}
+                />
+              )}
             </div>
           </div>
 
