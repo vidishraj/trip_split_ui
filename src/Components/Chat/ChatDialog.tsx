@@ -1,15 +1,25 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dialog, Slide, useMediaQuery, useTheme } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { ChatImage, chatWithAgent, invalidateAll } from '../../Api/Api';
+import {
+  ChatImage,
+  chatWithAgent,
+  fetchChatHistory,
+  invalidateAll,
+} from '../../Api/Api';
 import { useTravel } from '../../Contexts/TravelContext';
 import { useMessage } from '../../Contexts/NotifContext';
+import { useUser } from '../../Contexts/GlobalContext';
 import { Perf, Stamp } from '../Design/Atoms';
 
 interface ChatMessage {
+  /** server id (real persisted) or a temporary client id for optimistic rows */
+  id: string;
   role: 'user' | 'assistant';
   content: string;
   imageCount?: number;
+  userName?: string | null;
+  pending?: boolean;
 }
 
 interface ChatDialogProps {
@@ -42,7 +52,6 @@ const fileToBase64 = (file: File): Promise<string> =>
     reader.onerror = () => reject(reader.error);
     reader.onload = () => {
       const r = String(reader.result || '');
-      // strip "data:image/...;base64," prefix
       const i = r.indexOf(',');
       resolve(i >= 0 ? r.slice(i + 1) : r);
     };
@@ -54,18 +63,46 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const travelCtx = useTravel();
   const { setPayload } = useMessage();
+  const { user } = useUser();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const [attached, setAttached] = useState<AttachedImage[]>([]);
   const listRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Load saved transcript whenever the dialog opens (or the chosen trip changes).
+  useEffect(() => {
+    if (!open) return;
+    const tripId = travelCtx.state.chosenTrip?.tripIdShared;
+    if (!tripId) return;
+    setLoadingHistory(true);
+    fetchChatHistory(tripId)
+      .then((res) => {
+        const rows: any[] = res.data?.Message ?? [];
+        setMessages(
+          rows.map((r) => ({
+            id: String(r.id),
+            role: r.role,
+            content: r.content,
+            imageCount: r.imageCount || 0,
+            userName: r.userName,
+          })),
+        );
+      })
+      .catch(() => {
+        // Non-fatal: surface a soft warning and start with empty state.
+        setPayload({ type: 'warning', message: 'Could not load chat history.' });
+      })
+      .finally(() => setLoadingHistory(false));
+  }, [open, travelCtx.state.chosenTrip?.tripIdShared, setPayload]);
+
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
-  }, [messages, busy]);
+  }, [messages, busy, loadingHistory]);
 
-  // Revoke object URLs on unmount to avoid leaks.
+  // Revoke any pending object URLs on unmount.
   useEffect(
     () => () => {
       attached.forEach((img) => URL.revokeObjectURL(img.previewUrl));
@@ -77,7 +114,6 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
   const addFiles = useCallback(
     async (files: File[]) => {
       if (!files.length) return;
-      // Filter to image types we can send.
       const usable = files.filter((f) => ACCEPTED_TYPES.includes(f.type));
       if (!usable.length) {
         setPayload({ type: 'warning', message: 'Only PNG/JPEG/WebP/GIF images.' });
@@ -119,6 +155,18 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
     });
   };
 
+  // Resolve the current user's display name to show on optimistic rows —
+  // match the firebase email against the trip's member roster, fall back
+  // to display name or "You".
+  const currentSenderName = (() => {
+    const email = user?.email;
+    if (email) {
+      const me = travelCtx.state.users.find((u) => u.email === email);
+      if (me) return me.userName;
+    }
+    return user?.displayName || 'You';
+  })();
+
   const send = useCallback(async () => {
     const text = input.trim();
     const tripId = travelCtx.state.chosenTrip?.tripIdShared;
@@ -128,32 +176,50 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
       data: a.data,
       media_type: a.media_type,
     }));
-    const localUserContent = text || `(${attached.length} image${attached.length === 1 ? '' : 's'} attached)`;
+    const localUserContent =
+      text || `(${attached.length} image${attached.length === 1 ? '' : 's'} attached)`;
     const imageCount = attached.length;
 
-    // Clear inputs immediately — and revoke preview URLs after they're
-    // no longer needed for the user's own bubble.
     setInput('');
     attached.forEach((a) => URL.revokeObjectURL(a.previewUrl));
     setAttached([]);
 
-    setMessages((prev) => [...prev, { role: 'user', content: localUserContent, imageCount }]);
+    const tempId = `pending-${Date.now()}`;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: tempId,
+        role: 'user',
+        content: localUserContent,
+        imageCount,
+        userName: currentSenderName,
+        pending: true,
+      },
+    ]);
     setBusy(true);
 
-    // Read the prior history right before the user turn so we don't
-    // re-send the just-pushed message to the backend (the backend
-    // expects history to be everything BEFORE this turn).
-    let priorHistory: ChatMessage[] = [];
-    setMessages((prev) => {
-      priorHistory = prev.slice(0, -1);
-      return prev;
-    });
-
     try {
-      const res = await chatWithAgent(tripId, text, priorHistory, outgoingImages);
+      const res = await chatWithAgent(tripId, text, outgoingImages);
       const payload = res.data?.Message ?? {};
       const reply: string = payload.reply || '(no reply)';
-      setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
+      const userServerId = payload.userMessageId ? String(payload.userMessageId) : tempId;
+      const assistantServerId = payload.assistantMessageId
+        ? String(payload.assistantMessageId)
+        : `asst-${Date.now()}`;
+      setMessages((prev) =>
+        prev
+          .map((m) =>
+            m.id === tempId ? { ...m, id: userServerId, pending: false } : m,
+          )
+          .concat([
+            {
+              id: assistantServerId,
+              role: 'assistant',
+              content: reply,
+              userName: null,
+            },
+          ]),
+      );
       if (payload.error) setPayload({ type: 'error', message: payload.error });
       if (Array.isArray(payload.mutations) && payload.mutations.length > 0) {
         invalidateAll();
@@ -162,12 +228,21 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
     } catch (e: any) {
       const msg =
         e?.response?.data?.Error || e?.message || 'Could not reach the clerk.';
-      setMessages((prev) => [...prev, { role: 'assistant', content: `Error: ${msg}` }]);
+      setMessages((prev) =>
+        prev.concat([
+          {
+            id: `err-${Date.now()}`,
+            role: 'assistant',
+            content: `Error: ${msg}`,
+            userName: null,
+          },
+        ]),
+      );
       setPayload({ type: 'error', message: msg });
     } finally {
       setBusy(false);
     }
-  }, [input, attached, busy, travelCtx, setPayload]);
+  }, [input, attached, busy, travelCtx, setPayload, currentSenderName]);
 
   const onKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.nativeEvent.isComposing) return;
@@ -194,7 +269,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
   const onPickFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     addFiles(files);
-    if (e.target) e.target.value = ''; // reset so picking the same file again still fires onChange
+    if (e.target) e.target.value = '';
   };
 
   return (
@@ -251,7 +326,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
             }}
           >
             <span style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 600, letterSpacing: 0 }}>✦</span>
-            Telegraph desk
+            Trip telegraph
           </div>
           <button
             className="ts-mono"
@@ -287,7 +362,13 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
               'repeating-linear-gradient(to bottom, transparent 0, transparent 30px, rgba(20,17,13,0.06) 31px)',
           }}
         >
-          {messages.length === 0 && (
+          {loadingHistory && (
+            <div className="ts-mono" style={{ fontSize: 11, letterSpacing: '0.2em', color: 'var(--ink-faded)' }}>
+              ··· loading transcript ···
+            </div>
+          )}
+
+          {!loadingHistory && messages.length === 0 && (
             <div style={{ textAlign: 'center', marginTop: 28 }}>
               <Stamp text="OPERATOR" date="READY" tone="ledger" size={94} rotate={-7} />
               <div className="ts-eyebrow" style={{ marginTop: 18 }}>Try a message</div>
@@ -312,12 +393,13 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
             </div>
           )}
 
-          {messages.map((m, i) => (
+          {messages.map((m) => (
             <div
-              key={i}
+              key={m.id}
               style={{
                 alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
                 maxWidth: '88%',
+                opacity: m.pending ? 0.7 : 1,
               }}
             >
               <div
@@ -331,8 +413,11 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ open, onClose }) => {
                   textAlign: m.role === 'user' ? 'right' : 'left',
                 }}
               >
-                {m.role === 'user' ? '↑ Bearer' : '↓ Operator'}
+                {m.role === 'user'
+                  ? `↑ ${m.userName || 'Bearer'}`
+                  : '↓ Operator'}
                 {m.imageCount ? ` · ${m.imageCount} image${m.imageCount === 1 ? '' : 's'}` : ''}
+                {m.pending ? ' · sending…' : ''}
               </div>
               <div
                 style={{

@@ -215,8 +215,13 @@ export interface ChatImage {
 export async function chatWithAgent(
   tripId: string,
   message: string,
-  history: Array<{ role: 'user' | 'assistant'; content: string }>,
   images?: ChatImage[],
 ): Promise<any> {
-  return axios.post('/chat', { tripId, message, history, images: images ?? [] });
+  // History is no longer sent — the server reads the trip's saved
+  // transcript from the DB.
+  return axios.post('/chat', { tripId, message, images: images ?? [] });
+}
+
+export async function fetchChatHistory(tripId: string): Promise<any> {
+  return axios.get('/getChatHistory', { params: { trip: tripId }, cache: false });
 }
